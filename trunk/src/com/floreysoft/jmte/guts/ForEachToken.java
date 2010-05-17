@@ -8,6 +8,9 @@ public class ForEachToken implements Token {
 	private String separator;
 	private int scanIndex;
 	private int offset;
+	private boolean last;
+	private boolean first;
+	private int index;
 
 	public ForEachToken(String varName, Iterable<Object> iterable) {
 		this.varName = varName;
@@ -44,6 +47,30 @@ public class ForEachToken implements Token {
 
 	public int getOffset() {
 		return offset;
+	}
+
+	public void setLast(boolean last) {
+		this.last = last;
+	}
+
+	public boolean isLast() {
+		return last;
+	}
+
+	public void setFirst(boolean first) {
+		this.first = first;
+	}
+
+	public boolean isFirst() {
+		return first;
+	}
+
+	public void setIndex(int index) {
+		this.index = index;
+	}
+
+	public int getIndex() {
+		return index;
 	}
 
 }

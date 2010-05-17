@@ -28,20 +28,26 @@ import com.floreysoft.jmte.guts.StringToken;
 import com.floreysoft.jmte.guts.Token;
 
 /**
- * <p>The template engine.</p>
+ * <p>
+ * The template engine.
+ * </p>
  * 
  * 
  * 
- *  <p>Usually this is the only class you need calling
- * {@link #transform(String, Map)}. Like this</p>
+ * <p>
+ * Usually this is the only class you need calling
+ * {@link #transform(String, Map)}. Like this
+ * </p>
  * 
  * <pre>
  * Engine engine = new Engine();
  * String transformed = engine.transform(input, model);
  * </pre>
  * 
- * <p>You have to provide the template input written in the template language and a
- * model from String to Object. Maybe like this</p>
+ * <p>
+ * You have to provide the template input written in the template language and a
+ * model from String to Object. Maybe like this
+ * </p>
  * 
  * <pre>
  * String input = &quot;${name}&quot;;
@@ -65,7 +71,8 @@ import com.floreysoft.jmte.guts.Token;
  * {name} or &lt;name> or whatever you like
  * <li><em>flexible</em> - feed in templates as String, Reader, File or
  * InputStream - you can also use it as a stand alone tool and feed the model in
- * a property file - or use it as a replacement for {@link String.format} passing in <code>Object...</code> as model
+ * a property file - or use it as a replacement for {@link String.format}
+ * passing in <code>Object...</code> as model
  * <li><em>small</em> - barely 1000 lines of code and no dependencies
  * <li><em>simply to learn</em> - it takes less than 5 minutes to learn
  * <li><em>simply to deploy</em> - no external dependencies and runs almost in
@@ -79,7 +86,10 @@ import com.floreysoft.jmte.guts.Token;
  * escaping of special characters, making it even faster)
  * </ul>
  * 
- * <p>For a set of expressions and matching result have a look at the {@link EngineTest test cases}.</p>
+ * <p>
+ * For a set of expressions and matching result have a look at the
+ * {@link EngineTest test cases}.
+ * </p>
  * 
  * @see EngineTest
  * @see Lexer
@@ -87,6 +97,10 @@ import com.floreysoft.jmte.guts.Token;
  * @see Tool
  */
 public final class Engine {
+	private static final String ODD = "odd_";
+	private static final String EVEN = "even_";
+	private static final String LAST = "last_";
+	private static final String FIRST = "first_";
 	private static final String EVIL_HACKY_DOUBLE_BACKSLASH_PLACEHOLDER = "EVIL_HACKY_DOUBLE_BACKSLASH_PLACEHOLDER";
 
 	static class StartEndPair {
@@ -174,6 +188,7 @@ public final class Engine {
 	private Lexer lexer;
 	private LinkedList<Token> scopes = new LinkedList<Token>();
 	private ErrorHandler errorHandler;
+	private Set<String> panicModelCleanupSet;
 
 	public Engine() {
 		this("${", "}", 1.2);
@@ -210,10 +225,7 @@ public final class Engine {
 
 	String transformPure(String input, List<StartEndPair> scan,
 			Map<String, Object> model) {
-		// XXX contains temporary variables added to model in loops which have
-		// to be
-		// cleared when parser terminates uncontrolled with exception
-		Set<String> panicModelCleanupList = new HashSet<String>();
+		panicModelCleanupSet = new HashSet<String>();
 
 		try {
 			char[] inputChars = input.toCharArray();
@@ -259,9 +271,13 @@ public final class Engine {
 					} else {
 						Object value = feToken.iterator().next();
 						model.put(feToken.getVarName(), value);
-						panicModelCleanupList.add(feToken.getVarName());
+						panicModelCleanupSet.add(feToken.getVarName());
 						feToken.setScanIndex(i);
 						feToken.setOffset(offset);
+						feToken.setFirst(true);
+						feToken.setIndex(0);
+						feToken.setLast(!feToken.iterator().hasNext());
+						addSpecialVariables(feToken, model);
 					}
 					push(token);
 				} else if (token instanceof IfToken) {
@@ -282,7 +298,7 @@ public final class Engine {
 						if (feToken.iterator().hasNext()) {
 							Object value = feToken.iterator().next();
 							model.put(feToken.getVarName(), value);
-							panicModelCleanupList.add(feToken.getVarName());
+							panicModelCleanupSet.add(feToken.getVarName());
 							i = feToken.getScanIndex();
 							offset = feToken.getOffset();
 							startEndPair = scan.get(i);
@@ -290,9 +306,14 @@ public final class Engine {
 							if (!skipMode && feToken.getSeparator() != null) {
 								output.append(feToken.getSeparator());
 							}
+							feToken.setFirst(false);
+							feToken.setLast(!feToken.iterator().hasNext());
+							feToken.setIndex(feToken.getIndex()+1);
+							addSpecialVariables(feToken, model);
 						} else {
+							removeSpecialVariables(feToken, model);
 							model.remove(feToken.getVarName());
-							panicModelCleanupList.remove(feToken.getVarName());
+							panicModelCleanupSet.remove(feToken.getVarName());
 						}
 					}
 				}
@@ -305,10 +326,36 @@ public final class Engine {
 			output.append(inputChars, offset, remainingChars);
 			return output.toString();
 		} finally {
-			for (String varName : panicModelCleanupList) {
+			for (String varName : panicModelCleanupSet) {
 				model.remove(varName);
 			}
 		}
+	}
+
+	private void addSpecialVariables(ForEachToken feToken,
+			Map<String, Object> model) {
+		String suffix = feToken.getVarName();
+		model.put(FIRST+suffix, feToken.isFirst());
+		model.put(LAST+suffix, feToken.isLast());
+		model.put(EVEN+suffix, feToken.getIndex() % 2 == 0);
+		model.put(ODD+suffix, feToken.getIndex() % 2 == 1);
+		panicModelCleanupSet.add(FIRST+suffix);
+		panicModelCleanupSet.add(LAST+suffix);
+		panicModelCleanupSet.add(EVEN+suffix);
+		panicModelCleanupSet.add(ODD+suffix);
+	}
+
+	private void removeSpecialVariables(ForEachToken feToken,
+			Map<String, Object> model) {
+		String suffix = feToken.getVarName();
+		model.remove(FIRST+suffix);
+		model.remove(LAST+suffix);
+		model.remove(EVEN+suffix);
+		model.remove(ODD+suffix);
+		panicModelCleanupSet.remove(FIRST+suffix);
+		panicModelCleanupSet.remove(LAST+suffix);
+		panicModelCleanupSet.remove(EVEN+suffix);
+		panicModelCleanupSet.remove(ODD+suffix);
 	}
 
 	private void push(Token token) {

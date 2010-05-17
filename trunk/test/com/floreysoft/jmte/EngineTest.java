@@ -264,6 +264,13 @@ public final class EngineTest {
 	}
 
 	@Test
+	public void ifNotExpression() throws Exception {
+		String output = engine.transform(
+				"${if !hugo}${address}${else}NIX${end}", DEFAULT_MODEL);
+		assertEquals(DEFAULT_MODEL.get("address"), output);
+	}
+
+	@Test
 	public void ifNullFalseExpression() throws Exception {
 		String output = engine.transform(
 				"${if hugo}${address}${else}NIX${end}", DEFAULT_MODEL);
@@ -355,6 +362,14 @@ public final class EngineTest {
 		String output = engine.transform("${foreach list item}${item}\n${end}",
 				DEFAULT_MODEL);
 		assertEquals("1.1, 1.2\n" + "2.1, 2.2\n", output);
+		assertNull(DEFAULT_MODEL.get("item"));
+	}
+
+	@Test
+	public void specialForeachVariables() throws Exception {
+		String output = engine.transform("${foreach list item}${item}\n${if last_item}last${end}${if first_item}first${end}${if even_item} even${end}${if odd_item} odd${end}${end}",
+				DEFAULT_MODEL);
+		assertEquals("1.1, 1.2\nfirst even" + "2.1, 2.2\nlast odd", output);
 		assertNull(DEFAULT_MODEL.get("item"));
 	}
 
