@@ -1,0 +1,167 @@
+<?xml version="1.0"?>
+<project name="jmte" default="all" basedir=".">
+
+  <!-- 
+  ===================================================================
+  Set build properties
+  =================================================================== 
+  -->
+
+  <property file="${basedir}/build.properties"/>
+
+  <property name="name" value="jmte" />
+  <property name="creator" value="floreysoft GmbH"/>
+  <property name="final.name" value="${name}-${version}"/>
+  <property name="dist.name" value="${name}-${version}-full.zip"/>
+  <property name="jar.name" value="${final.name}.jar"/>
+  <property name="main-class" value="com.floreysoft.jmte.Tool" />
+
+  <tstamp>
+	<format property="TODAY.DATE" pattern="yyyy-MM-dd" locale="us" />
+	<format property="TODAY.TIME" pattern="HH:mm:ss" locale="us" />
+  </tstamp>
+
+  <property name="today" value="${TODAY.DATE} ${TODAY.TIME}" />
+
+	<!-- 
+  ===================================================================
+  Set the properties related to the source tree
+  =================================================================== 
+  -->
+
+  <property name="src.dir" value="${basedir}/src"/>
+  <property name="java.dir" value="${src.dir}"/>
+  <property name="test.dir" value="${basedir}/test"/>
+  <property name="example.dir" value="${basedir}/example"/>
+	
+  <!-- 
+  ===================================================================
+  Set the properties for the build area
+  =================================================================== 
+  -->
+  	<property name="build.dir" value="${basedir}/bin"/>
+  	<property name="lib.dir" value="${basedir}/lib"/>
+	<property name="manifest.file.name" value="MANIFST.MF"/>
+ 	<property name="dist.dir" value="${basedir}/dist"/>
+ 	<property name="tmp.dir" value="${build.dir}/tmp"/>
+ 	<property name="doc.dir" value="${basedir}/doc"/>
+ 	<property name="api.dir" value="${doc.dir}/api"/>
+
+	  <path id="classpath">
+	    <pathelement location="${build.dir}" />
+	    <fileset dir="${lib.dir}" includes="junit.jar"/>
+	  </path>
+
+  <!-- 
+  ===================================================================
+  Prepare the build              
+  =================================================================== 
+  -->
+
+  <target name="prepare">
+    <tstamp />
+    <mkdir dir="${build.dir}"/>
+    <mkdir dir="${dist.dir}"/>
+  </target>
+
+  <!-- 
+  ===================================================================
+  Build the code           
+  =================================================================== 
+  -->
+
+  <target name="build" depends="prepare" description="Compiles the main classes">
+    <javac destdir="${build.dir}"
+      source="${compile.source}"
+      target="${compile.target}"
+      debug="${compile.debug}"
+      deprecation="${compile.deprecation}"
+      optimize="${compile.optimize}" >
+	      <src path="${src.dir}" />
+          <src path="${test.dir}"/>
+	      <classpath refid="classpath" />
+    </javac>
+  	<copy todir="${build.dir}" >
+  		<fileset dir="${src.dir}" includes="**/*.properties" />
+    </copy>
+  </target>
+	
+<!-- 
+  ===================================================================
+  Archive the code           
+  =================================================================== 
+  -->	
+<target name="archive-jars" depends="build" description="Builds the exectutable jar-archives">
+	<jar destfile="${dist.dir}/${jar.name}" filesetmanifest="skip">
+		<manifest>
+			<attribute name="Built-By" value="${creator}"/>
+			<attribute name="Main-Class" value="${main-class}"/>
+			<attribute name="Class-Path" value="."/>
+			<attribute name="Version" value="${version}"/>
+			<attribute name="Build-Date" value="${today}"/>
+		</manifest>
+		<fileset dir="${build.dir}" excludes="**/*Test*.class,tmp/**"/>
+	</jar>
+</target>
+  
+  <!--
+  ===================================================================
+  Distribute the code
+  ===================================================================
+  -->
+
+  <target name="release" depends="all,test" />	
+	
+  <target name="all" depends="full-dist" description="Creates all distributions">
+  </target>
+	
+  <target name="full-dist" depends="clean,build,test,javadoc,archive-jars" description="Source distribution">
+ 	<zip destfile="${dist.dir}/${dist.name}" >
+ 	  <zipfileset dir="${example.dir}" prefix="${final.name}/example"/>
+ 	  <zipfileset dir="${test.dir}" prefix="${final.name}/test"/>
+      <zipfileset dir="${src.dir}" prefix="${final.name}/src"/>
+ 	  <zipfileset dir="${doc.dir}" prefix="${final.name}/doc" />
+ 	  <zipfileset dir="${dist.dir}" includes="${jar.name}" prefix="${final.name}"/>
+ 	  <zipfileset dir="${basedir}" includes="Releasenotes.txt" prefix="${final.name}"/>
+    </zip>
+  </target>
+		
+  <target name="javadoc" depends="build" description="Generates the public API">
+	 <javadoc
+	           destdir="${api.dir}"
+	           author="true"
+	           version="true"
+	           use="true"
+	           windowtitle="Java Minimal Template Enginge - Public API">
+
+	    <packageset dir="src" defaultexcludes="yes">
+	    </packageset>
+
+	  </javadoc>
+    </target>
+	
+  <!--
+  ===================================================================
+  Cleans up build directories
+  ===================================================================
+  -->
+  <target name="clean" description="Removes temporaray files">
+  	<delete dir="${build.dir}" />
+  </target> 
+
+  <!-- 
+  ===================================================================
+  Do JUnit tests
+  =================================================================== 
+  -->
+  
+  <target name="test" depends="build"  description="Exectutes JUnit tests">
+    <mkdir dir="${tmp.dir}"/>
+    <junit printsummary="yes" haltonfailure="yes">
+      <classpath refid="classpath" />
+      <formatter type="plain" />
+      <test name="com.floreysoft.jmte.EngineTest" haltonfailure="yes" todir="${tmp.dir}"/>
+     </junit>
+  </target>
+
+</project>
