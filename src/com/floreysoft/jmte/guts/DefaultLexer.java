@@ -88,8 +88,14 @@ public class DefaultLexer implements Lexer {
 
 				if (cmd == Keyword.IF) {
 					boolean condition;
+					boolean negate = false;
 					if (!skipMode) {
 						String objectExpression = split[1];
+						if (objectExpression.startsWith("!")) {
+							negate = true;
+							objectExpression = objectExpression.substring(1);
+
+						}
 						Object value = traverse(objectExpression, model);
 						if (value == null) {
 							condition = false;
@@ -114,6 +120,9 @@ public class DefaultLexer implements Lexer {
 						}
 					} else {
 						condition = false;
+					}
+					if (negate) {
+						condition = !condition;
 					}
 					return new IfToken(condition);
 				} else if (cmd == Keyword.FOREACH) {
