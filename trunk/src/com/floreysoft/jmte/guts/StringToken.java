@@ -1,6 +1,6 @@
 package com.floreysoft.jmte.guts;
 
-public class StringToken implements Token {
+public class StringToken extends Token {
 	protected String value;
 
 	public StringToken(String value) {

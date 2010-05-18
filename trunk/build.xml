@@ -127,6 +127,7 @@
   </target>
 		
   <target name="javadoc" depends="build" description="Generates the public API">
+  	<delete dir="${api.dir}" />
 	 <javadoc
 	           destdir="${api.dir}"
 	           author="true"
@@ -135,8 +136,9 @@
 	           windowtitle="Java Minimal Template Enginge - Public API">
 
 	    <packageset dir="src" defaultexcludes="yes">
+	    	<exclude name="**/guts/**"/>
 	    </packageset>
-
+	 	<link href="http://java.sun.com/javase/6/docs/api/"/>
 	  </javadoc>
     </target>
 	

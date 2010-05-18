@@ -2,7 +2,7 @@ package com.floreysoft.jmte.guts;
 
 import java.util.Iterator;
 
-public class ForEachToken implements Token {
+public class ForEachToken extends Token {
 	private final String varName;
 	private final Iterator<Object> iterator;
 	private String separator;

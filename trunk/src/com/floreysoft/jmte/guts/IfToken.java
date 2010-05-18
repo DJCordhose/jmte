@@ -1,6 +1,6 @@
 package com.floreysoft.jmte.guts;
 
-public class IfToken implements Token {
+public class IfToken extends Token {
 
 	private boolean condition;
 	

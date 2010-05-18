@@ -5,6 +5,8 @@
 <title>Java Minimal Template Engine</title>
 </head>
 <body>
+<h1>Java Minimal Template Engine</h1>
+<h2>Introduction</h2>
 
 <p>The Java project Minimal Template Engine is meant to fill the gap
 between simple string formatting with basic Java classes like
@@ -19,5 +21,35 @@ focused. It does not try to solve what Java can do better anyway.</p>
 <p>It has no external dependencies, can be extended and configured
 in many ways and has barely 1000 lines of code. It runs in almost all
 environments including Google App Engine.</p>
+
+
+<h2>Minimal Template Engine is</h2>
+<ul>
+	<li><em>minimal</em> - you can express everything who need in a
+	template language including if and foreach, but nothing more
+	<li><em>non-toy</em> - this is for real stuff
+	<li><em>extensible</em> - you can either extend or completely
+	replace both internal parsing and error handling
+	<li><em>configurable</em> - you do not like ${name}? Simply change
+	it to {name} or &lt;name> or whatever you like
+	<li><em>flexible</em> - feed in templates as String, Reader, File
+	or InputStream - you can also use it as a stand alone tool and feed the
+	model in a property file - or use it as a replacement for {@link
+	String.format} passing in <code>Object...</code> as model
+	<li><em>small</em> - barely 1000 lines of code and no dependencies
+	<li><em>simply to learn</em> - it takes less than 5 minutes to
+	learn
+	<li><em>simply to deploy</em> - no external dependencies and runs
+	almost in all environments (including Google App Engine)
+	<li><em>fun</em> - you have first class error messages in
+	development and robustness in production
+	<li><em>robust</em> - it is well tested by a set of JUnit tests
+	<li><em>compatible</em> - pass in <code>Map&lt;String,
+	Object></code> as model
+	<li><em>fast</em> - no time consuming parsing (you can even switch
+	off escaping of special characters, making it even faster)
+</ul>
+
+<h2>The Language</h2>
 </body>
 </html>

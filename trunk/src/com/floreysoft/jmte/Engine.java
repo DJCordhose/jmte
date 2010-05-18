@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.floreysoft.jmte.EngineTest;
 import com.floreysoft.jmte.guts.DefaultErrorHandler;
 import com.floreysoft.jmte.guts.DefaultLexer;
 import com.floreysoft.jmte.guts.ElseToken;
@@ -31,8 +30,6 @@ import com.floreysoft.jmte.guts.Token;
  * <p>
  * The template engine.
  * </p>
- * 
- * 
  * 
  * <p>
  * Usually this is the only class you need calling
@@ -59,39 +56,7 @@ import com.floreysoft.jmte.guts.Token;
  * 
  * where <code>input</code> contains the template and <code>model</code> the
  * model. <br>
- * <br>
- * Minimal Template Engine is
- * <ul>
- * <li><em>minimal</em> - you can express everything who need in a template
- * language including if and foreach, but nothing more
- * <li><em>non-toy</em> - this is for real stuff
- * <li><em>extensible</em> - you can either extend or completely replace both
- * internal parsing and error handling
- * <li><em>configurable</em> - you do not like ${name}? Simply change it to
- * {name} or &lt;name> or whatever you like
- * <li><em>flexible</em> - feed in templates as String, Reader, File or
- * InputStream - you can also use it as a stand alone tool and feed the model in
- * a property file - or use it as a replacement for {@link String.format}
- * passing in <code>Object...</code> as model
- * <li><em>small</em> - barely 1000 lines of code and no dependencies
- * <li><em>simply to learn</em> - it takes less than 5 minutes to learn
- * <li><em>simply to deploy</em> - no external dependencies and runs almost in
- * all environments (including Google App Engine)
- * <li><em>fun</em> - you have first class error messages in development and
- * robustness in production
- * <li><em>robust</em> - it is well tested by a set of JUnit tests
- * <li><em>compatible</em> - pass in <code>Map&lt;String, Object></code> as
- * model
- * <li><em>fast</em> - no time consuming parsing (you can even switch off
- * escaping of special characters, making it even faster)
- * </ul>
  * 
- * <p>
- * For a set of expressions and matching result have a look at the
- * {@link EngineTest test cases}.
- * </p>
- * 
- * @see EngineTest
  * @see Lexer
  * @see ErrorHandler
  * @see Tool
@@ -229,15 +194,12 @@ public final class Engine {
 
 		try {
 			char[] inputChars = input.toCharArray();
-			this.getErrorHandler().setInput(inputChars);
 			StringBuilder output = new StringBuilder(
 					(int) (input.length() * expansionSizeFactor));
 			int offset = 0;
 			int i = 0;
 			while (i < scan.size()) {
 				StartEndPair startEndPair = scan.get(i);
-				this.getErrorHandler().setCurrentBlockBounds(
-						startEndPair.start, startEndPair.end);
 				int length = startEndPair.start - exprStartToken.length()
 						- offset;
 				boolean skipMode = isSkipMode();
@@ -247,10 +209,8 @@ public final class Engine {
 				offset = startEndPair.end + exprEndToken.length();
 				i++;
 
-				String expr = input.substring(startEndPair.start,
-						startEndPair.end);
-				Token token = lexer.nextToken(expr, model, skipMode,
-						getErrorHandler());
+				Token token = lexer.nextToken(inputChars, startEndPair.start,
+						startEndPair.end, model, skipMode, getErrorHandler());
 				if (token instanceof StringToken) {
 					if (!skipMode) {
 						String expanded = ((StringToken) token).getValue();
@@ -264,7 +224,9 @@ public final class Engine {
 										String
 												.format(
 														"Foreach variable name '%s' already present in model",
-														feToken.getVarName()));
+														feToken.getVarName()),
+										inputChars, startEndPair.start,
+										startEndPair.end);
 					}
 					if (!feToken.iterator().hasNext()) {
 						token = new IfToken(false);
@@ -286,13 +248,16 @@ public final class Engine {
 					Token poppedToken = peek();
 					if (!(poppedToken instanceof IfToken)) {
 						getErrorHandler().error(
-								"Can't use else outside of if block");
+								"Can't use else outside of if block",
+								inputChars, startEndPair.start,
+								startEndPair.end);
 					}
 					push(token);
 				} else if (token instanceof EndToken) {
 					Token poppedToken = pop();
 					if (poppedToken == null) {
-						getErrorHandler().error("Unmatched end");
+						getErrorHandler().error("Unmatched end", inputChars,
+								startEndPair.start, startEndPair.end);
 					} else if (poppedToken instanceof ForEachToken) {
 						ForEachToken feToken = (ForEachToken) poppedToken;
 						if (feToken.iterator().hasNext()) {
@@ -308,7 +273,7 @@ public final class Engine {
 							}
 							feToken.setFirst(false);
 							feToken.setLast(!feToken.iterator().hasNext());
-							feToken.setIndex(feToken.getIndex()+1);
+							feToken.setIndex(feToken.getIndex() + 1);
 							addSpecialVariables(feToken, model);
 						} else {
 							removeSpecialVariables(feToken, model);
@@ -335,27 +300,27 @@ public final class Engine {
 	private void addSpecialVariables(ForEachToken feToken,
 			Map<String, Object> model) {
 		String suffix = feToken.getVarName();
-		model.put(FIRST+suffix, feToken.isFirst());
-		model.put(LAST+suffix, feToken.isLast());
-		model.put(EVEN+suffix, feToken.getIndex() % 2 == 0);
-		model.put(ODD+suffix, feToken.getIndex() % 2 == 1);
-		panicModelCleanupSet.add(FIRST+suffix);
-		panicModelCleanupSet.add(LAST+suffix);
-		panicModelCleanupSet.add(EVEN+suffix);
-		panicModelCleanupSet.add(ODD+suffix);
+		model.put(FIRST + suffix, feToken.isFirst());
+		model.put(LAST + suffix, feToken.isLast());
+		model.put(EVEN + suffix, feToken.getIndex() % 2 == 0);
+		model.put(ODD + suffix, feToken.getIndex() % 2 == 1);
+		panicModelCleanupSet.add(FIRST + suffix);
+		panicModelCleanupSet.add(LAST + suffix);
+		panicModelCleanupSet.add(EVEN + suffix);
+		panicModelCleanupSet.add(ODD + suffix);
 	}
 
 	private void removeSpecialVariables(ForEachToken feToken,
 			Map<String, Object> model) {
 		String suffix = feToken.getVarName();
-		model.remove(FIRST+suffix);
-		model.remove(LAST+suffix);
-		model.remove(EVEN+suffix);
-		model.remove(ODD+suffix);
-		panicModelCleanupSet.remove(FIRST+suffix);
-		panicModelCleanupSet.remove(LAST+suffix);
-		panicModelCleanupSet.remove(EVEN+suffix);
-		panicModelCleanupSet.remove(ODD+suffix);
+		model.remove(FIRST + suffix);
+		model.remove(LAST + suffix);
+		model.remove(EVEN + suffix);
+		model.remove(ODD + suffix);
+		panicModelCleanupSet.remove(FIRST + suffix);
+		panicModelCleanupSet.remove(LAST + suffix);
+		panicModelCleanupSet.remove(EVEN + suffix);
+		panicModelCleanupSet.remove(ODD + suffix);
 	}
 
 	private void push(Token token) {

@@ -29,13 +29,26 @@ public class DefaultLexer implements Lexer {
 	protected ErrorHandler errorHandler;
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public Token nextToken(String input, Map<String, Object> model,
-			boolean skipMode, ErrorHandler errorHandler) {
+	public Token nextToken(char[] template, int start, int end,
+			Map<String, Object> model, boolean skipMode,
+			ErrorHandler errorHandler) {
+		String input = new String(template, start, end - start);
 		this.errorHandler = errorHandler;
 		input = Util.trimFront(input);
 		String[] split = input.split("( |\t|\r|\n)+");
 
+		Token token = innerNextToken(template, start, end, model, skipMode, errorHandler,
+				input, split);
+		token.setBuffer(template);
+		token.setStart(start);
+		token.setEnd(end);
+		return token;
+	}
+
+	@SuppressWarnings("unchecked")
+	private Token innerNextToken(char[] template, int start, int end,
+			Map<String, Object> model, boolean skipMode,
+			ErrorHandler errorHandler, String input, String[] split) {
 		if (split.length == 0) {
 			// empty expression like ${}
 			return new StringToken("");
@@ -45,42 +58,50 @@ public class DefaultLexer implements Lexer {
 			// } which might be used for silent line breaks
 			if (objectExpression.equals("")) {
 				return new StringToken("");
-			}
-			try {
-				Keyword cmd = Keyword.valueOf(objectExpression.toUpperCase());
-				if (cmd == Keyword.ELSE) {
-					return new ElseToken();
-				} else if (cmd == Keyword.END) {
-					return new EndToken();
-				}
-			} catch (IllegalArgumentException e) {
-				// XXX will be thrown when this is not a keyword, in this case
-				// simply proceed parsing it as a variable expression
-			}
-			Object value;
-			if (!skipMode) {
-				// single name expression like ${name}
-				value = traverse(objectExpression, model);
-				if (value == null) {
-					errorHandler.error(String.format("Variable '%s' undefined",
-							objectExpression));
-					// gracefully ignore in production mode
-					value = "";
-
-				} else if (value instanceof Map || value instanceof Iterable) {
-					errorHandler
-							.error(String
-									.format(
-											"Illegal expansion of map or iterable variable '%s'",
-											objectExpression));
-					// gracefully ignore in production mode
-					value = "";
-				}
 			} else {
-				value = "";
-			}
+				try {
+					Keyword cmd = Keyword.valueOf(objectExpression
+							.toUpperCase());
+					if (cmd == Keyword.ELSE) {
+						return new ElseToken();
+					} else if (cmd == Keyword.END) {
+						return new EndToken();
+					}
+				} catch (IllegalArgumentException e) {
+					// XXX will be thrown when this is not a keyword, in this
+					// case
+					// simply proceed parsing it as a variable expression
+				}
+				Object value;
+				if (!skipMode) {
+					// single name expression like ${name}
+					value = traverse(objectExpression, model, template, start,
+							end);
+					if (value == null) {
+						errorHandler.error(String.format(
+								"Variable '%s' undefined", objectExpression),
+								template, start, end);
+						// gracefully ignore in production mode
+						value = "";
 
-			return new StringToken(value.toString());
+					} else if (value instanceof Map
+							|| value instanceof Iterable) {
+						errorHandler
+								.error(
+										String
+												.format(
+														"Illegal expansion of map or iterable variable '%s'",
+														objectExpression),
+										template, start, end);
+						// gracefully ignore in production mode
+						value = "";
+					}
+				} else {
+					value = "";
+				}
+
+				return new StringToken(value.toString());
+			}
 		} else {
 			String cmdString = split[0];
 			try {
@@ -94,9 +115,9 @@ public class DefaultLexer implements Lexer {
 						if (objectExpression.startsWith("!")) {
 							negate = true;
 							objectExpression = objectExpression.substring(1);
-
 						}
-						Object value = traverse(objectExpression, model);
+						Object value = traverse(objectExpression, model,
+								template, start, end);
 						if (value == null) {
 							condition = false;
 						} else if (value instanceof Boolean) {
@@ -128,7 +149,8 @@ public class DefaultLexer implements Lexer {
 				} else if (cmd == Keyword.FOREACH) {
 					if (!skipMode) {
 						String objectExpression = split[1];
-						Object value = traverse(objectExpression, model);
+						Object value = traverse(objectExpression, model,
+								template, start, end);
 						Iterable<Object> iterable;
 						if (value == null) {
 							return new IfToken(false);
@@ -138,59 +160,65 @@ public class DefaultLexer implements Lexer {
 							iterable = ((Iterable) value);
 						} else {
 							errorHandler
-									.error(String
-											.format(
-													"Can only iterator over map or iterable on '%s'",
-													objectExpression));
+									.error(
+											String
+													.format(
+															"Can only iterator over map or iterable on '%s'",
+															objectExpression),
+											template, start, end);
 							return new IfToken(false);
 						}
-						String varName = split[2];
-						ForEachToken forEachToken = new ForEachToken(varName,
-								iterable);
+							String varName = split[2];
+							ForEachToken forEachToken = new ForEachToken(
+									varName, iterable);
 
-						// if we have more parameters, we also have separator
-						// data
-						if (split.length > 3 || split.length == 3
-								&& input.endsWith("  ")) {
-							// but as the separator itself can contain spaces
-							// and the number of spaces between the previous
-							// parts is unknown, we need to do this smarter
-							int gapCount = 0;
-							int separatorBegin = 0;
-							while (separatorBegin < input.length()) {
-								char c = input.charAt(separatorBegin);
-								separatorBegin++;
-								if (Character.isWhitespace(c)) {
-									gapCount++;
-									if (gapCount == 3) {
-										break;
-									} else {
-										while (Character.isWhitespace(c = input
-												.charAt(separatorBegin)))
-											separatorBegin++;
+							// if we have more parameters, we also have
+							// separator
+							// data
+							if (split.length > 3 || split.length == 3
+									&& input.endsWith("  ")) {
+								// but as the separator itself can contain
+								// spaces
+								// and the number of spaces between the previous
+								// parts is unknown, we need to do this smarter
+								int gapCount = 0;
+								int separatorBegin = 0;
+								while (separatorBegin < input.length()) {
+									char c = input.charAt(separatorBegin);
+									separatorBegin++;
+									if (Character.isWhitespace(c)) {
+										gapCount++;
+										if (gapCount == 3) {
+											break;
+										} else {
+											while (Character
+													.isWhitespace(c = input
+															.charAt(separatorBegin)))
+												separatorBegin++;
+										}
 									}
 								}
-							}
 
-							String separator = input.substring(separatorBegin);
-							forEachToken.setSeparator(separator);
+								String separator = input
+										.substring(separatorBegin);
+								forEachToken.setSeparator(separator);
+							}
+							return forEachToken;
 						}
-						return forEachToken;
 					} else {
 						return new IfToken(false);
-					}
 				}
-				// XXX can never happen, but here to satisfy compiler
-				return null;
 			} catch (IllegalArgumentException iae) {
-				throw new IllegalArgumentException(String.format(
-						"Command '%s' is undefined", cmdString));
+				errorHandler.error(String.format("Command '%s' is undefined",
+						cmdString), template, start, end);
 			}
-
 		}
+		// default in case anything went wrong
+		return new StringToken("");
 	}
 
-	protected Object traverse(String objectExpression, Map<String, Object> model) {
+	protected Object traverse(String objectExpression,
+			Map<String, Object> model, char[] template, int start, int end) {
 		String[] split = objectExpression.split("\\.");
 
 		String objectName = split[0];
@@ -199,35 +227,39 @@ public class DefaultLexer implements Lexer {
 		LinkedList<String> attributeNames = new LinkedList<String>(Arrays
 				.asList(split));
 		attributeNames.remove(0);
-		value = traverse(value, attributeNames);
+		value = traverse(value, attributeNames, template, start, end);
 		return value;
 	}
 
-	protected Object traverse(Object o, LinkedList<String> attributeNames) {
+	protected Object traverse(Object o, LinkedList<String> attributeNames,
+			char[] template, int start, int end) {
 		Object result;
 		if (attributeNames.isEmpty()) {
 			result = o;
 		} else {
 			if (o == null) {
 				errorHandler
-						.error(String
-								.format("You can not make property calls on null values"));
+						.error(
+								String
+										.format("You can not make property calls on null values"),
+								template, start, end);
 				return null;
 			}
 			String attributeName = attributeNames.remove(0);
-			Object nextStep = nextStep(o, attributeName);
-			result = traverse(nextStep, attributeNames);
+			Object nextStep = nextStep(o, attributeName, template, start, end);
+			result = traverse(nextStep, attributeNames, template, start, end);
 		}
 		return result;
 	}
 
 	@SuppressWarnings("unchecked")
-	protected Object nextStep(Object o, String attributeName) {
+	protected Object nextStep(Object o, String attributeName, char[] template,
+			int start, int end) {
 		Object result;
 		if (o instanceof String) {
 			errorHandler.error(String.format(
 					"You can not make property calls on string '%s'", o
-							.toString()));
+							.toString()), template, start, end);
 			return o;
 		} else if (o instanceof Map) {
 			Map map = (Map) o;
