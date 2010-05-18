@@ -50,6 +50,103 @@ environments including Google App Engine.</p>
 	off escaping of special characters, making it even faster)
 </ul>
 
+<h2>The model</h2>
+
+<p>
+<pre>Map&lt;String,Object></pre>
+</p>
+<p>Nothing more to say.</p>
+
 <h2>The Language</h2>
+
+<p>The language is really simple and can be learned in no time. It
+is all about having a text with small island of expressions that expand
+to text or control the expansion of text fragments. Those expressions
+are enclosed in special characters which are freely configurable but are
+by default
+<ul>
+	<li><code>${</code> for the start of an expression and
+	<li><code>}</code> for its end
+</ul>
+</p>
+
+<h3>Replacing variables</h3>
+
+<p>The simplest form of an expression is to expand an entry
+contained in the model to a string: <code> ${name} </code></p>
+
+<p>If you model contains complex objects and you want to expand a
+certain property or field you can use the "." notation to navigate to it
+like e.g. <code> ${object.name} </code>.</p>
+
+<h3>Conditional expansion</h3>
+
+<p>Sometimes you might want to display certain text or expand
+certain expression only when certain conditions hold. The minimal
+template engine provides you with an if-statement to do so.</p>
+
+<pre>
+${if condition}
+  text displayed if condition holds
+${else}
+  text displayed if condition does not hold
+${end}
+</pre>
+
+<p>The else-part is optional and the whole conditional block has to
+be terminated by the end-expression. If-expressions can be nested and
+conditions can be negated using the "!"-operator. There are no other
+logical operators, i.e. you can not combine conditions using <code>and</code>
+or <code>or</code>. The reason is that this is a minimal language,
+expressions can be complex and conditions can be constructed in the Java
+model. If you are not satisfied with his decision you can extend the
+language in any way you like.</p>
+
+<p>The condition can be any object. It evaluates using these rules
+<ul>
+	<li>if the object is a boolean the condition evaluates to <code>true</code>
+	if the boolean is <code>true</code> (hear, hear)
+	<li>if the object is a map, a collection, an array or any iterable
+	the condition evaluates to <code>true</code> if they contain any
+	elements
+	<li>otherwise the condition evaluates to <code>true</code> if the
+	object is not <code>null</code>
+</ul>
+</p>
+
+<h3>Loops (expanding more than one item)</h3>
+
+<p>If you want to expand all elements of a container you can use the
+foreach-expression.</p>
+
+<pre>
+${foreach container item}
+  ${item}
+${end}
+</pre>
+
+<p>In this example variable<code>item</code> is set to each element
+of the container and the body - i.e. the part between the foreach- and
+the end-expression - is expanded for each item in the container. The
+container can be anything that implements <code>java.lang.Iterable</code>
+or anything that implements <code>java.util.Map</code>. If the container
+is a map we iterate over its entry set and the items will be of type <code>Map.Entry</code>.
+This means you can access its parts using <code>${item.key}</code> and <code>${item.value}</code>.
+</p>
+
+Geht nur mit java.lang.Iterable (wie foreach) (=.entrySet) Keine
+Schritte, immer alle Verschachtelung möglich Separator möglich Syntax
+${foreach iterable laufVariablenName [separator]} ${laufVaribalenName}
+${end}
+
+<h3>Escaping</h3>
+
+In Java \\${ \\} \\\\ In File \${ \} \\
+
+
+<h2>API</h2>
+API reference can be found
+<a href="api/index.html">here</a>
+.
 </body>
 </html>
