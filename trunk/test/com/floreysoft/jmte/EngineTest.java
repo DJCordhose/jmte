@@ -91,12 +91,14 @@ public final class EngineTest {
 		LIST.add(new MyBean("1.1", "1.2"));
 		LIST.add(new MyBean("2.1", "2.2"));
 	}
-	
+
 	private final static MyBean[] ARRAY = new MyBean[2];
 	static {
 		ARRAY[0] = new MyBean("1.1", "1.2");
 		ARRAY[1] = new MyBean("2.1", "2.2");
 	}
+
+	private final static int[] INT_ARRAY = { 1, 2 };
 
 	private final static Iterable ITERABLE;
 	static {
@@ -115,11 +117,14 @@ public final class EngineTest {
 		DEFAULT_MODEL.put("list", LIST);
 		DEFAULT_MODEL.put("iterable", ITERABLE);
 		DEFAULT_MODEL.put("array", ARRAY);
+		DEFAULT_MODEL.put("intArray", INT_ARRAY);
 		DEFAULT_MODEL.put("bean", BEAN);
 		DEFAULT_MODEL.put("emptyMap", new HashMap());
 		DEFAULT_MODEL.put("emptyList", new ArrayList());
 		DEFAULT_MODEL.put("emptyArray", new Object[0]);
+		DEFAULT_MODEL.put("emptyIntArray", new int[0]);
 		DEFAULT_MODEL.put("emptyIterable", new MyIterable());
+		
 
 	}
 	private Engine engine;
@@ -146,8 +151,9 @@ public final class EngineTest {
 	@Test
 	public void identityTransform() throws Exception {
 		engine.setLexer(new Lexer() {
-			public Token nextToken(char[] template, int start, int end, Map<String, Object> model,
-					boolean expand, ErrorHandler errorHandler) {
+			public Token nextToken(char[] template, int start, int end,
+					Map<String, Object> model, boolean expand,
+					ErrorHandler errorHandler) {
 				String input = new String(template, start, end - start);
 				return new StringToken("${" + input + "}");
 			}
@@ -225,26 +231,30 @@ public final class EngineTest {
 
 	@Test(expected = IllegalArgumentException.class)
 	public void nullExpressionDevel() throws Exception {
-		engine.setErrorHandler(new DefaultErrorHandler(DefaultErrorHandler.Mode.DEVELOPMENT));
+		engine.setErrorHandler(new DefaultErrorHandler(
+				DefaultErrorHandler.Mode.DEVELOPMENT));
 		engine.transform("${undefined}", DEFAULT_MODEL);
 	}
 
 	@Test
 	public void nullExpressionProd() throws Exception {
-		engine.setErrorHandler(new DefaultErrorHandler(DefaultErrorHandler.Mode.PRODUCTION));
+		engine.setErrorHandler(new DefaultErrorHandler(
+				DefaultErrorHandler.Mode.PRODUCTION));
 		String output = engine.transform("${undefined}", DEFAULT_MODEL);
 		assertEquals("", output);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void illegalMapExpressionDevel() throws Exception {
-		engine.setErrorHandler(new DefaultErrorHandler(DefaultErrorHandler.Mode.DEVELOPMENT));
+		engine.setErrorHandler(new DefaultErrorHandler(
+				DefaultErrorHandler.Mode.DEVELOPMENT));
 		engine.transform("${map}", DEFAULT_MODEL);
 	}
 
 	@Test
 	public void illegalMapExpressionProd() throws Exception {
-		engine.setErrorHandler(new DefaultErrorHandler(DefaultErrorHandler.Mode.PRODUCTION));
+		engine.setErrorHandler(new DefaultErrorHandler(
+				DefaultErrorHandler.Mode.PRODUCTION));
 		String output = engine.transform("${map}", DEFAULT_MODEL);
 		assertEquals("", output);
 	}
@@ -352,6 +362,20 @@ public final class EngineTest {
 	}
 
 	@Test
+	public void ifPrimitiveArrayTrueExpression() throws Exception {
+		String output = engine.transform(
+				"${if intArray}${address}${else}NIX${end}", DEFAULT_MODEL);
+		assertEquals(DEFAULT_MODEL.get("address"), output);
+	}
+
+	@Test
+	public void ifPrimitiveArrayFalseExpression() throws Exception {
+		String output = engine.transform(
+				"${if emptyIntArray }${address}${else}NIX${end}", DEFAULT_MODEL);
+		assertEquals("NIX", output);
+	}
+
+	@Test
 	public void nestedIfExpression() throws Exception {
 		String output = engine
 				.transform(
@@ -370,34 +394,46 @@ public final class EngineTest {
 
 	@Test
 	public void foreachArray() throws Exception {
-		String output = engine.transform("${foreach array item}${item}\n${end}",
-				DEFAULT_MODEL);
+		String output = engine.transform(
+				"${foreach array item}${item}\n${end}", DEFAULT_MODEL);
 		assertEquals("1.1, 1.2\n" + "2.1, 2.2\n", output);
 		assertNull(DEFAULT_MODEL.get("item"));
 	}
 
 	@Test
+	public void foreachPrimitiveArray() throws Exception {
+		String output = engine.transform(
+				"${foreach intArray item}${item}\n${end}", DEFAULT_MODEL);
+		assertEquals("1\n2\n", output);
+		assertNull(DEFAULT_MODEL.get("item"));
+	}
+
+	@Test
 	public void foreachMap() throws Exception {
-		String output = engine.transform("${foreach map entry}${entry.key}=${entry.value}\n${end}",
+		String output = engine.transform(
+				"${foreach map entry}${entry.key}=${entry.value}\n${end}",
 				DEFAULT_MODEL);
 		assertEquals("mapEntry1=mapValue1\n" + "mapEntry2=mapValue2\n", output);
 		assertNull(DEFAULT_MODEL.get("item"));
 
 	}
-	
+
 	@Test
 	public void specialForeachVariables() throws Exception {
-		String output = engine.transform("${foreach list item}${item}\n${if last_item}last${end}${if first_item}first${end}${if even_item} even${end}${if odd_item} odd${end}${end}",
-				DEFAULT_MODEL);
+		String output = engine
+				.transform(
+						"${foreach list item}${item}\n${if last_item}last${end}${if first_item}first${end}${if even_item} even${end}${if odd_item} odd${end}${end}",
+						DEFAULT_MODEL);
 		assertEquals("1.1, 1.2\nfirst even" + "2.1, 2.2\nlast odd", output);
 		assertNull(DEFAULT_MODEL.get("item"));
 	}
 
 	@Test
 	public void foreachSeparator() throws Exception {
-		String output = engine.transform(
-				"${ \n foreach\n\t  list  \r  item   ,}${item.property1}${end}",
-				DEFAULT_MODEL);
+		String output = engine
+				.transform(
+						"${ \n foreach\n\t  list  \r  item   ,}${item.property1}${end}",
+						DEFAULT_MODEL);
 		assertEquals("1.1  ,2.1", output);
 		assertNull(DEFAULT_MODEL.get("item"));
 	}
@@ -552,7 +588,7 @@ public final class EngineTest {
 		Engine engine = new Engine();
 		String transformed = engine.transform(input, model);
 		System.out.println(transformed);
-		Set<Entry<String,Object>> entrySet = MAP.entrySet();
-		
+		Set<Entry<String, Object>> entrySet = MAP.entrySet();
+
 	}
 }

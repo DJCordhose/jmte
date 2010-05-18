@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import com.floreysoft.jmte.ErrorHandler;
@@ -135,15 +136,11 @@ public class DefaultLexer implements Lexer {
 					} else if (value instanceof Iterable) {
 						Iterator iterator = ((Iterable) value).iterator();
 						condition = iterator.hasNext();
-						// TODO need to have checks for all kinds of
-						// primitive
-						// arrays
-						// e.g. } else if (value instanceof int[]) {
-					} else if (value.getClass().isArray()) {
-						Object[] array = (Object[]) value;
-						condition = array.length != 0;
 					} else {
-						condition = true;
+						List list = Util.arrayAsList(value);
+						// XXX looks strange, but is ok: list will be null if is
+						// is not an array which results to true
+						condition = list == null || !list.isEmpty();
 					}
 				} else {
 					condition = false;
@@ -164,18 +161,18 @@ public class DefaultLexer implements Lexer {
 						iterable = ((Map) value).entrySet();
 					} else if (value instanceof Iterable) {
 						iterable = ((Iterable) value);
-					} else if (value.getClass().isArray()) {
-						Object[] array = (Object[]) value;
-						iterable = Arrays.asList(array);
 					} else {
-						errorHandler
-								.error(
-										String
-												.format(
-														"Can only iterator over map or iterable on '%s'",
-														objectExpression),
-										template, start, end);
-						return new IfToken(false);
+						iterable = Util.arrayAsList(value);
+						if (iterable == null) {
+							errorHandler
+									.error(
+											String
+													.format(
+															"Can only iterator over map or iterable on '%s'",
+															objectExpression),
+											template, start, end);
+							return new IfToken(false);
+						}
 					}
 					String varName = split[2];
 					ForEachToken forEachToken = new ForEachToken(varName,
