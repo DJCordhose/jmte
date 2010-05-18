@@ -20,6 +20,7 @@ import com.floreysoft.jmte.Engine;
 import com.floreysoft.jmte.ErrorHandler;
 import com.floreysoft.jmte.Lexer;
 import com.floreysoft.jmte.Engine.StartEndPair;
+import com.floreysoft.jmte.guts.DefaultErrorHandler;
 import com.floreysoft.jmte.guts.StringToken;
 import com.floreysoft.jmte.guts.Token;
 
@@ -144,8 +145,9 @@ public final class EngineTest {
 	@Test
 	public void identityTransform() throws Exception {
 		engine.setLexer(new Lexer() {
-			public Token nextToken(String input, Map<String, Object> model,
+			public Token nextToken(char[] template, int start, int end, Map<String, Object> model,
 					boolean expand, ErrorHandler errorHandler) {
+				String input = new String(template, start, end - start);
 				return new StringToken("${" + input + "}");
 			}
 
@@ -222,26 +224,26 @@ public final class EngineTest {
 
 	@Test(expected = IllegalArgumentException.class)
 	public void nullExpressionDevel() throws Exception {
-		engine.getErrorHandler().setMode(ErrorHandler.Mode.DEVELOPMENT);
+		engine.setErrorHandler(new DefaultErrorHandler(DefaultErrorHandler.Mode.DEVELOPMENT));
 		engine.transform("${undefined}", DEFAULT_MODEL);
 	}
 
 	@Test
 	public void nullExpressionProd() throws Exception {
-		engine.getErrorHandler().setMode(ErrorHandler.Mode.PRODUCTION);
+		engine.setErrorHandler(new DefaultErrorHandler(DefaultErrorHandler.Mode.PRODUCTION));
 		String output = engine.transform("${undefined}", DEFAULT_MODEL);
 		assertEquals("", output);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void illegalMapExpressionDevel() throws Exception {
-		engine.getErrorHandler().setMode(ErrorHandler.Mode.DEVELOPMENT);
+		engine.setErrorHandler(new DefaultErrorHandler(DefaultErrorHandler.Mode.DEVELOPMENT));
 		engine.transform("${map}", DEFAULT_MODEL);
 	}
 
 	@Test
 	public void illegalMapExpressionProd() throws Exception {
-		engine.getErrorHandler().setMode(ErrorHandler.Mode.PRODUCTION);
+		engine.setErrorHandler(new DefaultErrorHandler(DefaultErrorHandler.Mode.PRODUCTION));
 		String output = engine.transform("${map}", DEFAULT_MODEL);
 		assertEquals("", output);
 	}

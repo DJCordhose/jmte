@@ -1,4 +1,4 @@
 package com.floreysoft.jmte.guts;
 
-public class ElseToken implements Token {
+public class ElseToken extends Token {
 }

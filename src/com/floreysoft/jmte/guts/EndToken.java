@@ -1,4 +1,4 @@
 package com.floreysoft.jmte.guts;
 
-public class EndToken implements Token {
+public class EndToken extends Token {
 }

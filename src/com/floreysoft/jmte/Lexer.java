@@ -23,8 +23,14 @@ public interface Lexer {
 	 * Scans and expands the input to find out what kind of token a certain
 	 * script section represents.
 	 * 
-	 * @param input
-	 *            the script section to be parsed
+	 * @param template
+	 *            the complete string template
+	 * @param start
+	 *            the position in the complete template where the script section
+	 *            to be parsed <em>starts</em>
+	 * @param end
+	 *            the position in the complete template where the script section
+	 *            to be parsed <em>ends</em>
 	 * @param model
 	 *            the complete model possibly containing temporary data
 	 * @param skipMode
@@ -37,6 +43,7 @@ public interface Lexer {
 	 * @return implementation of {@link Token} to indicate the type of section
 	 *         that was parsed
 	 */
-	Token nextToken(String input, Map<String, Object> model, boolean skipMode,
+	Token nextToken(char[] template, int start, int end,
+			Map<String, Object> model, boolean skipMode,
 			ErrorHandler errorHandler);
 }

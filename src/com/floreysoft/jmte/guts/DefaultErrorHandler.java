@@ -5,44 +5,32 @@ import java.util.logging.Logger;
 import com.floreysoft.jmte.ErrorHandler;
 
 public class DefaultErrorHandler implements ErrorHandler {
+	public static enum Mode {
+		PRODUCTION, DEVELOPMENT
+	};
 
 	private static final Logger LOG = Logger
 			.getLogger(DefaultErrorHandler.class.getName());
-
-	private Mode mode = Mode.DEVELOPMENT;
+	private Mode mode;
 
 	private char[] input;
 	private int currentBlockStart;
 	private int currentBlockEnd;
 
-	private int getLine() {
-		int line = 1;
-		for (int i = 0; i < currentBlockStart; i++) {
-			if (input[i] == '\n') {
-				line++;
-			}
-		}
-		return line;
+
+	public DefaultErrorHandler(Mode mode) {
+		super();
+		this.mode = mode;
 	}
 
-	int getColumn() {
-		int column = 0;
-		for (int i = currentBlockStart; i >= 0; i--) {
-			if (input[i] == '\n') {
-				break;
-			} else {
-				column++;
-			}
-		}
-		return column;
+	public DefaultErrorHandler() {
+		this(Mode.DEVELOPMENT);
 	}
 
-	public void warning(String message) {
-		String completeMessage = completeMessage("Warning", message);
-		LOG.warning(completeMessage);
-	}
-
-	public void error(String message) throws IllegalArgumentException {
+	public void error(String message, char[] template, int start, int end) throws IllegalArgumentException {
+		this.input = template;
+		this.currentBlockStart = start;
+		this.currentBlockEnd = end;
 		String completeMessage = completeMessage("Error", message);
 		if (mode == Mode.DEVELOPMENT) {
 			throw new IllegalArgumentException(completeMessage);
@@ -61,15 +49,28 @@ public class DefaultErrorHandler implements ErrorHandler {
 				column, message);
 		return completeMessage;
 	}
+	
 
-	public void setCurrentBlockBounds(int start, int end) {
-		this.currentBlockStart = start;
-		this.currentBlockEnd = end;
+	protected int getLine() {
+		int line = 1;
+		for (int i = 0; i < currentBlockStart; i++) {
+			if (input[i] == '\n') {
+				line++;
+			}
+		}
+		return line;
 	}
 
-	public void setInput(char[] input) {
-		this.input = input;
-		setCurrentBlockBounds(0, 0);
+	protected int getColumn() {
+		int column = 0;
+		for (int i = currentBlockStart; i >= 0; i--) {
+			if (input[i] == '\n') {
+				break;
+			} else {
+				column++;
+			}
+		}
+		return column;
 	}
 
 	public Mode getMode() {
