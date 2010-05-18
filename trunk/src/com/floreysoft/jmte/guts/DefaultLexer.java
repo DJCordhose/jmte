@@ -1,7 +1,5 @@
 package com.floreysoft.jmte.guts;
 
-import java.beans.IntrospectionException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -106,111 +104,116 @@ public class DefaultLexer implements Lexer {
 			}
 		} else {
 			String cmdString = split[0];
+			Keyword cmd = null;
 			try {
-				Keyword cmd = Keyword.valueOf(cmdString.toUpperCase());
-
-				if (cmd == Keyword.IF) {
-					boolean condition;
-					boolean negate = false;
-					if (!skipMode) {
-						String objectExpression = split[1];
-						if (objectExpression.startsWith("!")) {
-							negate = true;
-							objectExpression = objectExpression.substring(1);
-						}
-						Object value = traverse(objectExpression, model,
-								template, start, end);
-						if (value == null) {
-							condition = false;
-						} else if (value instanceof Boolean) {
-							condition = (Boolean) value;
-						} else if (value instanceof Map) {
-							condition = !((Map) value).isEmpty();
-						} else if (value instanceof Collection) {
-							condition = !((Collection) value).isEmpty();
-						} else if (value instanceof Iterable) {
-							Iterator iterator = ((Iterable) value).iterator();
-							condition = iterator.hasNext();
-							// TODO need to have checks for all kinds of
-							// primitive
-							// arrays
-							// e.g. } else if (value instanceof int[]) {
-						} else if (value.getClass().isArray()) {
-							Object[] array = (Object[]) value;
-							condition = array.length != 0;
-						} else {
-							condition = true;
-						}
-					} else {
-						condition = false;
-					}
-					if (negate) {
-						condition = !condition;
-					}
-					return new IfToken(condition);
-				} else if (cmd == Keyword.FOREACH) {
-					if (!skipMode) {
-						String objectExpression = split[1];
-						Object value = traverse(objectExpression, model,
-								template, start, end);
-						Iterable<Object> iterable;
-						if (value == null) {
-							return new IfToken(false);
-						} else if (value instanceof Map) {
-							iterable = ((Map) value).entrySet();
-						} else if (value instanceof Iterable) {
-							iterable = ((Iterable) value);
-						} else {
-							errorHandler
-									.error(
-											String
-													.format(
-															"Can only iterator over map or iterable on '%s'",
-															objectExpression),
-											template, start, end);
-							return new IfToken(false);
-						}
-						String varName = split[2];
-						ForEachToken forEachToken = new ForEachToken(varName,
-								iterable);
-
-						// if we have more parameters, we also have
-						// separator
-						// data
-						if (split.length > 3 || split.length == 3
-								&& input.endsWith("  ")) {
-							// but as the separator itself can contain
-							// spaces
-							// and the number of spaces between the previous
-							// parts is unknown, we need to do this smarter
-							int gapCount = 0;
-							int separatorBegin = 0;
-							while (separatorBegin < input.length()) {
-								char c = input.charAt(separatorBegin);
-								separatorBegin++;
-								if (Character.isWhitespace(c)) {
-									gapCount++;
-									if (gapCount == 3) {
-										break;
-									} else {
-										while (Character.isWhitespace(c = input
-												.charAt(separatorBegin)))
-											separatorBegin++;
-									}
-								}
-							}
-
-							String separator = input.substring(separatorBegin);
-							forEachToken.setSeparator(separator);
-						}
-						return forEachToken;
-					}
-				} else {
-					return new IfToken(false);
-				}
+				cmd = Keyword.valueOf(cmdString.toUpperCase());
 			} catch (IllegalArgumentException iae) {
 				errorHandler.error(String.format("Command '%s' is undefined",
 						cmdString), template, start, end);
+				return new StringToken("");
+			}
+
+			if (cmd == Keyword.IF) {
+				boolean condition;
+				boolean negate = false;
+				if (!skipMode) {
+					String objectExpression = split[1];
+					if (objectExpression.startsWith("!")) {
+						negate = true;
+						objectExpression = objectExpression.substring(1);
+					}
+					Object value = traverse(objectExpression, model, template,
+							start, end);
+					if (value == null) {
+						condition = false;
+					} else if (value instanceof Boolean) {
+						condition = (Boolean) value;
+					} else if (value instanceof Map) {
+						condition = !((Map) value).isEmpty();
+					} else if (value instanceof Collection) {
+						condition = !((Collection) value).isEmpty();
+					} else if (value instanceof Iterable) {
+						Iterator iterator = ((Iterable) value).iterator();
+						condition = iterator.hasNext();
+						// TODO need to have checks for all kinds of
+						// primitive
+						// arrays
+						// e.g. } else if (value instanceof int[]) {
+					} else if (value.getClass().isArray()) {
+						Object[] array = (Object[]) value;
+						condition = array.length != 0;
+					} else {
+						condition = true;
+					}
+				} else {
+					condition = false;
+				}
+				if (negate) {
+					condition = !condition;
+				}
+				return new IfToken(condition);
+			} else if (cmd == Keyword.FOREACH) {
+				if (!skipMode) {
+					String objectExpression = split[1];
+					Object value = traverse(objectExpression, model, template,
+							start, end);
+					Iterable<Object> iterable;
+					if (value == null) {
+						return new IfToken(false);
+					} else if (value instanceof Map) {
+						iterable = ((Map) value).entrySet();
+					} else if (value instanceof Iterable) {
+						iterable = ((Iterable) value);
+					} else if (value.getClass().isArray()) {
+						Object[] array = (Object[]) value;
+						iterable = Arrays.asList(array);
+					} else {
+						errorHandler
+								.error(
+										String
+												.format(
+														"Can only iterator over map or iterable on '%s'",
+														objectExpression),
+										template, start, end);
+						return new IfToken(false);
+					}
+					String varName = split[2];
+					ForEachToken forEachToken = new ForEachToken(varName,
+							iterable);
+
+					// if we have more parameters, we also have
+					// separator
+					// data
+					if (split.length > 3 || split.length == 3
+							&& input.endsWith("  ")) {
+						// but as the separator itself can contain
+						// spaces
+						// and the number of spaces between the previous
+						// parts is unknown, we need to do this smarter
+						int gapCount = 0;
+						int separatorBegin = 0;
+						while (separatorBegin < input.length()) {
+							char c = input.charAt(separatorBegin);
+							separatorBegin++;
+							if (Character.isWhitespace(c)) {
+								gapCount++;
+								if (gapCount == 3) {
+									break;
+								} else {
+									while (Character.isWhitespace(c = input
+											.charAt(separatorBegin)))
+										separatorBegin++;
+								}
+							}
+						}
+
+						String separator = input.substring(separatorBegin);
+						forEachToken.setSeparator(separator);
+					}
+					return forEachToken;
+				}
+			} else {
+				return new IfToken(false);
 			}
 		}
 		// default in case anything went wrong
