@@ -1,5 +1,7 @@
 package com.floreysoft.jmte.guts;
 
+import java.beans.IntrospectionException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -37,8 +39,8 @@ public class DefaultLexer implements Lexer {
 		input = Util.trimFront(input);
 		String[] split = input.split("( |\t|\r|\n)+");
 
-		Token token = innerNextToken(template, start, end, model, skipMode, errorHandler,
-				input, split);
+		Token token = innerNextToken(template, start, end, model, skipMode,
+				errorHandler, input, split);
 		token.setBuffer(template);
 		token.setStart(start);
 		token.setEnd(end);
@@ -156,7 +158,7 @@ public class DefaultLexer implements Lexer {
 							return new IfToken(false);
 						} else if (value instanceof Map) {
 							iterable = ((Map) value).entrySet();
-						} else if (value instanceof Collection) {
+						} else if (value instanceof Iterable) {
 							iterable = ((Iterable) value);
 						} else {
 							errorHandler
@@ -168,45 +170,43 @@ public class DefaultLexer implements Lexer {
 											template, start, end);
 							return new IfToken(false);
 						}
-							String varName = split[2];
-							ForEachToken forEachToken = new ForEachToken(
-									varName, iterable);
+						String varName = split[2];
+						ForEachToken forEachToken = new ForEachToken(varName,
+								iterable);
 
-							// if we have more parameters, we also have
-							// separator
-							// data
-							if (split.length > 3 || split.length == 3
-									&& input.endsWith("  ")) {
-								// but as the separator itself can contain
-								// spaces
-								// and the number of spaces between the previous
-								// parts is unknown, we need to do this smarter
-								int gapCount = 0;
-								int separatorBegin = 0;
-								while (separatorBegin < input.length()) {
-									char c = input.charAt(separatorBegin);
-									separatorBegin++;
-									if (Character.isWhitespace(c)) {
-										gapCount++;
-										if (gapCount == 3) {
-											break;
-										} else {
-											while (Character
-													.isWhitespace(c = input
-															.charAt(separatorBegin)))
-												separatorBegin++;
-										}
+						// if we have more parameters, we also have
+						// separator
+						// data
+						if (split.length > 3 || split.length == 3
+								&& input.endsWith("  ")) {
+							// but as the separator itself can contain
+							// spaces
+							// and the number of spaces between the previous
+							// parts is unknown, we need to do this smarter
+							int gapCount = 0;
+							int separatorBegin = 0;
+							while (separatorBegin < input.length()) {
+								char c = input.charAt(separatorBegin);
+								separatorBegin++;
+								if (Character.isWhitespace(c)) {
+									gapCount++;
+									if (gapCount == 3) {
+										break;
+									} else {
+										while (Character.isWhitespace(c = input
+												.charAt(separatorBegin)))
+											separatorBegin++;
 									}
 								}
-
-								String separator = input
-										.substring(separatorBegin);
-								forEachToken.setSeparator(separator);
 							}
-							return forEachToken;
+
+							String separator = input.substring(separatorBegin);
+							forEachToken.setSeparator(separator);
 						}
-					} else {
-						return new IfToken(false);
+						return forEachToken;
+					}
+				} else {
+					return new IfToken(false);
 				}
 			} catch (IllegalArgumentException iae) {
 				errorHandler.error(String.format("Command '%s' is undefined",
@@ -265,7 +265,15 @@ public class DefaultLexer implements Lexer {
 			Map map = (Map) o;
 			result = map.get(attributeName);
 		} else {
-			result = Util.getPropertyValue(o, attributeName);
+			try {
+				result = Util.getPropertyValue(o, attributeName);
+			} catch (Exception e) {
+				errorHandler.error(String.format(
+						"Property '%s' on object '%s' can not be accessed: %s",
+						attributeName, o.toString(), e.getMessage()), template,
+						start, end);
+				result = "";
+			}
 		}
 		return result;
 	}

@@ -12,13 +12,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import com.floreysoft.jmte.Engine;
-import com.floreysoft.jmte.ErrorHandler;
-import com.floreysoft.jmte.Lexer;
 import com.floreysoft.jmte.Engine.StartEndPair;
 import com.floreysoft.jmte.guts.DefaultErrorHandler;
 import com.floreysoft.jmte.guts.StringToken;
@@ -84,6 +83,7 @@ public final class EngineTest {
 	private final static Map<String, Object> MAP = new HashMap<String, Object>();
 	static {
 		MAP.put("mapEntry1", "mapValue1");
+		MAP.put("mapEntry2", "mapValue2");
 	}
 
 	private final static List<MyBean> LIST = new ArrayList<MyBean>();
@@ -91,6 +91,7 @@ public final class EngineTest {
 		LIST.add(new MyBean("1.1", "1.2"));
 		LIST.add(new MyBean("2.1", "2.2"));
 	}
+	
 	private final static MyBean[] ARRAY = new MyBean[2];
 	static {
 		ARRAY[0] = new MyBean("1.1", "1.2");
@@ -368,6 +369,23 @@ public final class EngineTest {
 	}
 
 	@Test
+	public void foreachArray() throws Exception {
+		String output = engine.transform("${foreach array item}${item}\n${end}",
+				DEFAULT_MODEL);
+		assertEquals("1.1, 1.2\n" + "2.1, 2.2\n", output);
+		assertNull(DEFAULT_MODEL.get("item"));
+	}
+
+	@Test
+	public void foreachMap() throws Exception {
+		String output = engine.transform("${foreach map entry}${entry.key}=${entry.value}\n${end}",
+				DEFAULT_MODEL);
+		assertEquals("mapEntry1=mapValue1\n" + "mapEntry2=mapValue2\n", output);
+		assertNull(DEFAULT_MODEL.get("item"));
+
+	}
+	
+	@Test
 	public void specialForeachVariables() throws Exception {
 		String output = engine.transform("${foreach list item}${item}\n${if last_item}last${end}${if first_item}first${end}${if even_item} even${end}${if odd_item} odd${end}${end}",
 				DEFAULT_MODEL);
@@ -534,5 +552,7 @@ public final class EngineTest {
 		Engine engine = new Engine();
 		String transformed = engine.transform(input, model);
 		System.out.println(transformed);
+		Set<Entry<String,Object>> entrySet = MAP.entrySet();
+		
 	}
 }
