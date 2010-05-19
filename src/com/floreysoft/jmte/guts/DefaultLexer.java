@@ -125,7 +125,7 @@ public class DefaultLexer implements Lexer {
 					}
 					Object value = traverse(objectExpression, model, template,
 							start, end);
-					if (value == null) {
+					if (value == null || value.toString().equals("")) {
 						condition = false;
 					} else if (value instanceof Boolean) {
 						condition = (Boolean) value;

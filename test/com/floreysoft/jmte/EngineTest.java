@@ -124,9 +124,9 @@ public final class EngineTest {
 		DEFAULT_MODEL.put("emptyArray", new Object[0]);
 		DEFAULT_MODEL.put("emptyIntArray", new int[0]);
 		DEFAULT_MODEL.put("emptyIterable", new MyIterable());
-		
-
+		DEFAULT_MODEL.put("empty", "");
 	}
+	
 	private Engine engine;
 
 	@Before
@@ -260,6 +260,13 @@ public final class EngineTest {
 	}
 
 	@Test
+	public void ifEmptyFalseExpression() throws Exception {
+		String output = engine.transform(
+				"${if empty}${address}${else}NIX${end}", DEFAULT_MODEL);
+		assertEquals("NIX", output);
+	}
+	
+	@Test
 	public void ifNullTrueExpression() throws Exception {
 		String output = engine.transform(
 				"${if address}${address}${else}NIX${end}", DEFAULT_MODEL);
@@ -281,13 +288,6 @@ public final class EngineTest {
 		String output = engine.transform(
 				"${if !hugo}${address}${else}NIX${end}", DEFAULT_MODEL);
 		assertEquals(DEFAULT_MODEL.get("address"), output);
-	}
-
-	@Test
-	public void ifNullFalseExpression() throws Exception {
-		String output = engine.transform(
-				"${if hugo}${address}${else}NIX${end}", DEFAULT_MODEL);
-		assertEquals("NIX", output);
 	}
 
 	@Test
