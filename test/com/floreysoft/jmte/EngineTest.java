@@ -12,8 +12,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -125,7 +123,7 @@ public final class EngineTest {
 		DEFAULT_MODEL.put("emptyIterable", new MyIterable());
 		DEFAULT_MODEL.put("empty", "");
 	}
-	
+
 	private Engine engine;
 
 	@Before
@@ -264,7 +262,7 @@ public final class EngineTest {
 				"${if empty}${address}${else}NIX${end}", DEFAULT_MODEL);
 		assertEquals("NIX", output);
 	}
-	
+
 	@Test
 	public void ifNullTrueExpression() throws Exception {
 		String output = engine.transform(
@@ -369,8 +367,9 @@ public final class EngineTest {
 
 	@Test
 	public void ifPrimitiveArrayFalseExpression() throws Exception {
-		String output = engine.transform(
-				"${if emptyIntArray }${address}${else}NIX${end}", DEFAULT_MODEL);
+		String output = engine
+				.transform("${if emptyIntArray }${address}${else}NIX${end}",
+						DEFAULT_MODEL);
 		assertEquals("NIX", output);
 	}
 
@@ -586,8 +585,6 @@ public final class EngineTest {
 		model.put("name", "Minimal Template Engine");
 		Engine engine = new Engine();
 		String transformed = engine.transform(input, model);
-		System.out.println(transformed);
-		Set<Entry<String, Object>> entrySet = MAP.entrySet();
-
+		assert(transformed.equals("Minimal Template Engine"));
 	}
 }
