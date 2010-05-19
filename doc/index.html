@@ -109,7 +109,7 @@ language in any way you like.</p>
 	elements
 	<li>otherwise the condition evaluates to <code>true</code> if the
 	object is not <code>null</code> and <code>toString</code> is not equal
-	<code>""</code>
+	to <code>""</code>
 </ul>
 </p>
 
@@ -124,24 +124,85 @@ ${foreach container item}
 ${end}
 </pre>
 
-<p>In this example variable<code>item</code> is set to each element
+<p>In this example variable <code>item</code> is set to each element
 of the container and the body - i.e. the part between the foreach- and
 the end-expression - is expanded for each item in the container. The
 container can be anything that implements <code>java.lang.Iterable</code>
-or anything that implements <code>java.util.Map</code>. If the container
-is a map we iterate over its entry set and the items will be of type <code>Map.Entry</code>.
-This means you can access its parts using <code>${item.key}</code> and <code>${item.value}</code>.
+or anything that implements <code>java.util.Map</code> or any array. If
+the container is a map we iterate over its entry set and the items will
+be of type <code>Map.Entry</code>. This means you can access its parts
+using <code>${item.key}</code> and <code>${item.value}</code>.</p>
+
+<p>Loops can be nested and can also contain all kinds of other
+expressions. You are not able to specify a step or a start of end index.</p>
+
+<h4>Special variables</h4>
+<p>In certain cases you might want to have change the way an item in
+a container shall be displayed depending on its position inside the
+container. One example is to have the rows in a table be displayed
+having an alternating format depending whether their row number is even
+or odd.</p>
+
+<p>Current list of special variables
+<ol>
+	<li>first
+	<li>last
+	<li>odd
+	<li>even
+</ol>
 </p>
 
-Geht nur mit java.lang.Iterable (wie foreach) (=.entrySet) Keine
-Schritte, immer alle Verschachtelung möglich Separator möglich Syntax
-${foreach iterable laufVariablenName [separator]} ${laufVaribalenName}
+<p>Special variables are suffixed by a <code>_</code> followed by
+the name of the item variable. This means inside a foreach loop that has
+<code>item</code> as the item name there will be the variable <code>first_item</code>.</p>
+
+<p>Example:</p>
+
+<pre>
+${foreach items item}
+  ${if first_item}
+    &lt;em>${item}&lt;/em>
+  ${else}
+    ${item}
+  ${end}
 ${end}
+</pre>
+
+
+<h4>Separators</h4>
+
+<p>When displaying a list of items you might want to have a
+separator between each item. This will not work using a normal body as
+this means there shall be no additional separator after the last item.
+You can either solve this using special variables - explained in the
+previous section - or more easily using a separator. Such is separator
+is added into the foreach expression like this</p>
+<pre>
+${foreach container item , }${item}${end}
+</pre>
+
+<p>Suppose the container contains the items <code>item1</code> and <code>item2</code>
+then the formatted output looks like <code>item1, item2</code>.</p>
 
 <h3>Escaping</h3>
 
-In Java \\${ \\} \\\\ In File \${ \} \\
-
+<p>When you want to use the special character sequences literally
+you will have to escape them using a the backslash <code>\</code>. You
+can also escape the backslash by adding a second.</p>
+<p>In Java this would be
+<ul>
+	<li>\\${
+	<li>\\}
+	<li>\\\\
+</ul>
+</p>
+<p>and if you read your template from a file
+<ul>
+	<li>\${
+	<li>\}
+	<li>\\
+</ul>
+</p>
 
 <h2>API</h2>
 API reference can be found
