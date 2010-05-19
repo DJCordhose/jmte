@@ -8,13 +8,14 @@ import java.util.logging.Logger;
 public class DefaultErrorHandler implements ErrorHandler {
 
 	/**
-	 * Mode to decide what to do with error messages. 
+	 * Mode to decide what to do with error messages.
 	 */
 	public static enum Mode {
 		/**
-		 * This mode tries to handle errors as graceful as possible while logging them.
+		 * This mode tries to handle errors as graceful as possible while
+		 * logging them.
 		 */
-		PRODUCTION, 
+		PRODUCTION,
 		/**
 		 * In this mode each error leads to an exception.
 		 */
@@ -29,17 +30,29 @@ public class DefaultErrorHandler implements ErrorHandler {
 	private int currentBlockStart;
 	private int currentBlockEnd;
 
-
+	/**
+	 * Creates an error handler of the desired mode
+	 * 
+	 * @param mode
+	 *            the desired mode
+	 */
 	public DefaultErrorHandler(Mode mode) {
 		super();
 		this.mode = mode;
 	}
 
+	/**
+	 * Creates an error handler in development mode.
+	 */
 	public DefaultErrorHandler() {
 		this(Mode.DEVELOPMENT);
 	}
 
-	public void error(String message, char[] template, int start, int end) throws IllegalArgumentException {
+	/**
+	 * {@inheritDoc}
+	 */
+	public void error(String message, char[] template, int start, int end)
+			throws IllegalArgumentException {
 		this.input = template;
 		this.currentBlockStart = start;
 		this.currentBlockEnd = end;
@@ -61,7 +74,6 @@ public class DefaultErrorHandler implements ErrorHandler {
 				column, message);
 		return completeMessage;
 	}
-	
 
 	protected int getLine() {
 		int line = 1;

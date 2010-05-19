@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.floreysoft.jmte.token.DefaultToken;
 import com.floreysoft.jmte.token.ElseToken;
 import com.floreysoft.jmte.token.EndToken;
 import com.floreysoft.jmte.token.ForEachToken;
@@ -50,6 +49,7 @@ import com.floreysoft.jmte.token.StringToken;
  * model.put(&quot;name&quot;, &quot;Minimal Template Engine&quot;);
  * Engine engine = new Engine();
  * String transformed = engine.transform(input, model);
+ * assert(transformed.equals("Minimal Template Engine"));
  * </pre>
  * 
  * where <code>input</code> contains the template and <code>model</code> the
@@ -81,6 +81,16 @@ public final class Engine {
 		}
 	}
 
+	/**
+	 * Replacement for {@link java.lang.String.format}. All arguments will be put into the
+	 * model having their index starting from 1 as their name.
+	 * 
+	 * @param pattern
+	 *            the template
+	 * @param args
+	 *            any number of arguments
+	 * @return the expanded template
+	 */
 	public static String format(String pattern, Object... args) {
 		Map<String, Object> model = arrayToModel(null, args);
 		Engine engine = new Engine();
@@ -88,6 +98,17 @@ public final class Engine {
 		return output;
 	}
 
+	/**
+	 * Transforms an array to a model using the index of the elements (starting
+	 * from 1) in the array and a prefix to form their names.
+	 * 
+	 * @param prefix
+	 *            the prefix to add to the index or <code>null</code> if none
+	 *            shall be applied
+	 * @param args
+	 *            the array to be transformed into the model
+	 * @return the model containing the arguments
+	 */
 	public static Map<String, Object> arrayToModel(String prefix,
 			Object... args) {
 		Map<String, Object> model = new HashMap<String, Object>();
@@ -102,6 +123,15 @@ public final class Engine {
 		return model;
 	}
 
+	/**
+	 * Transforms a file into a string.
+	 * 
+	 * @param file
+	 *            the file to be transformed
+	 * @param charsetName
+	 *            encoding of the file
+	 * @return the string containing the content of the file
+	 */
 	public static String fileToString(File file, String charsetName)
 			throws UnsupportedEncodingException, FileNotFoundException,
 			IOException {
@@ -119,6 +149,15 @@ public final class Engine {
 		}
 	}
 
+	/**
+	 * Transforms a stream into a string.
+	 * 
+	 * @param is
+	 *            the stream to be transformed
+	 * @param charsetName
+	 *            encoding of the file
+	 * @return the string containing the content of the stream
+	 */
 	public static String streamToString(InputStream is, String charsetName)
 			throws UnsupportedEncodingException, IOException {
 		Reader r = null;
@@ -135,6 +174,13 @@ public final class Engine {
 		}
 	}
 
+	/**
+	 * Transforms a reader into a string.
+	 * 
+	 * @param reader
+	 *            the reader to be transformed
+	 * @return the string containing the content of the reader
+	 */
 	public static String readerToString(Reader reader) throws IOException {
 		StringBuilder sb = new StringBuilder();
 		char[] buf = new char[1024];
@@ -153,14 +199,36 @@ public final class Engine {
 	private ErrorHandler errorHandler;
 	private Set<String> panicModelCleanupSet;
 
+	/**
+	 * Creates a new engine having <code>${</code> and <code>}</code> as start
+	 * and end strings for expressions.
+	 */
 	public Engine() {
 		this("${", "}", 1.2);
 	}
 
+	/**
+	 * Creates a new engine having custom start and end strings for expressions.
+	 * 
+	 * @param exprStartToken
+	 *            the string that starts an expression
+	 * @param exprEndToken
+	 *            the string that ends an expression
+	 */
 	public Engine(String exprStartToken, String exprEndToken) {
 		this(exprStartToken, exprEndToken, 1.2);
 	}
 
+	/**
+	 * Creates a new engine having custom start and end strings for expressions.
+	 * 
+	 * @param exprStartToken
+	 *            the string that starts an expression
+	 * @param exprEndToken
+	 *            the string that ends an expression
+	 * @param expansionSizeFactor
+	 *            the factor for the expected size of the expanded output
+	 */
 	public Engine(String exprStartToken, String exprEndToken,
 			double expansionSizeFactor) {
 		this.exprStartToken = exprStartToken;
@@ -170,14 +238,36 @@ public final class Engine {
 		this.setErrorHandler(new DefaultErrorHandler());
 	}
 
-	public String transform(String input, Map<String, Object> model) {
-		return transform(input, model, true);
+	/**
+	 * Transforms a template into an expanded output using the given model.
+	 * 
+	 * @param template
+	 *            the template to expand
+	 * @param model
+	 *            the model used to evaluate expressions inside the template
+	 * @return the expanded output
+	 */
+	public String transform(String template, Map<String, Object> model) {
+		return transform(template, model, true);
 	}
 
-	public String transform(String input, Map<String, Object> model,
+	/**
+	 * Transforms a template into an expanded output using the given model.
+	 * 
+	 * @param template
+	 *            the template to expand
+	 * @param model
+	 *            the model used to evaluate expressions inside the template
+	 * @param useEscaping
+	 *            <code>true</code> if you want escaping to be applied - which
+	 *            is the default
+	 * 
+	 * @return the expanded output
+	 */
+	public String transform(String template, Map<String, Object> model,
 			boolean useEscaping) {
-		List<StartEndPair> scan = scan(input, useEscaping);
-		String transformed = transformPure(input, scan, model);
+		List<StartEndPair> scan = scan(template, useEscaping);
+		String transformed = transformPure(template, scan, model);
 		if (!useEscaping) {
 			return transformed;
 		} else {
@@ -414,14 +504,40 @@ public final class Engine {
 		return escaped;
 	}
 
+	/**
+	 * Sets a new lexer - which might be different from standard one.
+	 * 
+	 * @param lexer
+	 *            the new lexer
+	 */
 	public void setLexer(Lexer lexer) {
 		this.lexer = lexer;
 	}
 
+	/**
+	 * Gets the currently used lexer.
+	 * 
+	 * @return the currently used lexer
+	 */
+	public Lexer getLexer() {
+		return lexer;
+	}
+
+	/**
+	 * Sets the error handler to be used in this engine
+	 * 
+	 * @param errorHandler
+	 *            the new error handler
+	 */
 	public void setErrorHandler(ErrorHandler errorHandler) {
 		this.errorHandler = errorHandler;
 	}
 
+	/**
+	 * Gets the currently used error handler
+	 * 
+	 * @return the error handler
+	 */
 	public ErrorHandler getErrorHandler() {
 		return errorHandler;
 	}
