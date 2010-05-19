@@ -17,14 +17,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.floreysoft.jmte.guts.DefaultErrorHandler;
-import com.floreysoft.jmte.guts.DefaultLexer;
-import com.floreysoft.jmte.guts.ElseToken;
-import com.floreysoft.jmte.guts.EndToken;
-import com.floreysoft.jmte.guts.ForEachToken;
-import com.floreysoft.jmte.guts.IfToken;
-import com.floreysoft.jmte.guts.StringToken;
-import com.floreysoft.jmte.guts.Token;
+import com.floreysoft.jmte.token.DefaultToken;
+import com.floreysoft.jmte.token.ElseToken;
+import com.floreysoft.jmte.token.EndToken;
+import com.floreysoft.jmte.token.ForEachToken;
+import com.floreysoft.jmte.token.IfToken;
+import com.floreysoft.jmte.token.StringToken;
 
 /**
  * <p>

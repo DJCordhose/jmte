@@ -8,6 +8,15 @@ import java.io.UnsupportedEncodingException;
 import java.util.Map;
 import java.util.Properties;
 
+/**
+ * <p>Main class used as a command line tool. You pass at least two arguments</p>
+ * <ul>
+ * <li>file name of the template to use
+ * <li>property file containing flat name/value entries which will be used as the model
+ * <li>optionally the charset name used inside the template - default is ISO-8859-15
+ * </ul>
+ * 
+ */
 public final class Tool {
 
 	@SuppressWarnings("unchecked")
@@ -15,10 +24,14 @@ public final class Tool {
 			String charsetName) throws UnsupportedEncodingException,
 			FileNotFoundException, IOException {
 		if (!template.exists()) {
-			throw new IllegalArgumentException(String.format("Tempalte file '%s' does not exist", template.getCanonicalPath()));
+			throw new IllegalArgumentException(String.format(
+					"Tempalte file '%s' does not exist", template
+							.getCanonicalPath()));
 		}
 		if (!propertiesFile.exists()) {
-			throw new IllegalArgumentException(String.format("Properties file '%s' does not exist", propertiesFile.getCanonicalPath()));
+			throw new IllegalArgumentException(String.format(
+					"Properties file '%s' does not exist", propertiesFile
+							.getCanonicalPath()));
 		}
 		FileInputStream stream = null;
 		try {
