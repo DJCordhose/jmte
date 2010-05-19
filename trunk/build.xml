@@ -133,10 +133,11 @@
 	           author="true"
 	           version="true"
 	           use="true"
+	 	access="public"
 	           windowtitle="Java Minimal Template Enginge - Public API">
 
 	    <packageset dir="src" defaultexcludes="yes">
-	    	<exclude name="**/guts/**"/>
+	    	<exclude name="**/token/**"/>
 	    </packageset>
 	 	<link href="http://java.sun.com/javase/6/docs/api/"/>
 	  </javadoc>

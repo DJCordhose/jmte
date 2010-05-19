@@ -1,5 +1,12 @@
 package com.floreysoft.jmte;
 
+/**
+ * Interface used to handle errors while expanding a template. This interface is
+ * called by the {@link Engine} and by the {@link Lexer}.
+ * 
+ * @see Engine
+ * @see Lexer
+ */
 public interface ErrorHandler {
 	/**
 	 * Handles an error while interpreting a template in an appropriate way.
