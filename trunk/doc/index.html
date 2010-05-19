@@ -34,8 +34,8 @@ environments including Google App Engine.</p>
 	it to {name} or &lt;name> or whatever you like
 	<li><em>flexible</em> - feed in templates as String, Reader, File
 	or InputStream - you can also use it as a stand alone tool and feed the
-	model in a property file - or use it as a replacement for {@link
-	String.format} passing in <code>Object...</code> as model
+	model in a property file - or use it as a replacement for <code>String.format</code>
+	passing in <code>Object...</code> as model
 	<li><em>small</em> - barely 1000 lines of code and no dependencies
 	<li><em>simply to learn</em> - it takes less than 5 minutes to
 	learn
@@ -46,15 +46,13 @@ environments including Google App Engine.</p>
 	<li><em>robust</em> - it is well tested by a set of JUnit tests
 	<li><em>compatible</em> - pass in <code>Map&lt;String,
 	Object></code> as model
-	<li><em>fast</em> - no time consuming parsing (you can even switch
-	off escaping of special characters, making it even faster)
+	<li><em>fast</em> - no time consuming parsing (you can switch off
+	escaping of special characters, making it even faster)
 </ul>
 
 <h2>The model</h2>
 
-<p>
-<pre>Map&lt;String,Object></pre>
-</p>
+<p><pre>Map&lt;String,Object></pre></p>
 <p>Nothing more to say.</p>
 
 <h2>The Language</h2>
@@ -110,7 +108,8 @@ language in any way you like.</p>
 	the condition evaluates to <code>true</code> if they contain any
 	elements
 	<li>otherwise the condition evaluates to <code>true</code> if the
-	object is not <code>null</code>
+	object is not <code>null</code> and <code>toString</code> is not equal
+	<code>""</code>
 </ul>
 </p>
 
