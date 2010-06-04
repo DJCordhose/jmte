@@ -25,10 +25,9 @@ import java.util.Map.Entry;
 
 /**
  * Assorted static utility methods.
- *
+ * 
  */
 public class Util {
-
 
 	/**
 	 * Transforms a file into a string.
@@ -54,6 +53,21 @@ public class Util {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Transforms a file into a string.
+	 * 
+	 * @param fileName
+	 *            name of the file to be transformed
+	 * @param charsetName
+	 *            encoding of the file
+	 * @return the string containing the content of the file
+	 */
+	public static String fileToString(String fileName, String charsetName)
+			throws UnsupportedEncodingException, FileNotFoundException,
+			IOException {
+		return fileToString(new File(fileName), charsetName);
 	}
 
 	/**
@@ -101,8 +115,10 @@ public class Util {
 	/**
 	 * Transforms any array to a matching list
 	 * 
-	 * @param value something that might be an array 
-	 * @return List representation if passed in value was an array, <code>null</code> otherwise
+	 * @param value
+	 *            something that might be an array
+	 * @return List representation if passed in value was an array,
+	 *         <code>null</code> otherwise
 	 */
 	@SuppressWarnings("unchecked")
 	public static List arrayAsList(Object value) {
@@ -165,7 +181,8 @@ public class Util {
 	/**
 	 * Trims off white space from the beginning of a string.
 	 * 
-	 * @param input the string to be trimmed
+	 * @param input
+	 *            the string to be trimmed
 	 * @return the trimmed string
 	 */
 	public static String trimFront(String input) {
@@ -179,9 +196,12 @@ public class Util {
 	 * Finds the property value for a certain object.
 	 * 
 	 * 
-	 * @param o object to find the property value for
-	 * @param attributeName name of the requested attribute 
-	 * @return the value for the requested attribute or <code>null</code> when there is no such value
+	 * @param o
+	 *            object to find the property value for
+	 * @param attributeName
+	 *            name of the requested attribute
+	 * @return the value for the requested attribute or <code>null</code> when
+	 *         there is no such value
 	 */
 	@SuppressWarnings("unchecked")
 	public static Object getPropertyValue(Object o, String attributeName)
@@ -222,5 +242,4 @@ public class Util {
 		}
 		return result;
 	}
-
 }
