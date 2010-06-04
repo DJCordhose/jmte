@@ -540,7 +540,7 @@ public final class EngineTest {
 		String input = "stream content";
 		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(
 				input.getBytes(charsetName));
-		String streamToString = Engine.streamToString(byteArrayInputStream,
+		String streamToString = Util.streamToString(byteArrayInputStream,
 				charsetName);
 		assertEquals(input, streamToString);
 	}
@@ -549,7 +549,7 @@ public final class EngineTest {
 	public void reader2String() throws Exception {
 		String input = "reader content";
 		StringReader stringReader = new StringReader(input);
-		String readerToString = Engine.readerToString(stringReader);
+		String readerToString = Util.readerToString(stringReader);
 		assertEquals(input, readerToString);
 	}
 
@@ -557,7 +557,7 @@ public final class EngineTest {
 	public void file2String() throws Exception {
 		String charsetName = "ISO-8859-15";
 		File file = new File("example/basic.mte");
-		String fileToString = Engine.fileToString(file, charsetName);
+		String fileToString = Util.fileToString(file, charsetName);
 		assertEquals("${if address}${address}${else}NIX${end}", fileToString);
 	}
 
