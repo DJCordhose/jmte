@@ -35,7 +35,7 @@ public final class Tool {
 		}
 		FileInputStream stream = null;
 		try {
-			String input = Engine.fileToString(template, charsetName);
+			String input = Util.fileToString(template, charsetName);
 			Engine engine = new Engine();
 
 			Properties properties = new Properties();

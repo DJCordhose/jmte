@@ -4,6 +4,15 @@ import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -19,6 +28,75 @@ import java.util.Map.Entry;
  *
  */
 public class Util {
+
+
+	/**
+	 * Transforms a file into a string.
+	 * 
+	 * @param file
+	 *            the file to be transformed
+	 * @param charsetName
+	 *            encoding of the file
+	 * @return the string containing the content of the file
+	 */
+	public static String fileToString(File file, String charsetName)
+			throws UnsupportedEncodingException, FileNotFoundException,
+			IOException {
+		FileInputStream fileInputStream = new FileInputStream(file);
+		try {
+			fileInputStream = new FileInputStream(file);
+			return streamToString(fileInputStream, charsetName);
+		} finally {
+			if (fileInputStream != null) {
+				try {
+					fileInputStream.close();
+				} catch (IOException e) {
+				}
+			}
+		}
+	}
+
+	/**
+	 * Transforms a stream into a string.
+	 * 
+	 * @param is
+	 *            the stream to be transformed
+	 * @param charsetName
+	 *            encoding of the file
+	 * @return the string containing the content of the stream
+	 */
+	public static String streamToString(InputStream is, String charsetName)
+			throws UnsupportedEncodingException, IOException {
+		Reader r = null;
+		try {
+			r = new BufferedReader(new InputStreamReader(is, charsetName));
+			return readerToString(r);
+		} finally {
+			if (r != null) {
+				try {
+					r.close();
+				} catch (IOException e) {
+				}
+			}
+		}
+	}
+
+	/**
+	 * Transforms a reader into a string.
+	 * 
+	 * @param reader
+	 *            the reader to be transformed
+	 * @return the string containing the content of the reader
+	 */
+	public static String readerToString(Reader reader) throws IOException {
+		StringBuilder sb = new StringBuilder();
+		char[] buf = new char[1024];
+		int numRead = 0;
+		while ((numRead = reader.read(buf)) != -1) {
+			sb.append(buf, 0, numRead);
+		}
+		return sb.toString();
+	}
 
 	/**
 	 * Transforms any array to a matching list
