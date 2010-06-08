@@ -8,11 +8,14 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -30,6 +33,31 @@ import java.util.Map.Entry;
 public class Util {
 
 	/**
+	 * Writes a string into a file.
+	 * 
+	 * @param string the string
+	 * @param file the file
+	 * @param charsetName encoding of the file
+	 * @throws IOException
+	 */
+	public static void stringToFile(String string, File file, String charsetName)
+			throws IOException {
+		FileOutputStream fos = null;
+		Writer writer = null;
+		try {
+			fos = new FileOutputStream(file);
+			writer = new OutputStreamWriter(fos, charsetName);
+			writer.write(string);
+		} finally {
+			if (writer != null) {
+				writer.close();
+			} else if (fos != null) {
+				fos.close();
+			}
+		}
+	}
+
+	/**
 	 * Transforms a file into a string.
 	 * 
 	 * @param file
@@ -41,16 +69,13 @@ public class Util {
 	public static String fileToString(File file, String charsetName)
 			throws UnsupportedEncodingException, FileNotFoundException,
 			IOException {
-		FileInputStream fileInputStream = new FileInputStream(file);
+		FileInputStream fileInputStream = null;
 		try {
 			fileInputStream = new FileInputStream(file);
 			return streamToString(fileInputStream, charsetName);
 		} finally {
 			if (fileInputStream != null) {
-				try {
-					fileInputStream.close();
-				} catch (IOException e) {
-				}
+				fileInputStream.close();
 			}
 		}
 	}
