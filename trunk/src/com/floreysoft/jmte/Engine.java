@@ -215,13 +215,13 @@ public final class Engine {
 			int i = 0;
 			while (i < scan.size()) {
 				StartEndPair startEndPair = scan.get(i);
-				int length = startEndPair.start - exprStartToken.length()
+				int length = startEndPair.start - getExprStartToken().length()
 						- offset;
 				boolean skipMode = isSkipMode();
 				if (!skipMode) {
 					output.append(inputChars, offset, length);
 				}
-				offset = startEndPair.end + exprEndToken.length();
+				offset = startEndPair.end + getExprEndToken().length();
 				i++;
 
 				Token token = lexer.nextToken(inputChars, startEndPair.start,
@@ -391,23 +391,23 @@ public final class Engine {
 		List<StartEndPair> result = new ArrayList<StartEndPair>();
 		int fromIndex = 0;
 		while (true) {
-			int exprStart = input.indexOf(exprStartToken, fromIndex);
+			int exprStart = input.indexOf(getExprStartToken(), fromIndex);
 			if (exprStart == -1) {
 				break;
 			}
 			if (useEscaping && isEscaped(input, exprStart)) {
-				fromIndex = exprStart + exprStartToken.length();
+				fromIndex = exprStart + getExprStartToken().length();
 				continue;
 			}
 
-			exprStart += exprStartToken.length();
-			int exprEnd = input.indexOf(exprEndToken, exprStart);
+			exprStart += getExprStartToken().length();
+			int exprEnd = input.indexOf(getExprEndToken(), exprStart);
 			while (useEscaping && isEscaped(input, exprEnd)) {
-				exprEnd = input.indexOf(exprEndToken, exprEnd
-						+ exprEndToken.length());
+				exprEnd = input.indexOf(getExprEndToken(), exprEnd
+						+ getExprEndToken().length());
 			}
 
-			fromIndex = exprEnd + exprEndToken.length();
+			fromIndex = exprEnd + getExprEndToken().length();
 
 			StartEndPair startEndPair = new StartEndPair(exprStart, exprEnd);
 			result.add(startEndPair);
@@ -478,6 +478,14 @@ public final class Engine {
 	 */
 	public ErrorHandler getErrorHandler() {
 		return errorHandler;
+	}
+
+	public String getExprStartToken() {
+		return exprStartToken;
+	}
+
+	public String getExprEndToken() {
+		return exprEndToken;
 	}
 
 }
