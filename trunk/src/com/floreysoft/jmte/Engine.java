@@ -1,14 +1,5 @@
 package com.floreysoft.jmte;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -49,7 +40,7 @@ import com.floreysoft.jmte.token.StringToken;
  * model.put(&quot;name&quot;, &quot;Minimal Template Engine&quot;);
  * Engine engine = new Engine();
  * String transformed = engine.transform(input, model);
- * assert(transformed.equals("Minimal Template Engine"));
+ * assert (transformed.equals(&quot;Minimal Template Engine&quot;));
  * </pre>
  * 
  * where <code>input</code> contains the template and <code>model</code> the
@@ -66,7 +57,11 @@ public final class Engine {
 	private static final String FIRST = "first_";
 	private static final String EVIL_HACKY_DOUBLE_BACKSLASH_PLACEHOLDER = "EVIL_HACKY_DOUBLE_BACKSLASH_PLACEHOLDER";
 
-	static class StartEndPair {
+	/**
+	 * Pairs of begin/end.
+	 *
+	 */
+	public static class StartEndPair {
 		public final int start;
 		public final int end;
 
@@ -82,8 +77,8 @@ public final class Engine {
 	}
 
 	/**
-	 * Replacement for {@link java.lang.String.format}. All arguments will be put into the
-	 * model having their index starting from 1 as their name.
+	 * Replacement for {@link java.lang.String.format}. All arguments will be
+	 * put into the model having their index starting from 1 as their name.
 	 * 
 	 * @param pattern
 	 *            the template
@@ -381,16 +376,18 @@ public final class Engine {
 		return !condition;
 	}
 
-	String applyEscapes(String input) {
-		String unescaped = input.replaceAll("\\\\\\\\",
-				EVIL_HACKY_DOUBLE_BACKSLASH_PLACEHOLDER);
-		unescaped = unescaped.replaceAll("\\\\", "");
-		unescaped = unescaped.replaceAll(
-				EVIL_HACKY_DOUBLE_BACKSLASH_PLACEHOLDER, "\\\\");
-		return unescaped;
-	}
-
-	List<StartEndPair> scan(String input, boolean useEscaping) {
+	/**
+	 * Scans the input and spits out begin/end pairs telling you where
+	 * expressions can be found.
+	 * 
+	 * @param input
+	 *            the input
+	 * @param useEscaping
+	 *            tells the method whether to use (<code>true</code>) or ignore
+	 *            escape character \\
+	 * @return the begin/end pairs telling you where expressions can be found
+	 */
+	public List<StartEndPair> scan(String input, boolean useEscaping) {
 		List<StartEndPair> result = new ArrayList<StartEndPair>();
 		int fromIndex = 0;
 		while (true) {
@@ -416,6 +413,15 @@ public final class Engine {
 			result.add(startEndPair);
 		}
 		return result;
+	}
+
+	String applyEscapes(String input) {
+		String unescaped = input.replaceAll("\\\\\\\\",
+				EVIL_HACKY_DOUBLE_BACKSLASH_PLACEHOLDER);
+		unescaped = unescaped.replaceAll("\\\\", "");
+		unescaped = unescaped.replaceAll(
+				EVIL_HACKY_DOUBLE_BACKSLASH_PLACEHOLDER, "\\\\");
+		return unescaped;
 	}
 
 	// a character is escaped when it is preceded by an unescaped \
