@@ -105,7 +105,8 @@ public class DefaultLexer implements Lexer {
 						value = "";
 					}
 				} else {
-					value = "";
+					// in skip mode keep old expression
+					value = objectExpression;
 				}
 
 				return new StringToken(value.toString());
