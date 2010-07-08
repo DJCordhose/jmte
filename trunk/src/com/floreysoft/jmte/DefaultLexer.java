@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import com.floreysoft.jmte.token.DefaultToken;
+import com.floreysoft.jmte.token.AbstractToken;
 import com.floreysoft.jmte.token.ElseToken;
 import com.floreysoft.jmte.token.EndToken;
 import com.floreysoft.jmte.token.ForEachToken;
@@ -37,15 +37,15 @@ public class DefaultLexer implements Lexer {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Token nextToken(char[] template, int start, int end,
-			Map<String, Object> model, boolean skipMode,
-			ErrorHandler errorHandler) {
+	public Token nextToken(final char[] template, final int start, final int end,
+			final Map<String, Object> model, final boolean skipMode,
+			final ErrorHandler errorHandler) {
 		String input = new String(template, start, end - start);
 		this.errorHandler = errorHandler;
 		input = Util.trimFront(input);
 		String[] split = input.split("( |\t|\r|\n)+");
 
-		DefaultToken token = innerNextToken(template, start, end, model, skipMode,
+		AbstractToken token = innerNextToken(template, start, end, model, skipMode,
 				errorHandler, input, split);
 		token.setBuffer(template);
 		token.setStart(start);
@@ -54,9 +54,9 @@ public class DefaultLexer implements Lexer {
 	}
 
 	@SuppressWarnings("unchecked")
-	private DefaultToken innerNextToken(char[] template, int start, int end,
-			Map<String, Object> model, boolean skipMode,
-			ErrorHandler errorHandler, String input, String[] split) {
+	private AbstractToken innerNextToken(final char[] template, final int start, final int end,
+			final Map<String, Object> model, final boolean skipMode,
+			final ErrorHandler errorHandler, final String input, final String[] split) {
 		if (split.length == 0) {
 			// empty expression like ${}
 			return new StringToken("");

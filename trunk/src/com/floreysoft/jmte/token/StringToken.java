@@ -1,6 +1,6 @@
 package com.floreysoft.jmte.token;
 
-public class StringToken extends DefaultToken {
+public class StringToken extends AbstractToken {
 	protected String value;
 
 	public StringToken(String value) {

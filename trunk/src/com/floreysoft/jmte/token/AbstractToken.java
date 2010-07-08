@@ -2,17 +2,17 @@ package com.floreysoft.jmte.token;
 
 import com.floreysoft.jmte.Token;
 
-public class DefaultToken implements Token {
+public abstract class AbstractToken implements Token {
 
 	private char[] buffer;
 	private int start;
 	private int end;
 
-	public DefaultToken() {
+	public AbstractToken() {
 
 	}
 
-	public DefaultToken(char[] buffer, int start, int end) {
+	public AbstractToken(char[] buffer, int start, int end) {
 		this.setBuffer(buffer);
 		this.setStart(start);
 		this.setEnd(end);
