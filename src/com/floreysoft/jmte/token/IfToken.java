@@ -1,6 +1,6 @@
 package com.floreysoft.jmte.token;
 
-public class IfToken extends DefaultToken {
+public class IfToken extends AbstractToken {
 
 	private boolean condition;
 	

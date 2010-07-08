@@ -6,4 +6,10 @@ package com.floreysoft.jmte;
  */
 public interface Token {
 
+	/**
+	 * Returns the text of the token.
+	 * 
+	 * @return the text
+	 */
+	public String getText();
 }

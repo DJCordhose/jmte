@@ -17,7 +17,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.floreysoft.jmte.Engine.StartEndPair;
-import com.floreysoft.jmte.token.DefaultToken;
 import com.floreysoft.jmte.token.StringToken;
 
 @SuppressWarnings("unchecked")
@@ -148,7 +147,7 @@ public final class EngineTest {
 	@Test
 	public void identityTransform() throws Exception {
 		engine.setLexer(new Lexer() {
-			public DefaultToken nextToken(char[] template, int start, int end,
+			public Token nextToken(char[] template, int start, int end,
 					Map<String, Object> model, boolean expand,
 					ErrorHandler errorHandler) {
 				String input = new String(template, start, end - start);
@@ -585,6 +584,7 @@ public final class EngineTest {
 		model.put("name", "Minimal Template Engine");
 		Engine engine = new Engine();
 		String transformed = engine.transform(input, model);
+		System.out.println(transformed);
 		assert(transformed.equals("Minimal Template Engine"));
 	}
 }

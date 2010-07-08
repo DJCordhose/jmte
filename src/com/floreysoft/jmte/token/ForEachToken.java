@@ -2,7 +2,7 @@ package com.floreysoft.jmte.token;
 
 import java.util.Iterator;
 
-public class ForEachToken extends DefaultToken {
+public class ForEachToken extends AbstractToken {
 	private final String varName;
 	private final Iterator<Object> iterator;
 	private String separator;
