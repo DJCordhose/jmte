@@ -96,7 +96,6 @@
 		<manifest>
 			<attribute name="Built-By" value="${creator}"/>
 			<attribute name="Main-Class" value="${main-class}"/>
-			<attribute name="Class-Path" value="."/>
 			<attribute name="Version" value="${version}"/>
 			<attribute name="Build-Date" value="${today}"/>
 		</manifest>
