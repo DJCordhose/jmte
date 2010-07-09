@@ -1,5 +1,6 @@
 package com.floreysoft.jmte;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -8,6 +9,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -427,6 +429,19 @@ public final class EngineTest {
 		assertEquals(expected, output);
 	}
 
+	@Test
+	public void mergedForeach() throws Exception {
+		List amount = Arrays.asList(1, 2, 3);
+		List price = Arrays.asList(3.6, 2, 3.0);
+		List total = Arrays.asList("3.6", "4", "9");
+		
+		List<Map<String,Object>> mergedLists = Engine.mergeLists(new String[] {"amount", "price", "total"}, amount, price, total);
+		Map<String,Object> model = new HashMap<String, Object>();
+		model.put("mergedLists", mergedLists);
+		String output = engine.transform("${foreach mergedLists item}${item.amount} x ${item.price} = ${item.total}\n${end}",
+				model);
+		assertEquals("1 x 3.6 = 3.6\n" + "2 x 2 = 4\n"+ "3 x 3.0 = 9\n", output);
+	}
 
 	@Test
 	public void foreachArray() throws Exception {
