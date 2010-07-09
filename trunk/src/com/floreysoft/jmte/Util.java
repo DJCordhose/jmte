@@ -146,7 +146,7 @@ public class Util {
 	 *         <code>null</code> otherwise
 	 */
 	@SuppressWarnings("unchecked")
-	public static List arrayAsList(Object value) {
+	public static List<Object> arrayAsList(Object value) {
 		List list = null;
 		if (value instanceof int[]) {
 			list = new ArrayList();

@@ -240,21 +240,48 @@ public final class EngineTest {
 		assertEquals("", output);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void illegalMapExpressionDevel() throws Exception {
-		engine.setErrorHandler(new DefaultErrorHandler(
-				DefaultErrorHandler.Mode.DEVELOPMENT));
-		engine.transform("${map}", DEFAULT_MODEL);
+	@Test
+	public void directMap() throws Exception {
+		// if we try to directly output a map, we simply get the first value
+		String output = engine.transform("${map}", DEFAULT_MODEL);
+		assertEquals("mapValue1", output);
 	}
 
 	@Test
-	public void illegalMapExpressionProd() throws Exception {
-		engine.setErrorHandler(new DefaultErrorHandler(
-				DefaultErrorHandler.Mode.PRODUCTION));
-		String output = engine.transform("${map}", DEFAULT_MODEL);
+	public void directEmptyMap() throws Exception {
+		// if we try to directly output an empty map, we simply get an empty string
+		String output = engine.transform("${emptyMap}", DEFAULT_MODEL);
 		assertEquals("", output);
 	}
-
+	
+	@Test
+	public void directList() throws Exception {
+		// if we try to directly output a list, we simply get the first value
+		String output = engine.transform("${list}", DEFAULT_MODEL);
+		assertEquals("1.1, 1.2", output);
+	}
+	
+	@Test
+	public void directArray() throws Exception {
+		// if we try to directly output an array, we simply get the first value
+		String output = engine.transform("${array}", DEFAULT_MODEL);
+		assertEquals("1.1, 1.2", output);
+	}
+	
+	@Test
+	public void directEmptyList() throws Exception {
+		// if we try to directly output an empty list, we simply get an empty string
+		String output = engine.transform("${emptyList}", DEFAULT_MODEL);
+		assertEquals("", output);
+	}
+	
+	@Test
+	public void directEmptyArray() throws Exception {
+		// if we try to directly output an empty array, we simply get an empty string
+		String output = engine.transform("${emptyArray}", DEFAULT_MODEL);
+		assertEquals("", output);
+	}
+	
 	@Test
 	public void ifEmptyFalseExpression() throws Exception {
 		String output = engine.transform(
@@ -388,6 +415,18 @@ public final class EngineTest {
 		assertEquals("1.1, 1.2\n" + "2.1, 2.2\n", output);
 		assertNull(DEFAULT_MODEL.get("item"));
 	}
+
+	@Test
+	public void foreachSingletonAsList() throws Exception {
+		// if the variable we want to iterate over is atomic, we simply wrap
+		// it into a singleton list
+		String output = engine.transform("${foreach address item}${item}${end}",
+				DEFAULT_MODEL);
+		String expected = engine.transform("${address}",
+				DEFAULT_MODEL);
+		assertEquals(expected, output);
+	}
+
 
 	@Test
 	public void foreachArray() throws Exception {

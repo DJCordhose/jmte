@@ -2,6 +2,7 @@ package com.floreysoft.jmte;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -92,17 +93,22 @@ public class DefaultLexer implements Lexer {
 						// gracefully ignore in production mode
 						value = "";
 
-					} else if (value instanceof Map
-							|| value instanceof Iterable) {
-						errorHandler
-								.error(
-										String
-												.format(
-														"Illegal expansion of map or iterable variable '%s'",
-														objectExpression),
-										template, start, end);
-						// gracefully ignore in production mode
-						value = "";
+					} else if (!(value instanceof String)) {
+						final List<Object> arrayAsList = Util
+								.arrayAsList(value);
+						if (arrayAsList != null) {
+							value = arrayAsList.size() > 0 ? arrayAsList.get(0)
+									: "";
+						} else if (value instanceof Map) {
+							final Map map = (Map) value;
+							final Collection values = map.values();
+							value = values.size() > 0 ? values.iterator()
+									.next() : "";
+						} else if (value instanceof Iterable) {
+							final Iterable iterable = (Iterable) value;
+							final Iterator iterator = iterable.iterator();
+							value = iterator.hasNext() ? iterator.next() : "";
+						}
 					}
 				} else {
 					// in skip mode keep old expression
@@ -172,14 +178,8 @@ public class DefaultLexer implements Lexer {
 					} else {
 						iterable = Util.arrayAsList(value);
 						if (iterable == null) {
-							errorHandler
-									.error(
-											String
-													.format(
-															"Can only iterator over map or iterable on '%s'",
-															objectExpression),
-											template, start, end);
-							return new IfToken(false);
+							// we have a single value here and simply wrap it in a List
+							iterable = Collections.singletonList(value);
 						}
 					}
 					String varName = split[2];
