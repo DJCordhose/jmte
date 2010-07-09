@@ -117,6 +117,49 @@ public final class Engine {
 		}
 		return model;
 	}
+	
+	/**
+	 * Merges any number of named lists into a single one contained their
+	 * combined values. Can be very handy in case of a servlet request which
+	 * might contain several lists of parameters that you want to iterate over
+	 * in a combined way.
+	 * 
+	 * @param names
+	 *            the names of the variables in the following lists
+	 * @param lists
+	 *            the lists containing the values for the named variables
+	 * @return a merge list containing the combined values of the lists
+	 */
+	public static List<Map<String, Object>> mergeLists(String[] names,
+			List<Object>... lists) {
+		List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
+		if (lists.length != 0) {
+			
+			// first check if all looks good
+			int expectedSize = names.length;
+			for (int i = 0; i < lists.length; i++) {
+				List<Object> list = lists[i];
+				if (list.size() != expectedSize) {
+					throw new IllegalArgumentException(
+							"All lists and array of names must have the same size!");
+				}
+			}
+
+			// yes, things are ok
+			List<Object> masterList = lists[0];
+			for (int i = 0; i < masterList.size(); i++) {
+				Map<String, Object> map = new HashMap<String, Object>();
+				for (int j = 0; j < lists.length; j++) {
+					String name = names[j];
+					List<Object> list = lists[j];
+					Object value = list.get(i);
+					map.put(name, value);
+				}
+				resultList.add(map);
+			}
+		}
+		return resultList;
+	}
 
 	private final String exprStartToken;
 	private final String exprEndToken;
