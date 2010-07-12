@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project name="jmte" default="all" basedir=".">
+<project name="${name}" default="jar" basedir=".">
 
   <!-- 
   ===================================================================
@@ -9,12 +9,10 @@
 
   <property file="${basedir}/build.properties"/>
 
-  <property name="name" value="jmte" />
   <property name="creator" value="floreysoft GmbH"/>
   <property name="final.name" value="${name}-${version}"/>
   <property name="dist.name" value="${name}-${version}-full.zip"/>
   <property name="jar.name" value="${final.name}.jar"/>
-  <property name="main-class" value="com.floreysoft.jmte.Tool" />
 
   <tstamp>
 	<format property="TODAY.DATE" pattern="yyyy-MM-dd" locale="us" />
@@ -49,7 +47,7 @@
 
 	  <path id="classpath">
 	    <pathelement location="${build.dir}" />
-	    <fileset dir="${lib.dir}" includes="junit.jar"/>
+	    <fileset dir="${lib.dir}"/>
 	  </path>
 
   <!-- 
@@ -108,13 +106,12 @@
   Distribute the code
   ===================================================================
   -->
+	
+  <target name="all" depends="full-dist" description="Creates all distributions" />
+	
+  <target name="jar" depends="clean,build,test,archive-jars" description="Creates the testet release jar" />
 
-  <target name="release" depends="all,test" />	
-	
-  <target name="all" depends="full-dist" description="Creates all distributions">
-  </target>
-	
-  <target name="full-dist" depends="clean,build,test,javadoc,archive-jars" description="Source distribution">
+  <target name="full-dist" depends="jar,javadoc" description="Source distribution">
  	<zip destfile="${dist.dir}/${dist.name}" >
  	  <zipfileset dir="${example.dir}" prefix="${final.name}/example"/>
  	  <zipfileset dir="${test.dir}" prefix="${final.name}/test"/>
@@ -133,7 +130,7 @@
 	           version="true"
 	           use="true"
 	 	access="public"
-	           windowtitle="Java Minimal Template Enginge - Public API">
+	           windowtitle="${full.name} - Public API">
 
 	    <packageset dir="src" defaultexcludes="yes">
 	    	<exclude name="**/token/**"/>
@@ -162,7 +159,7 @@
     <junit printsummary="yes" haltonfailure="yes">
       <classpath refid="classpath" />
       <formatter type="plain" />
-      <test name="com.floreysoft.jmte.EngineTest" haltonfailure="yes" todir="${tmp.dir}"/>
+      <test name="${test.class}" haltonfailure="yes" todir="${tmp.dir}"/>
      </junit>
   </target>
 
