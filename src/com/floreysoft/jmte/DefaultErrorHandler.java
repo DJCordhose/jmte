@@ -29,7 +29,8 @@ public class DefaultErrorHandler implements ErrorHandler {
 	private char[] input;
 	private int currentBlockStart;
 	private int currentBlockEnd;
-
+	private String currentInputName;
+	
 	/**
 	 * Creates an error handler of the desired mode
 	 * 
@@ -70,7 +71,8 @@ public class DefaultErrorHandler implements ErrorHandler {
 		int line = getLine();
 		int column = getColumn();
 		String completeMessage = String.format(
-				"%s while parsing '%s' at (%d:%d): %s", type, context, line,
+				"%s while parsing '%s' at %s(%d:%d): %s", type, context,
+				(currentInputName != null ? currentInputName : ""), line,
 				column, message);
 		return completeMessage;
 	}
@@ -103,6 +105,14 @@ public class DefaultErrorHandler implements ErrorHandler {
 
 	public void setMode(Mode mode) {
 		this.mode = mode;
+	}
+
+	public void setCurrentInputName(String currentInputName) {
+		this.currentInputName = currentInputName;
+	}
+
+	public String getCurrentInputName() {
+		return currentInputName;
 	}
 
 }

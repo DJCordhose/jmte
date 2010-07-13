@@ -87,10 +87,6 @@ public class DefaultLexer implements Lexer {
 					value = traverse(objectExpression, model, template, start,
 							end);
 					if (value == null) {
-						errorHandler.error(String.format(
-								"Variable '%s' undefined", objectExpression),
-								template, start, end);
-						// gracefully ignore in production mode
 						value = "";
 
 					} else if (!(value instanceof String)) {
@@ -246,11 +242,6 @@ public class DefaultLexer implements Lexer {
 			result = o;
 		} else {
 			if (o == null) {
-				errorHandler
-						.error(
-								String
-										.format("You can not make property calls on null values"),
-								template, start, end);
 				return null;
 			}
 			String attributeName = attributeNames.remove(0);
