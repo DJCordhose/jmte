@@ -227,17 +227,8 @@ public final class EngineTest {
 
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void nullExpressionDevel() throws Exception {
-		engine.setErrorHandler(new DefaultErrorHandler(
-				DefaultErrorHandler.Mode.DEVELOPMENT));
-		engine.transform("${undefined}", DEFAULT_MODEL);
-	}
-
 	@Test
-	public void nullExpressionProd() throws Exception {
-		engine.setErrorHandler(new DefaultErrorHandler(
-				DefaultErrorHandler.Mode.PRODUCTION));
+	public void nullExpression() throws Exception {
 		String output = engine.transform("${undefined}", DEFAULT_MODEL);
 		assertEquals("", output);
 	}
@@ -515,12 +506,6 @@ public final class EngineTest {
 		assertEquals("1.12.1\n" + "1.12.1\n", output);
 		assertNull(DEFAULT_MODEL.get("item"));
 		assertNull(DEFAULT_MODEL.get("item2"));
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void foreachCleanup() throws Exception {
-		engine.transform("${foreach list item}${item}\n${end}${item}",
-				DEFAULT_MODEL);
 	}
 
 	@Test
