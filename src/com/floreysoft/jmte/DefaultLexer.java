@@ -269,7 +269,9 @@ public class DefaultLexer implements Lexer {
 			} catch (Exception e) {
 				errorHandler.error(String.format(
 						"Property '%s' on object '%s' can not be accessed: %s",
-						attributeName, o.toString(), e.getMessage()), template,
+						attributeName, o.toString(), e.getMessage() != null ? e
+								.getMessage() : e.getCause() != null ? e
+								.getCause().getMessage() : ""), template,
 						start, end);
 				result = "";
 			}
