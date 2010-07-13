@@ -212,9 +212,9 @@ public class DefaultLexer implements Lexer {
 						forEachToken.setSeparator(separator);
 					}
 					return forEachToken;
+				} else {
+					return new IfToken(false);
 				}
-			} else {
-				return new IfToken(false);
 			}
 		}
 		// default in case anything went wrong

@@ -528,8 +528,17 @@ public final class EngineTest {
 	}
 
 	@Test
+	public void scopingInFalseIf() throws Exception {
+		String template = "${if emptyList}" + "Was da"
+				+ "${foreach emptyList item}" + "${end}" + "${else}" + "Nüscht"
+				+ "${end}";
+		String output = engine.transform(template, DEFAULT_MODEL);
+		assertEquals("Nüscht", output);
+	}
+	
+	@Test
 	public void foreachDoubleVarNameError() throws Exception {
-		// XXX strange way of checking for excepion as we need to make sure
+		// XXX strange way of checking for exception as we need to make sure
 		// model is clean even after exception
 		boolean exceptionFound = false;
 		try {
