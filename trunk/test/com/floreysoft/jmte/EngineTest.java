@@ -198,7 +198,7 @@ public final class EngineTest {
 		} catch (Exception e) {
 			String message = e.getMessage();
 			foundPosition = message
-					.equals("Error while parsing 'else' at (3:8): Can't use else outside of if block");
+					.equals("Error while parsing 'else' at (3:8): Can't use else outside of if block (surrounding block is none)");
 
 		}
 		assertTrue(

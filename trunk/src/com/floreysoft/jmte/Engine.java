@@ -305,10 +305,10 @@ public final class Engine {
 				} else if (token instanceof ElseToken) {
 					Token poppedToken = peek();
 					if (!(poppedToken instanceof IfToken)) {
-						getErrorHandler().error(
-								"Can't use else outside of if block",
-								inputChars, startEndPair.start,
-								startEndPair.end);
+						String surrounding = poppedToken == null ? "none" : poppedToken.getText();
+						String errorMessage = String.format("Can't use else outside of if block (surrounding block is %s)", surrounding);
+						getErrorHandler().error(errorMessage, inputChars,
+								startEndPair.start, startEndPair.end);
 					}
 					push(token);
 				} else if (token instanceof EndToken) {
