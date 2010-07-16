@@ -125,17 +125,10 @@ public final class EngineTest {
 		DEFAULT_MODEL.put("empty", "");
 	}
 
-	private Engine engine;
-
-	@Before
-	public void setUp() {
-		engine = new Engine();
-	}
-
 	@Test
 	public void extract() throws Exception {
 		String line = "${if adresse}Sie wohnen an ${adresse}";
-		List<StartEndPair> scan = engine.scan(line, true);
+		List<StartEndPair> scan = new Engine().scan(line, true);
 		assertEquals(2, scan.size());
 
 		assertEquals(2, scan.get(0).start);
@@ -148,14 +141,15 @@ public final class EngineTest {
 
 	@Test
 	public void identityTransform() throws Exception {
-		engine.setLexer(new Lexer() {
-			public Token nextToken(char[] template, int start, int end,
-					Map<String, Object> model, boolean expand,
-					ErrorHandler errorHandler) {
+		Engine engine = new Engine().withLexer(new Lexer() {
+
+			@Override
+			public Token nextToken(String sourceName, char[] template,
+					int start, int end, Map<String, Object> model,
+					boolean skipMode, ErrorHandler errorHandler) {
 				String input = new String(template, start, end - start);
 				return new StringToken("${" + input + "}");
 			}
-
 		});
 
 		String line = "${if adresse}Sie wohnen an ${adresse}";
@@ -165,26 +159,26 @@ public final class EngineTest {
 
 	@Test
 	public void simpleExpression() throws Exception {
-		String output = engine.transform("${address}", DEFAULT_MODEL);
+		String output = new Engine().transform("${address}", DEFAULT_MODEL);
 		assertEquals(DEFAULT_MODEL.get("address"), output);
 	}
 
 	@Test
 	public void empty() throws Exception {
-		String output = engine.transform("${\n}${ \n }${}", DEFAULT_MODEL);
+		String output = new Engine().transform("${\n}${ \n }${}", DEFAULT_MODEL);
 		assertEquals("", output);
 	}
 
 	@Test
 	public void suffixPrefix() throws Exception {
-		String output = engine.transform("PREFIX${address}SUFFIX",
+		String output = new Engine().transform("PREFIX${address}SUFFIX",
 				DEFAULT_MODEL);
 		assertEquals("PREFIX" + DEFAULT_MODEL.get("address") + "SUFFIX", output);
 	}
 
 	@Test
 	public void noTransformation() throws Exception {
-		String output = engine.transform("No transformation required",
+		String output = new Engine().transform("No transformation required",
 				DEFAULT_MODEL);
 		assertEquals("No transformation required", output);
 	}
@@ -193,7 +187,7 @@ public final class EngineTest {
 	public void errorPosition() throws Exception {
 		boolean foundPosition = false;
 		try {
-			engine.transform("\n${address}\n     ${else}NIX${end}",
+			new Engine().transform("\n${address}\n     ${else}NIX${end}",
 					DEFAULT_MODEL);
 		} catch (Exception e) {
 			String message = e.getMessage();
@@ -208,114 +202,114 @@ public final class EngineTest {
 
 	@Test
 	public void mapExpression() throws Exception {
-		String output = engine.transform("${map.mapEntry1}", DEFAULT_MODEL);
+		String output = new Engine().transform("${map.mapEntry1}", DEFAULT_MODEL);
 		assertEquals(MAP.get("mapEntry1"), output);
 
 	}
 
 	@Test
 	public void propertyExpressionGetter() throws Exception {
-		String output = engine.transform("${bean.property1}", DEFAULT_MODEL);
+		String output = new Engine().transform("${bean.property1}", DEFAULT_MODEL);
 		assertEquals(BEAN.getProperty1().toString(), output);
 
 	}
 
 	@Test
 	public void propertyExpressionField() throws Exception {
-		String output = engine.transform("${bean.property2}", DEFAULT_MODEL);
+		String output = new Engine().transform("${bean.property2}", DEFAULT_MODEL);
 		assertEquals(BEAN.property2.toString(), output);
 
 	}
 
 	@Test
 	public void nullExpression() throws Exception {
-		String output = engine.transform("${undefined}", DEFAULT_MODEL);
+		String output = new Engine().transform("${undefined}", DEFAULT_MODEL);
 		assertEquals("", output);
 	}
 
 	@Test
 	public void directMap() throws Exception {
 		// if we try to directly output a map, we simply get the first value
-		String output = engine.transform("${map}", DEFAULT_MODEL);
+		String output = new Engine().transform("${map}", DEFAULT_MODEL);
 		assertEquals("mapValue1", output);
 	}
 
 	@Test
 	public void directEmptyMap() throws Exception {
 		// if we try to directly output an empty map, we simply get an empty string
-		String output = engine.transform("${emptyMap}", DEFAULT_MODEL);
+		String output = new Engine().transform("${emptyMap}", DEFAULT_MODEL);
 		assertEquals("", output);
 	}
 	
 	@Test
 	public void directList() throws Exception {
 		// if we try to directly output a list, we simply get the first value
-		String output = engine.transform("${list}", DEFAULT_MODEL);
+		String output = new Engine().transform("${list}", DEFAULT_MODEL);
 		assertEquals("1.1, 1.2", output);
 	}
 	
 	@Test
 	public void directArray() throws Exception {
 		// if we try to directly output an array, we simply get the first value
-		String output = engine.transform("${array}", DEFAULT_MODEL);
+		String output = new Engine().transform("${array}", DEFAULT_MODEL);
 		assertEquals("1.1, 1.2", output);
 	}
 	
 	@Test
 	public void directEmptyList() throws Exception {
 		// if we try to directly output an empty list, we simply get an empty string
-		String output = engine.transform("${emptyList}", DEFAULT_MODEL);
+		String output = new Engine().transform("${emptyList}", DEFAULT_MODEL);
 		assertEquals("", output);
 	}
 	
 	@Test
 	public void directEmptyArray() throws Exception {
 		// if we try to directly output an empty array, we simply get an empty string
-		String output = engine.transform("${emptyArray}", DEFAULT_MODEL);
+		String output = new Engine().transform("${emptyArray}", DEFAULT_MODEL);
 		assertEquals("", output);
 	}
 	
 	@Test
 	public void ifEmptyFalseExpression() throws Exception {
-		String output = engine.transform(
+		String output = new Engine().transform(
 				"${if empty}${address}${else}NIX${end}", DEFAULT_MODEL);
 		assertEquals("NIX", output);
 	}
 
 	@Test
 	public void ifNullTrueExpression() throws Exception {
-		String output = engine.transform(
+		String output = new Engine().transform(
 				"${if address}${address}${else}NIX${end}", DEFAULT_MODEL);
 		assertEquals(DEFAULT_MODEL.get("address"), output);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void elseWithoutIfError() throws Exception {
-		engine.transform("${address}${else}NIX${end}", DEFAULT_MODEL);
+		new Engine().transform("${address}${else}NIX${end}", DEFAULT_MODEL);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void endWithoutBlockError() throws Exception {
-		engine.transform("${address}${end}", DEFAULT_MODEL);
+		new Engine().transform("${address}${end}", DEFAULT_MODEL);
 	}
 
 	@Test
 	public void ifNotExpression() throws Exception {
-		String output = engine.transform(
+		String output = new Engine().transform(
 				"${if !hugo}${address}${else}NIX${end}", DEFAULT_MODEL);
 		assertEquals(DEFAULT_MODEL.get("address"), output);
 	}
 
 	@Test
 	public void ifBooleanTrueExpression() throws Exception {
-		String output = engine.transform(
+		String output = new Engine().transform(
 				"${if bean.trueCond}${address}${else}NIX${end}", DEFAULT_MODEL);
 		assertEquals(DEFAULT_MODEL.get("address"), output);
 	}
 
 	@Test
 	public void ifBooleanFalseExpression() throws Exception {
-		String output = engine
+		String output = new Engine()
 				.transform("${if bean.falseCond}${address}${else}NIX${end}",
 						DEFAULT_MODEL);
 		assertEquals("NIX", output);
@@ -323,70 +317,70 @@ public final class EngineTest {
 
 	@Test
 	public void ifMapTrueExpression() throws Exception {
-		String output = engine.transform("${if map}${address}${else}NIX${end}",
+		String output = new Engine().transform("${if map}${address}${else}NIX${end}",
 				DEFAULT_MODEL);
 		assertEquals(DEFAULT_MODEL.get("address"), output);
 	}
 
 	@Test
 	public void ifMapFalseExpression() throws Exception {
-		String output = engine.transform(
+		String output = new Engine().transform(
 				"${if emptyMap}${address}${else}NIX${end}", DEFAULT_MODEL);
 		assertEquals("NIX", output);
 	}
 
 	@Test
 	public void ifCollectionTrueExpression() throws Exception {
-		String output = engine.transform(
+		String output = new Engine().transform(
 				"${if list}${address}${else}NIX${end}", DEFAULT_MODEL);
 		assertEquals(DEFAULT_MODEL.get("address"), output);
 	}
 
 	@Test
 	public void ifCollectionFalseExpression() throws Exception {
-		String output = engine.transform(
+		String output = new Engine().transform(
 				"${if emptyList}${address}${else}NIX${end}", DEFAULT_MODEL);
 		assertEquals("NIX", output);
 	}
 
 	@Test
 	public void ifIterableTrueExpression() throws Exception {
-		String output = engine.transform(
+		String output = new Engine().transform(
 				"${if iterable}${address}${else}NIX${end}", DEFAULT_MODEL);
 		assertEquals(DEFAULT_MODEL.get("address"), output);
 	}
 
 	@Test
 	public void ifIterableFalseExpression() throws Exception {
-		String output = engine.transform(
+		String output = new Engine().transform(
 				"${if emptyIterable}${address}${else}NIX${end}", DEFAULT_MODEL);
 		assertEquals("NIX", output);
 	}
 
 	@Test
 	public void ifArrayTrueExpression() throws Exception {
-		String output = engine.transform(
+		String output = new Engine().transform(
 				"${if array}${address}${else}NIX${end}", DEFAULT_MODEL);
 		assertEquals(DEFAULT_MODEL.get("address"), output);
 	}
 
 	@Test
 	public void ifArrayFalseExpression() throws Exception {
-		String output = engine.transform(
+		String output = new Engine().transform(
 				"${if emptyArray }${address}${else}NIX${end}", DEFAULT_MODEL);
 		assertEquals("NIX", output);
 	}
 
 	@Test
 	public void ifPrimitiveArrayTrueExpression() throws Exception {
-		String output = engine.transform(
+		String output = new Engine().transform(
 				"${if intArray}${address}${else}NIX${end}", DEFAULT_MODEL);
 		assertEquals(DEFAULT_MODEL.get("address"), output);
 	}
 
 	@Test
 	public void ifPrimitiveArrayFalseExpression() throws Exception {
-		String output = engine
+		String output = new Engine()
 				.transform("${if emptyIntArray }${address}${else}NIX${end}",
 						DEFAULT_MODEL);
 		assertEquals("NIX", output);
@@ -394,7 +388,7 @@ public final class EngineTest {
 
 	@Test
 	public void nestedIfExpression() throws Exception {
-		String output = engine
+		String output = new Engine()
 				.transform(
 						"${if hugo}${address}${else}${if address}${address}${else}NIX${end}${end}",
 						DEFAULT_MODEL);
@@ -403,7 +397,7 @@ public final class EngineTest {
 
 	@Test
 	public void simpleForeach() throws Exception {
-		String output = engine.transform("${foreach list item}${item}\n${end}",
+		String output = new Engine().transform("${foreach list item}${item}\n${end}",
 				DEFAULT_MODEL);
 		assertEquals("1.1, 1.2\n" + "2.1, 2.2\n", output);
 		assertNull(DEFAULT_MODEL.get("item"));
@@ -413,9 +407,9 @@ public final class EngineTest {
 	public void foreachSingletonAsList() throws Exception {
 		// if the variable we want to iterate over is atomic, we simply wrap
 		// it into a singleton list
-		String output = engine.transform("${foreach address item}${item}${end}",
+		String output = new Engine().transform("${foreach address item}${item}${end}",
 				DEFAULT_MODEL);
-		String expected = engine.transform("${address}",
+		String expected = new Engine().transform("${address}",
 				DEFAULT_MODEL);
 		assertEquals(expected, output);
 	}
@@ -429,14 +423,14 @@ public final class EngineTest {
 		List<Map<String,Object>> mergedLists = Engine.mergeLists(new String[] {"amount", "price", "total"}, amount, price, total);
 		Map<String,Object> model = new HashMap<String, Object>();
 		model.put("mergedLists", mergedLists);
-		String output = engine.transform("${foreach mergedLists item}${item.amount} x ${item.price} = ${item.total}\n${end}",
+		String output = new Engine().transform("${foreach mergedLists item}${item.amount} x ${item.price} = ${item.total}\n${end}",
 				model);
 		assertEquals("1 x 3.6 = 3.6\n" + "2 x 2 = 4\n"+ "3 x 3.0 = 9\n", output);
 	}
 
 	@Test
 	public void foreachArray() throws Exception {
-		String output = engine.transform(
+		String output = new Engine().transform(
 				"${foreach array item}${item}\n${end}", DEFAULT_MODEL);
 		assertEquals("1.1, 1.2\n" + "2.1, 2.2\n", output);
 		assertNull(DEFAULT_MODEL.get("item"));
@@ -444,7 +438,7 @@ public final class EngineTest {
 
 	@Test
 	public void foreachPrimitiveArray() throws Exception {
-		String output = engine.transform(
+		String output = new Engine().transform(
 				"${foreach intArray item}${item}\n${end}", DEFAULT_MODEL);
 		assertEquals("1\n2\n", output);
 		assertNull(DEFAULT_MODEL.get("item"));
@@ -452,7 +446,7 @@ public final class EngineTest {
 
 	@Test
 	public void foreachMap() throws Exception {
-		String output = engine.transform(
+		String output = new Engine().transform(
 				"${foreach map entry}${entry.key}=${entry.value}\n${end}",
 				DEFAULT_MODEL);
 		assertEquals("mapEntry1=mapValue1\n" + "mapEntry2=mapValue2\n", output);
@@ -462,7 +456,7 @@ public final class EngineTest {
 
 	@Test
 	public void specialForeachVariables() throws Exception {
-		String output = engine
+		String output = new Engine()
 				.transform(
 						"${foreach list item}${item}\n${if last_item}last${end}${if first_item}first${end}${if even_item} even${end}${if odd_item} odd${end}${end}",
 						DEFAULT_MODEL);
@@ -472,7 +466,7 @@ public final class EngineTest {
 
 	@Test
 	public void foreachSeparator() throws Exception {
-		String output = engine
+		String output = new Engine()
 				.transform(
 						"${ \n foreach\n\t  list  \r  item   ,}${item.property1}${end}",
 						DEFAULT_MODEL);
@@ -482,7 +476,7 @@ public final class EngineTest {
 
 	@Test
 	public void crazyForeachSeparator() throws Exception {
-		String output = engine
+		String output = new Engine()
 				.transform("${ foreach list item  }${item.property1}${end}",
 						DEFAULT_MODEL);
 		assertEquals("1.1 2.1", output);
@@ -491,7 +485,7 @@ public final class EngineTest {
 
 	@Test
 	public void propertyForeach() throws Exception {
-		String output = engine.transform(
+		String output = new Engine().transform(
 				"${foreach list item}${item.property1}\n${end}", DEFAULT_MODEL);
 		assertEquals("1.1\n" + "2.1\n", output);
 		assertNull(DEFAULT_MODEL.get("item"));
@@ -499,7 +493,7 @@ public final class EngineTest {
 
 	@Test
 	public void nestedForeach() throws Exception {
-		String output = engine
+		String output = new Engine()
 				.transform(
 						"${foreach list item}${foreach item.list item2}${item2.property1}${end}\n${end}",
 						DEFAULT_MODEL);
@@ -510,7 +504,7 @@ public final class EngineTest {
 
 	@Test
 	public void emptyForeach() throws Exception {
-		String output = engine.transform(
+		String output = new Engine().transform(
 				"${foreach emptyList item}${item.property1}\n${end}",
 				DEFAULT_MODEL);
 		assertEquals("", output);
@@ -519,7 +513,7 @@ public final class EngineTest {
 
 	@Test
 	public void ifInForeach() throws Exception {
-		String output = engine
+		String output = new Engine()
 				.transform(
 						"${foreach list item}${if item}${item}${if hugo}${item}${end}${end}\n${end}",
 						DEFAULT_MODEL);
@@ -532,7 +526,7 @@ public final class EngineTest {
 		String template = "${if emptyList}" + "Was da"
 				+ "${foreach emptyList item}" + "${end}" + "${else}" + "Nüscht"
 				+ "${end}";
-		String output = engine.transform(template, DEFAULT_MODEL);
+		String output = new Engine().transform(template, DEFAULT_MODEL);
 		assertEquals("Nüscht", output);
 	}
 	
@@ -542,7 +536,7 @@ public final class EngineTest {
 		// model is clean even after exception
 		boolean exceptionFound = false;
 		try {
-			engine
+			new Engine()
 					.transform(
 							"${foreach list item}${foreach list item}${item}\n${end}${end}",
 							DEFAULT_MODEL);
@@ -555,26 +549,25 @@ public final class EngineTest {
 
 	@Test
 	public void simpleEscaping() throws Exception {
-		String output = engine.transform("\\${\\}\n\\\\}", DEFAULT_MODEL);
+		String output = new Engine().transform("\\${\\}\n\\\\}", DEFAULT_MODEL);
 		assertEquals("${}\n\\}", output);
 	}
 
 	@Test
 	public void escapingDeactivated() throws Exception {
-		String output = engine.transform("\\${address}\n\\}", DEFAULT_MODEL,
-				false);
+		String output = new Engine().useEscaping(false).transform("\\${address}\n\\}", DEFAULT_MODEL);
 		assertEquals("\\Fillbert\n\\}", output);
 	}
 
 	@Test
 	public void escapingKernel() throws Exception {
-		String output = engine.applyEscapes("\\${\\}\n\\\\}");
+		String output = new Engine().applyEscapes("\\${\\}\n\\\\}");
 		assertEquals("${}\n\\}", output);
 	}
 
 	@Test
 	public void complexEscaping() throws Exception {
-		String output = engine
+		String output = new Engine()
 				.transform(
 						"${foreach list item \\${\n \\},}${item.property1}${end}\n\\\\",
 						DEFAULT_MODEL);
@@ -630,8 +623,8 @@ public final class EngineTest {
 		String input = "${name}";
 		Map<String, Object> model = new HashMap<String, Object>();
 		model.put("name", "Minimal Template Engine");
-		Engine engine = new Engine();
-		String transformed = engine.transform(input, model);
+		Engine engine= new Engine();
+		String transformed = new Engine().transform(input, model);
 		System.out.println(transformed);
 		assert(transformed.equals("Minimal Template Engine"));
 	}

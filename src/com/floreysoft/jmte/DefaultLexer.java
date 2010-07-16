@@ -38,7 +38,7 @@ public class DefaultLexer implements Lexer {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Token nextToken(final char[] template, final int start, final int end,
+	public Token nextToken(final String sourceName, final char[] template, final int start, final int end,
 			final Map<String, Object> model, final boolean skipMode,
 			final ErrorHandler errorHandler) {
 		String input = new String(template, start, end - start);
@@ -48,6 +48,7 @@ public class DefaultLexer implements Lexer {
 
 		DefaultToken token = innerNextToken(template, start, end, model, skipMode,
 				errorHandler, input, split);
+		token.setSourceName(sourceName);
 		token.setBuffer(template);
 		token.setStart(start);
 		token.setEnd(end);

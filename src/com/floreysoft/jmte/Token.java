@@ -17,4 +17,5 @@ public interface Token {
 
 	public int getColumn();
 
+	public String getSourceName();
 }

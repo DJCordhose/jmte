@@ -26,8 +26,6 @@ public class DefaultErrorHandler implements ErrorHandler {
 			.getLogger(DefaultErrorHandler.class.getName());
 	private Mode mode;
 
-	private String currentInputName;
-	
 	/**
 	 * Creates an error handler of the desired mode
 	 * 
@@ -63,10 +61,10 @@ public class DefaultErrorHandler implements ErrorHandler {
 		String context = token.getText();
 		int line = token.getLine();
 		int column = token.getColumn();
+		String sourceName = token.getSourceName() != null ? token.getSourceName() : "";
 		String completeMessage = String.format(
 				"%s while parsing '%s' at %s(%d:%d): %s", type, context,
-				(currentInputName != null ? currentInputName : ""), line,
-				column, message);
+				sourceName, line, column, message);
 		return completeMessage;
 	}
 
@@ -77,13 +75,4 @@ public class DefaultErrorHandler implements ErrorHandler {
 	public void setMode(Mode mode) {
 		this.mode = mode;
 	}
-
-	public void setCurrentInputName(String currentInputName) {
-		this.currentInputName = currentInputName;
-	}
-
-	public String getCurrentInputName() {
-		return currentInputName;
-	}
-
 }

@@ -9,7 +9,7 @@ import com.floreysoft.jmte.token.DefaultToken;
  * characters (${ and } by default).
  * 
  * You can implement it in any way you like and replace it in the {@link Engine}
- * using {@link Engine#setLexer(Lexer)}.
+ * using {@link Engine#usingLexer(Lexer)}.
  * 
  * It might be a good idea to inherit from {@link DefaultLexer} and add new
  * functionality. Possible extensions might be complex expressions in if
@@ -22,6 +22,8 @@ public interface Lexer {
 	 * Scans and expands the input to find out what kind of token a certain
 	 * script section represents.
 	 * 
+	 * @param sourceName
+	 *            name of the source of the token - could be a filename
 	 * @param template
 	 *            the complete string template
 	 * @param start
@@ -35,14 +37,14 @@ public interface Lexer {
 	 * @param skipMode
 	 *            <code>true</code> if no expressions shall be evaluated while
 	 *            parsing - this is both for performance and even safety as in
-	 *            this mode some variables might remain unset which otherwise 
+	 *            this mode some variables might remain unset which otherwise
 	 *            would have to be set in non-skip mode
 	 * @param errorHandler
 	 *            handler to issue error messages and warnings
-	 * @return implementation of {@link DefaultToken} to indicate the type of section
-	 *         that was parsed
+	 * @return implementation of {@link DefaultToken} to indicate the type of
+	 *         section that was parsed
 	 */
-	Token nextToken(char[] template, int start, int end,
+	Token nextToken(String sourceName, char[] template, int start, int end,
 			Map<String, Object> model, boolean skipMode,
 			ErrorHandler errorHandler);
 }
