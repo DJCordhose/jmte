@@ -283,8 +283,7 @@ public final class Engine {
 												.format(
 														"Foreach variable name '%s' already present in model",
 														feToken.getVarName()),
-										inputChars, startEndPair.start,
-										startEndPair.end);
+										token);
 					}
 					if (!feToken.iterator().hasNext()) {
 						token = new IfToken(false);
@@ -307,15 +306,13 @@ public final class Engine {
 					if (!(poppedToken instanceof IfToken)) {
 						String surrounding = poppedToken == null ? "none" : poppedToken.getText();
 						String errorMessage = String.format("Can't use else outside of if block (surrounding block is %s)", surrounding);
-						getErrorHandler().error(errorMessage, inputChars,
-								startEndPair.start, startEndPair.end);
+						getErrorHandler().error(errorMessage, token);
 					}
 					push(token);
 				} else if (token instanceof EndToken) {
 					Token poppedToken = pop();
 					if (poppedToken == null) {
-						getErrorHandler().error("Unmatched end", inputChars,
-								startEndPair.start, startEndPair.end);
+						getErrorHandler().error("Unmatched end", token);
 					} else if (poppedToken instanceof ForEachToken) {
 						ForEachToken feToken = (ForEachToken) poppedToken;
 						if (feToken.iterator().hasNext()) {
