@@ -26,9 +26,6 @@ public class DefaultErrorHandler implements ErrorHandler {
 			.getLogger(DefaultErrorHandler.class.getName());
 	private Mode mode;
 
-	private char[] input;
-	private int currentBlockStart;
-	private int currentBlockEnd;
 	private String currentInputName;
 	
 	/**
@@ -52,12 +49,9 @@ public class DefaultErrorHandler implements ErrorHandler {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void error(String message, char[] template, int start, int end)
+	public void error(String message, Token token)
 			throws IllegalArgumentException {
-		this.input = template;
-		this.currentBlockStart = start;
-		this.currentBlockEnd = end;
-		String completeMessage = completeMessage("Error", message);
+		String completeMessage = completeMessage("Error", message, token);
 		if (mode == Mode.DEVELOPMENT) {
 			throw new IllegalArgumentException(completeMessage);
 		} else {
@@ -65,38 +59,15 @@ public class DefaultErrorHandler implements ErrorHandler {
 		}
 	}
 
-	private String completeMessage(String type, String message) {
-		String context = String.valueOf(input, currentBlockStart,
-				currentBlockEnd - currentBlockStart);
-		int line = getLine();
-		int column = getColumn();
+	private String completeMessage(String type, String message, Token token) {
+		String context = token.getText();
+		int line = token.getLine();
+		int column = token.getColumn();
 		String completeMessage = String.format(
 				"%s while parsing '%s' at %s(%d:%d): %s", type, context,
 				(currentInputName != null ? currentInputName : ""), line,
 				column, message);
 		return completeMessage;
-	}
-
-	protected int getLine() {
-		int line = 1;
-		for (int i = 0; i < currentBlockStart; i++) {
-			if (input[i] == '\n') {
-				line++;
-			}
-		}
-		return line;
-	}
-
-	protected int getColumn() {
-		int column = 0;
-		for (int i = currentBlockStart; i >= 0; i--) {
-			if (input[i] == '\n') {
-				break;
-			} else {
-				column++;
-			}
-		}
-		return column;
 	}
 
 	public Mode getMode() {

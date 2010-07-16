@@ -12,4 +12,9 @@ public interface Token {
 	 * @return the text
 	 */
 	public String getText();
+
+	public int getLine();
+
+	public int getColumn();
+
 }

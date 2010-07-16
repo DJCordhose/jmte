@@ -2,7 +2,7 @@ package com.floreysoft.jmte;
 
 import java.util.Map;
 
-import com.floreysoft.jmte.token.AbstractToken;
+import com.floreysoft.jmte.token.DefaultToken;
 
 /**
  * Interface for parsing script sections which are included inside the special
@@ -39,7 +39,7 @@ public interface Lexer {
 	 *            would have to be set in non-skip mode
 	 * @param errorHandler
 	 *            handler to issue error messages and warnings
-	 * @return implementation of {@link AbstractToken} to indicate the type of section
+	 * @return implementation of {@link DefaultToken} to indicate the type of section
 	 *         that was parsed
 	 */
 	Token nextToken(char[] template, int start, int end,

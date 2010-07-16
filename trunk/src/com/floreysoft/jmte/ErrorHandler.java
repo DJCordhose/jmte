@@ -14,14 +14,8 @@ public interface ErrorHandler {
 	 * 
 	 * @param message
 	 *            the detailed error message
-	 * @param template
-	 *            the complete string template
-	 * @param start
-	 *            the position in the complete template where the script section
-	 *            to be parsed <em>starts</em>
-	 * @param end
-	 *            the position in the complete template where the script section
-	 *            to be parsed <em>ends</em>
+	 * @param token
+	 *            the token this error occured on
 	 */
-	public void error(String message, char[] template, int start, int end);
+	public void error(String message, Token token);
 }

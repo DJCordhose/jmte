@@ -7,7 +7,8 @@
   =================================================================== 
   -->
 
-  <property file="${basedir}/build.properties"/>
+  <property file="${basedir}/common.properties"/>
+  <property file="${basedir}/local.properties"/>
 
   <property name="creator" value="floreysoft GmbH"/>
   <property name="final.name" value="${name}-${version}"/>
@@ -111,6 +112,12 @@
 	
   <target name="jar" depends="clean,build,test,archive-jars" description="Creates the testet release jar" />
 
+  <target name="deploy" description="Deploys jar" if="deploy.dir">
+  	<copy todir="${deploy.dir}" >
+  		<fileset file="${dist.dir}/${jar.name}" />
+    </copy>
+  </target>
+	
   <target name="full-dist" depends="jar,javadoc" description="Source distribution">
  	<zip destfile="${dist.dir}/${dist.name}" >
  	  <zipfileset dir="${example.dir}" prefix="${final.name}/example"/>

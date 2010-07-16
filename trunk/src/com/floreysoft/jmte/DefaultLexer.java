@@ -8,7 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import com.floreysoft.jmte.token.AbstractToken;
+import com.floreysoft.jmte.token.DefaultToken;
 import com.floreysoft.jmte.token.ElseToken;
 import com.floreysoft.jmte.token.EndToken;
 import com.floreysoft.jmte.token.ForEachToken;
@@ -46,7 +46,7 @@ public class DefaultLexer implements Lexer {
 		input = Util.trimFront(input);
 		String[] split = input.split("( |\t|\r|\n)+");
 
-		AbstractToken token = innerNextToken(template, start, end, model, skipMode,
+		DefaultToken token = innerNextToken(template, start, end, model, skipMode,
 				errorHandler, input, split);
 		token.setBuffer(template);
 		token.setStart(start);
@@ -55,9 +55,10 @@ public class DefaultLexer implements Lexer {
 	}
 
 	@SuppressWarnings("unchecked")
-	private AbstractToken innerNextToken(final char[] template, final int start, final int end,
+	private DefaultToken innerNextToken(final char[] template, final int start, final int end,
 			final Map<String, Object> model, final boolean skipMode,
 			final ErrorHandler errorHandler, final String input, final String[] split) {
+		Token errorToken = new DefaultToken(template, start, end);
 		if (split.length == 0) {
 			// empty expression like ${}
 			return new StringToken("");
@@ -84,8 +85,7 @@ public class DefaultLexer implements Lexer {
 				Object value;
 				if (!skipMode) {
 					// single name expression like ${name}
-					value = traverse(objectExpression, model, template, start,
-							end);
+					value = traverse(objectExpression, model, errorToken);
 					if (value == null) {
 						value = "";
 
@@ -120,7 +120,7 @@ public class DefaultLexer implements Lexer {
 				cmd = Keyword.valueOf(cmdString.toUpperCase());
 			} catch (IllegalArgumentException iae) {
 				errorHandler.error(String.format("Command '%s' is undefined",
-						cmdString), template, start, end);
+						cmdString), errorToken);
 				return new StringToken("");
 			}
 
@@ -133,8 +133,7 @@ public class DefaultLexer implements Lexer {
 						negate = true;
 						objectExpression = objectExpression.substring(1);
 					}
-					Object value = traverse(objectExpression, model, template,
-							start, end);
+					Object value = traverse(objectExpression, model, errorToken);
 					if (value == null || value.toString().equals("")) {
 						condition = false;
 					} else if (value instanceof Boolean) {
@@ -162,8 +161,7 @@ public class DefaultLexer implements Lexer {
 			} else if (cmd == Keyword.FOREACH) {
 				if (!skipMode) {
 					String objectExpression = split[1];
-					Object value = traverse(objectExpression, model, template,
-							start, end);
+					Object value = traverse(objectExpression, model, errorToken);
 					Iterable<Object> iterable;
 					if (value == null) {
 						return new IfToken(false);
@@ -222,7 +220,7 @@ public class DefaultLexer implements Lexer {
 	}
 
 	protected Object traverse(String objectExpression,
-			Map<String, Object> model, char[] template, int start, int end) {
+			Map<String, Object> model, Token errorToken) {
 		String[] split = objectExpression.split("\\.");
 
 		String objectName = split[0];
@@ -231,12 +229,11 @@ public class DefaultLexer implements Lexer {
 		LinkedList<String> attributeNames = new LinkedList<String>(Arrays
 				.asList(split));
 		attributeNames.remove(0);
-		value = traverse(value, attributeNames, template, start, end);
+		value = traverse(value, attributeNames, errorToken);
 		return value;
 	}
 
-	protected Object traverse(Object o, LinkedList<String> attributeNames,
-			char[] template, int start, int end) {
+	protected Object traverse(Object o, LinkedList<String> attributeNames, Token errorToken) {
 		Object result;
 		if (attributeNames.isEmpty()) {
 			result = o;
@@ -245,20 +242,19 @@ public class DefaultLexer implements Lexer {
 				return null;
 			}
 			String attributeName = attributeNames.remove(0);
-			Object nextStep = nextStep(o, attributeName, template, start, end);
-			result = traverse(nextStep, attributeNames, template, start, end);
+			Object nextStep = nextStep(o, attributeName, errorToken);
+			result = traverse(nextStep, attributeNames, errorToken);
 		}
 		return result;
 	}
 
 	@SuppressWarnings("unchecked")
-	protected Object nextStep(Object o, String attributeName, char[] template,
-			int start, int end) {
+	protected Object nextStep(Object o, String attributeName, Token errorToken) {
 		Object result;
 		if (o instanceof String) {
 			errorHandler.error(String.format(
 					"You can not make property calls on string '%s'", o
-							.toString()), template, start, end);
+							.toString()), errorToken);
 			return o;
 		} else if (o instanceof Map) {
 			Map map = (Map) o;
@@ -271,8 +267,7 @@ public class DefaultLexer implements Lexer {
 						"Property '%s' on object '%s' can not be accessed: %s",
 						attributeName, o.toString(), e.getMessage() != null ? e
 								.getMessage() : e.getCause() != null ? e
-								.getCause().getMessage() : ""), template,
-						start, end);
+								.getCause().getMessage() : ""), errorToken);
 				result = "";
 			}
 		}
