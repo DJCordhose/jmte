@@ -161,53 +161,34 @@ public final class Engine {
 		return resultList;
 	}
 
-	private final String exprStartToken;
-	private final String exprEndToken;
-	private final double expansionSizeFactor;
-	private Lexer lexer;
-	private LinkedList<Token> scopes = new LinkedList<Token>();
-	private ErrorHandler errorHandler;
-	private Set<String> panicModelCleanupSet;
+	private String exprStartToken = "${";
+	private String exprEndToken = "}";
+	private double expansionSizeFactor = 1.2;
+	private Lexer lexer = new DefaultLexer();
+	private ErrorHandler errorHandler = new DefaultErrorHandler();
+	private String sourceName = null;
+	private boolean useEscaping = true;
+	
+	private transient LinkedList<Token> scopes = new LinkedList<Token>();
+	private transient Set<String> panicModelCleanupSet;
 
 	/**
 	 * Creates a new engine having <code>${</code> and <code>}</code> as start
 	 * and end strings for expressions.
 	 */
 	public Engine() {
-		this("${", "}", 1.2);
 	}
 
-	/**
-	 * Creates a new engine having custom start and end strings for expressions.
-	 * 
-	 * @param exprStartToken
-	 *            the string that starts an expression
-	 * @param exprEndToken
-	 *            the string that ends an expression
-	 */
-	public Engine(String exprStartToken, String exprEndToken) {
-		this(exprStartToken, exprEndToken, 1.2);
+	public Engine withSourceName(String sourceName) {
+		this.sourceName = sourceName;
+		return this;
 	}
-
-	/**
-	 * Creates a new engine having custom start and end strings for expressions.
-	 * 
-	 * @param exprStartToken
-	 *            the string that starts an expression
-	 * @param exprEndToken
-	 *            the string that ends an expression
-	 * @param expansionSizeFactor
-	 *            the factor for the expected size of the expanded output
-	 */
-	public Engine(String exprStartToken, String exprEndToken,
-			double expansionSizeFactor) {
-		this.exprStartToken = exprStartToken;
-		this.exprEndToken = exprEndToken;
-		this.expansionSizeFactor = expansionSizeFactor;
-		this.setLexer(new DefaultLexer());
-		this.setErrorHandler(new DefaultErrorHandler());
+	
+	public Engine useEscaping(boolean useEscaping) {
+		this.useEscaping = useEscaping;
+		return this;
 	}
-
+	
 	/**
 	 * Transforms a template into an expanded output using the given model.
 	 * 
@@ -218,26 +199,8 @@ public final class Engine {
 	 * @return the expanded output
 	 */
 	public String transform(String template, Map<String, Object> model) {
-		return transform(template, model, true);
-	}
-
-	/**
-	 * Transforms a template into an expanded output using the given model.
-	 * 
-	 * @param template
-	 *            the template to expand
-	 * @param model
-	 *            the model used to evaluate expressions inside the template
-	 * @param useEscaping
-	 *            <code>true</code> if you want escaping to be applied - which
-	 *            is the default
-	 * 
-	 * @return the expanded output
-	 */
-	public String transform(String template, Map<String, Object> model,
-			boolean useEscaping) {
 		List<StartEndPair> scan = scan(template, useEscaping);
-		String transformed = transformPure(template, scan, model);
+		String transformed = transformPure(sourceName, template, scan, model);
 		if (!useEscaping) {
 			return transformed;
 		} else {
@@ -246,14 +209,14 @@ public final class Engine {
 		}
 	}
 
-	String transformPure(String input, List<StartEndPair> scan,
+	private String transformPure(String sourceName, String input, List<StartEndPair> scan,
 			Map<String, Object> model) {
 		panicModelCleanupSet = new HashSet<String>();
 
 		try {
 			char[] inputChars = input.toCharArray();
 			StringBuilder output = new StringBuilder(
-					(int) (input.length() * expansionSizeFactor));
+					(int) (input.length() * getExpansionSizeFactor()));
 			int offset = 0;
 			int i = 0;
 			while (i < scan.size()) {
@@ -267,7 +230,7 @@ public final class Engine {
 				offset = startEndPair.end + getExprEndToken().length();
 				i++;
 
-				Token token = lexer.nextToken(inputChars, startEndPair.start,
+				Token token = lexer.nextToken(sourceName, inputChars, startEndPair.start,
 						startEndPair.end, model, skipMode, getErrorHandler());
 				if (token instanceof StringToken) {
 					if (!skipMode) {
@@ -488,8 +451,9 @@ public final class Engine {
 	 * @param lexer
 	 *            the new lexer
 	 */
-	public void setLexer(Lexer lexer) {
+	public Engine withLexer(Lexer lexer) {
 		this.lexer = lexer;
+		return this;
 	}
 
 	/**
@@ -507,8 +471,9 @@ public final class Engine {
 	 * @param errorHandler
 	 *            the new error handler
 	 */
-	public void setErrorHandler(ErrorHandler errorHandler) {
+	public Engine withErrorHandler(ErrorHandler errorHandler) {
 		this.errorHandler = errorHandler;
+		return this;
 	}
 
 	/**
@@ -526,6 +491,25 @@ public final class Engine {
 
 	public String getExprEndToken() {
 		return exprEndToken;
+	}
+
+	public Engine withExprStartToken(String exprStartToken) {
+		this.exprStartToken = exprStartToken;
+		return this;
+	}
+
+	public Engine withExprEndToken(String exprEndToken) {
+		this.exprEndToken = exprEndToken;
+		return this;
+	}
+
+	public Engine withExpansionSizeFactor(double expansionSizeFactor) {
+		this.expansionSizeFactor = expansionSizeFactor;
+		return this;
+	}
+
+	public double getExpansionSizeFactor() {
+		return expansionSizeFactor;
 	}
 
 }

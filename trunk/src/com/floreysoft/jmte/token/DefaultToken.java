@@ -7,12 +7,18 @@ public class DefaultToken implements Token {
 	private char[] buffer;
 	private int start;
 	private int end;
-
+	private String sourceName;
+	
 	public DefaultToken() {
 
 	}
 
 	public DefaultToken(char[] buffer, int start, int end) {
+		this(null, buffer, start, end);
+	}
+
+	public DefaultToken(String sourceName, char[] buffer, int start, int end) {
+		this.setSourceName(sourceName);
 		this.setBuffer(buffer);
 		this.setStart(start);
 		this.setEnd(end);
@@ -72,5 +78,14 @@ public class DefaultToken implements Token {
 	@Override
 	public String toString() {
 		return getText();
+	}
+
+	public void setSourceName(String sourceName) {
+		this.sourceName = sourceName;
+	}
+
+	@Override
+	public String getSourceName() {
+		return sourceName;
 	}
 }
