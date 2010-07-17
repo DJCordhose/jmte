@@ -1,6 +1,7 @@
 package com.floreysoft.jmte;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -117,7 +118,27 @@ public final class Engine {
 		}
 		return model;
 	}
-	
+
+	public static Map<String, Object> toModel(String name1, Object value1) {
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put(name1, value1);
+		return model;
+	}
+
+	public static Map<String, Object> toModel(String name1, Object value1,
+			String name2, Object value2) {
+		Map<String, Object> model = toModel(name1, value1);
+		model.put(name2, value2);
+		return model;
+	}
+
+	public static Map<String, Object> toModel(String name1, Object value1,
+			String name2, Object value2, String name3, Object value3) {
+		Map<String, Object> model = toModel(name1, value1, name2, value2);
+		model.put(name3, value3);
+		return model;
+	}
+
 	/**
 	 * Merges any number of named lists into a single one contained their
 	 * combined values. Can be very handy in case of a servlet request which
@@ -184,6 +205,12 @@ public final class Engine {
 		return this;
 	}
 	
+	/**
+	 * * @param useEscaping tells the method whether to use (<code>true</code>)
+	 * or ignore escape character \\
+	 * 
+	 * @return
+	 */
 	public Engine useEscaping(boolean useEscaping) {
 		this.useEscaping = useEscaping;
 		return this;
@@ -199,7 +226,7 @@ public final class Engine {
 	 * @return the expanded output
 	 */
 	public String transform(String template, Map<String, Object> model) {
-		List<StartEndPair> scan = scan(template, useEscaping);
+		List<StartEndPair> scan = scan(template);
 		String transformed = transformPure(sourceName, template, scan, model);
 		if (!useEscaping) {
 			return transformed;
@@ -240,13 +267,11 @@ public final class Engine {
 				} else if (token instanceof ForEachToken) {
 					ForEachToken feToken = (ForEachToken) token;
 					if (model.containsKey(feToken.getVarName())) {
-						getErrorHandler()
-								.error(
-										String
-												.format(
-														"Foreach variable name '%s' already present in model",
-														feToken.getVarName()),
-										token);
+						getErrorHandler().error(
+								"variable-already-defined",
+								token,
+								Engine.toModel("variableName", feToken
+										.getVarName()));
 					}
 					if (!feToken.iterator().hasNext()) {
 						token = new IfToken(false);
@@ -267,15 +292,18 @@ public final class Engine {
 				} else if (token instanceof ElseToken) {
 					Token poppedToken = peek();
 					if (!(poppedToken instanceof IfToken)) {
-						String surrounding = poppedToken == null ? "none" : poppedToken.getText();
-						String errorMessage = String.format("Can't use else outside of if block (surrounding block is %s)", surrounding);
-						getErrorHandler().error(errorMessage, token);
+						getErrorHandler()
+								.error(
+										"else-out-of-scope",
+										token,
+										Engine.toModel("surroundingToken",
+												poppedToken));
 					}
 					push(token);
 				} else if (token instanceof EndToken) {
 					Token poppedToken = pop();
 					if (poppedToken == null) {
-						getErrorHandler().error("Unmatched end", token);
+						getErrorHandler().error("unmatched-end", token, null);
 					} else if (poppedToken instanceof ForEachToken) {
 						ForEachToken feToken = (ForEachToken) poppedToken;
 						if (feToken.iterator().hasNext()) {
@@ -385,12 +413,9 @@ public final class Engine {
 	 * 
 	 * @param input
 	 *            the input
-	 * @param useEscaping
-	 *            tells the method whether to use (<code>true</code>) or ignore
-	 *            escape character \\
 	 * @return the begin/end pairs telling you where expressions can be found
 	 */
-	public List<StartEndPair> scan(String input, boolean useEscaping) {
+	public List<StartEndPair> scan(String input) {
 		List<StartEndPair> result = new ArrayList<StartEndPair>();
 		int fromIndex = 0;
 		while (true) {
@@ -405,6 +430,9 @@ public final class Engine {
 
 			exprStart += getExprStartToken().length();
 			int exprEnd = input.indexOf(getExprEndToken(), exprStart);
+			if (exprEnd == -1) {
+				break;
+			}
 			while (useEscaping && isEscaped(input, exprEnd)) {
 				exprEnd = input.indexOf(getExprEndToken(), exprEnd
 						+ getExprEndToken().length());
