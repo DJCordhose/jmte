@@ -125,10 +125,18 @@ public final class EngineTest {
 		DEFAULT_MODEL.put("empty", "");
 	}
 
+	
+	@Test
+	public void unterminatedScan() throws Exception {
+		String line = "${no end";
+		List<StartEndPair> scan = new Engine().scan(line);
+		assertEquals(0, scan.size());
+	}
+	
 	@Test
 	public void extract() throws Exception {
 		String line = "${if adresse}Sie wohnen an ${adresse}";
-		List<StartEndPair> scan = new Engine().scan(line, true);
+		List<StartEndPair> scan = new Engine().scan(line);
 		assertEquals(2, scan.size());
 
 		assertEquals(2, scan.get(0).start);
@@ -189,10 +197,10 @@ public final class EngineTest {
 		try {
 			new Engine().transform("\n${address}\n     ${else}NIX${end}",
 					DEFAULT_MODEL);
-		} catch (Exception e) {
+		} catch (ParseException e) {
 			String message = e.getMessage();
 			foundPosition = message
-					.equals("Error while parsing 'else' at (3:8): Can't use else outside of if block (surrounding block is none)");
+					.equals("Error while parsing 'else' at location (3:8): Can't use else outside of if block");
 
 		}
 		assertTrue(
@@ -283,12 +291,12 @@ public final class EngineTest {
 		assertEquals(DEFAULT_MODEL.get("address"), output);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = ParseException.class)
 	public void elseWithoutIfError() throws Exception {
 		new Engine().transform("${address}${else}NIX${end}", DEFAULT_MODEL);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = ParseException.class)
 	public void endWithoutBlockError() throws Exception {
 		new Engine().transform("${address}${end}", DEFAULT_MODEL);
 	}
@@ -540,7 +548,7 @@ public final class EngineTest {
 					.transform(
 							"${foreach list item}${foreach list item}${item}\n${end}${end}",
 							DEFAULT_MODEL);
-		} catch (IllegalArgumentException e) {
+		} catch (ParseException e) {
 			exceptionFound = true;
 		}
 		assertTrue(exceptionFound);

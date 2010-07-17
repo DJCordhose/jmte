@@ -120,8 +120,7 @@ public class DefaultLexer implements Lexer {
 			try {
 				cmd = Keyword.valueOf(cmdString.toUpperCase());
 			} catch (IllegalArgumentException iae) {
-				errorHandler.error(String.format("Command '%s' is undefined",
-						cmdString), errorToken);
+				errorHandler.error("unknown-command", errorToken, Engine.toModel("cmd", cmdString));
 				return new StringToken("");
 			}
 
@@ -253,9 +252,8 @@ public class DefaultLexer implements Lexer {
 	protected Object nextStep(Object o, String attributeName, Token errorToken) {
 		Object result;
 		if (o instanceof String) {
-			errorHandler.error(String.format(
-					"You can not make property calls on string '%s'", o
-							.toString()), errorToken);
+			errorHandler.error("no-call-on-string", errorToken, Engine.toModel(
+					"receiver", o.toString()));
 			return o;
 		} else if (o instanceof Map) {
 			Map map = (Map) o;
@@ -264,11 +262,7 @@ public class DefaultLexer implements Lexer {
 			try {
 				result = Util.getPropertyValue(o, attributeName);
 			} catch (Exception e) {
-				errorHandler.error(String.format(
-						"Property '%s' on object '%s' can not be accessed: %s",
-						attributeName, o.toString(), e.getMessage() != null ? e
-								.getMessage() : e.getCause() != null ? e
-								.getCause().getMessage() : ""), errorToken);
+				errorHandler.error("property-access-error", errorToken, Engine.toModel("property", attributeName, "object", o, "exception", e));
 				result = "";
 			}
 		}

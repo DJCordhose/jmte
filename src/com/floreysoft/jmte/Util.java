@@ -233,7 +233,6 @@ public class Util {
 			throws IntrospectionException, IllegalArgumentException,
 			IllegalAccessException, InvocationTargetException,
 			SecurityException, NoSuchFieldException {
-		Object result = null;
 		BeanInfo beanInfo = Introspector.getBeanInfo(o.getClass());
 		PropertyDescriptor[] propertyDescriptors = beanInfo
 				.getPropertyDescriptors();
@@ -242,29 +241,30 @@ public class Util {
 		if (o instanceof Map.Entry) {
 			Map.Entry entry = (Entry) o;
 			if (attributeName.equals("key")) {
-				result = entry.getKey();
+				final Object result = entry.getKey();
+				return result;
 			} else if (attributeName.equals("value")) {
-				result = entry.getValue();
+				final Object result = entry.getValue();
+				return result;
 			}
 
-		} else {
+		}
 
-			for (PropertyDescriptor propertyDescriptor : propertyDescriptors) {
-				if (propertyDescriptor.getName().equals(attributeName)) {
-					Method readMethod = propertyDescriptor.getReadMethod();
-					if (readMethod != null) {
-						result = readMethod.invoke(o);
-						break;
-					}
-				}
-			}
-			if (result == null) {
-				Field field = o.getClass().getField(attributeName);
-				if (Modifier.isPublic(field.getModifiers())) {
-					result = field.get(o);
+		for (PropertyDescriptor propertyDescriptor : propertyDescriptors) {
+			String propertyName = propertyDescriptor.getName();
+			if (propertyName.equals(attributeName)) {
+				Method readMethod = propertyDescriptor.getReadMethod();
+				if (readMethod != null) {
+					final Object result = readMethod.invoke(o);
+					return result;
 				}
 			}
 		}
-		return result;
+		Field field = o.getClass().getField(attributeName);
+		if (Modifier.isPublic(field.getModifiers())) {
+			final Object result = field.get(o);
+			return result;
+		}
+		return null;
 	}
 }

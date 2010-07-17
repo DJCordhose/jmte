@@ -1,5 +1,7 @@
 package com.floreysoft.jmte;
 
+import java.util.Map;
+
 /**
  * Interface used to handle errors while expanding a template. This interface is
  * called by the {@link Engine} and by the {@link Lexer}.
@@ -8,14 +10,18 @@ package com.floreysoft.jmte;
  * @see Lexer
  */
 public interface ErrorHandler {
+	
 	/**
 	 * Handles an error while interpreting a template in an appropriate way.
 	 * This might contain logging the error or even throwing an exception.
 	 * 
-	 * @param message
-	 *            the detailed error message
+	 * @param messageKey
+	 *            key for the error message
 	 * @param token
 	 *            the token this error occured on
+	 * @param parameters
+	 *            additionl parameters to be filled into message or <code>null</<code> if you do not have additional parameters
 	 */
-	public void error(String message, Token token);
+	public void error(String messageKey, Token token,
+			Map<String, Object> parameters) throws ParseException;
 }
