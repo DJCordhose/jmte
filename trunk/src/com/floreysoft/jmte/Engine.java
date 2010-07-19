@@ -13,7 +13,7 @@ import com.floreysoft.jmte.token.ElseToken;
 import com.floreysoft.jmte.token.EndToken;
 import com.floreysoft.jmte.token.ForEachToken;
 import com.floreysoft.jmte.token.IfToken;
-import com.floreysoft.jmte.token.StringToken;
+import com.floreysoft.jmte.token.ExpressionToken;
 
 /**
  * <p>
@@ -259,9 +259,9 @@ public final class Engine {
 
 				Token token = lexer.nextToken(sourceName, inputChars, startEndPair.start,
 						startEndPair.end, model, skipMode, getErrorHandler());
-				if (token instanceof StringToken) {
+				if (token instanceof ExpressionToken) {
 					if (!skipMode) {
-						String expanded = ((StringToken) token).getValue();
+						String expanded = ((ExpressionToken) token).getValue();
 						output.append(expanded);
 					}
 				} else if (token instanceof ForEachToken) {

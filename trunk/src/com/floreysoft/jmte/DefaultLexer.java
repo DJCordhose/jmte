@@ -13,7 +13,7 @@ import com.floreysoft.jmte.token.ElseToken;
 import com.floreysoft.jmte.token.EndToken;
 import com.floreysoft.jmte.token.ForEachToken;
 import com.floreysoft.jmte.token.IfToken;
-import com.floreysoft.jmte.token.StringToken;
+import com.floreysoft.jmte.token.ExpressionToken;
 
 /**
  * <p>
@@ -46,8 +46,8 @@ public class DefaultLexer implements Lexer {
 		input = Util.trimFront(input);
 		String[] split = input.split("( |\t|\r|\n)+");
 
-		DefaultToken token = innerNextToken(template, start, end, model, skipMode,
-				errorHandler, input, split);
+		DefaultToken token = innerNextToken(model, skipMode, errorHandler,
+				input, split);
 		token.setSourceName(sourceName);
 		token.setBuffer(template);
 		token.setStart(start);
@@ -56,19 +56,19 @@ public class DefaultLexer implements Lexer {
 	}
 
 	@SuppressWarnings("unchecked")
-	private DefaultToken innerNextToken(final char[] template, final int start, final int end,
-			final Map<String, Object> model, final boolean skipMode,
-			final ErrorHandler errorHandler, final String input, final String[] split) {
-		Token errorToken = new DefaultToken(template, start, end);
+	private DefaultToken innerNextToken(final Map<String, Object> model,
+			final boolean skipMode, final ErrorHandler errorHandler,
+			final String input, final String[] split) {
+		Token errorToken = new DefaultToken();
 		if (split.length == 0) {
 			// empty expression like ${}
-			return new StringToken("");
+			return new ExpressionToken("");
 		} else if (split.length == 1) {
 			String objectExpression = split[0];
 			// ${
 			// } which might be used for silent line breaks
 			if (objectExpression.equals("")) {
-				return new StringToken("");
+				return new ExpressionToken("");
 			} else {
 				try {
 					Keyword cmd = Keyword.valueOf(objectExpression
@@ -112,7 +112,7 @@ public class DefaultLexer implements Lexer {
 					value = objectExpression;
 				}
 
-				return new StringToken(value.toString());
+				return new ExpressionToken(value.toString());
 			}
 		} else {
 			String cmdString = split[0];
@@ -121,7 +121,7 @@ public class DefaultLexer implements Lexer {
 				cmd = Keyword.valueOf(cmdString.toUpperCase());
 			} catch (IllegalArgumentException iae) {
 				errorHandler.error("unknown-command", errorToken, Engine.toModel("cmd", cmdString));
-				return new StringToken("");
+				return new ExpressionToken("");
 			}
 
 			if (cmd == Keyword.IF) {
@@ -216,7 +216,7 @@ public class DefaultLexer implements Lexer {
 			}
 		}
 		// default in case anything went wrong
-		return new StringToken("");
+		return new ExpressionToken("");
 	}
 
 	protected Object traverse(String objectExpression,
