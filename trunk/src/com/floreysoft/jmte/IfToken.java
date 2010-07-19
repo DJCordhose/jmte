@@ -5,8 +5,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-
 public class IfToken extends ExpressionToken {
+	public static final String IF = "if";
 
 	private boolean negated;
 
@@ -21,10 +21,19 @@ public class IfToken extends ExpressionToken {
 	}
 
 	@Override
+	public String getText() {
+		if (!duped) {
+			return super.getText();
+		} else {
+			return IF + " " + getExpression();
+		}
+	}
+
+	@Override
 	public Token dup() {
 		return new IfToken(this);
 	}
-	
+
 	public boolean isNegated() {
 		return negated;
 	}
@@ -36,7 +45,7 @@ public class IfToken extends ExpressionToken {
 		if (evaluated != null) {
 			return evaluated;
 		}
-		
+
 		final boolean condition;
 		final Object value = traverse(getSegments(), model, errorHandler);
 		if (value == null || value.toString().equals("")) {
@@ -58,8 +67,13 @@ public class IfToken extends ExpressionToken {
 		}
 
 		evaluated = negated ? !condition : condition;
-		
+
 		return evaluated;
 	}
 
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return super.toString();
+	}
 }

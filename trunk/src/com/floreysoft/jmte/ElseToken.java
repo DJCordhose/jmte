@@ -4,6 +4,7 @@ import java.util.Map;
 
 
 public class ElseToken extends AbstractToken {
+	public static final String ELSE = "else";
 
 	public ElseToken() {
 	}

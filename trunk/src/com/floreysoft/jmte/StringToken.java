@@ -19,6 +19,15 @@ public class StringToken extends ExpressionToken {
 	public Token dup() {
 		return new StringToken(this);
 	}
+	
+	@Override
+	public String getText() {
+		if (!duped) {
+			return super.getText();
+		} else {
+			return getExpression();
+		}
+	}
 
 	@Override
 	@SuppressWarnings("unchecked")

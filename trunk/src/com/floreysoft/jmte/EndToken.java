@@ -3,6 +3,7 @@ package com.floreysoft.jmte;
 import java.util.Map;
 
 public class EndToken extends AbstractToken {
+	public static final String END = "end";
 
 	public EndToken() {
 	}
