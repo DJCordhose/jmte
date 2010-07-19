@@ -273,7 +273,13 @@ public final class Engine {
 					feToken.setIterator(iterable.iterator());
 					if (!feToken.iterator().hasNext()) {
 						// XXX Hack to make an empty iteration a false if 
-						token = new IfToken(false);
+						token = new IfToken("", false) {
+							@Override
+							public Object evaluate(Map<String, Object> model,
+									ErrorHandler errorHandler) {
+								return false;
+							}
+						};
 					} else {
 						Object value = feToken.iterator().next();
 						model.put(feToken.getVarName(), value);
