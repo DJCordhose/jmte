@@ -14,11 +14,6 @@ package com.floreysoft.jmte;
  */
 public class DefaultLexer implements Lexer {
 
-	private static final String FOREACH = "foreach";
-	private static final String IF = "if";
-	private static final String END = "end";
-	private static final String ELSE = "else";
-
 	/**
 	 * {@inheritDoc}
 	 */
@@ -57,10 +52,10 @@ public class DefaultLexer implements Lexer {
 				return new StringToken("");
 			}
 			final String cmd = objectExpression;
-			if (cmd.equalsIgnoreCase(ELSE)) {
+			if (cmd.equalsIgnoreCase(ElseToken.ELSE)) {
 				return new ElseToken();
 			}
-			if (cmd.equalsIgnoreCase(END)) {
+			if (cmd.equalsIgnoreCase(EndToken.END)) {
 				return new EndToken();
 			}
 			// this is not a keyword, in this
@@ -74,7 +69,7 @@ public class DefaultLexer implements Lexer {
 		final String cmd = split[0];
 		final String objectExpression = split[1];
 
-		if (cmd.equalsIgnoreCase(IF)) {
+		if (cmd.equalsIgnoreCase(IfToken.IF)) {
 			final boolean negated;
 			final String ifExpression;
 			if (objectExpression.startsWith("!")) {
@@ -86,7 +81,7 @@ public class DefaultLexer implements Lexer {
 			}
 			return new IfToken(objectExpression, negated);
 		}
-		if (cmd.equalsIgnoreCase(FOREACH)) {
+		if (cmd.equalsIgnoreCase(ForEachToken.FOREACH)) {
 			final String varName = split[2];
 			String separator = null;
 			// if we have more parameters, we also have

@@ -11,11 +11,14 @@ public abstract class AbstractToken implements Token {
 	private int end;
 	private String sourceName;
 
+	protected boolean duped = false;
+
 	public AbstractToken() {
 
 	}
 
 	public AbstractToken(AbstractToken token) {
+		this.duped = true;
 		this.setSourceName(token.sourceName);
 		this.setBuffer(token.buffer);
 		this.setStart(token.start);

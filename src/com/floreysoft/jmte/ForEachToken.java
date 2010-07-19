@@ -7,6 +7,8 @@ import java.util.Map;
 
 
 public class ForEachToken extends ExpressionToken {
+	public static final String FOREACH = "foreach";
+	
 	private String varName;
 	private String separator;
 	
@@ -27,6 +29,15 @@ public class ForEachToken extends ExpressionToken {
 		super(forEachToken);
 		this.varName = forEachToken.varName;
 		this.separator = forEachToken.separator;
+	}
+
+	@Override
+	public String getText() {
+		if (!duped) {
+			return super.getText();
+		} else {
+			return FOREACH + " " + getExpression() + " " + varName + (separator == null ? "" : " " + separator);
+		}
 	}
 
 	@Override
