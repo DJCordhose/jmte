@@ -1,6 +1,5 @@
 package com.floreysoft.jmte;
 
-import java.util.Map;
 
 
 /**

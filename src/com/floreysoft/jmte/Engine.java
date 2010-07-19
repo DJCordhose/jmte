@@ -1,7 +1,6 @@
 package com.floreysoft.jmte;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -231,6 +230,7 @@ public final class Engine {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private String transformPure(String sourceName, String input,
 			List<StartEndPair> scan, Map<String, Object> model) {
 		panicModelCleanupSet = new HashSet<String>();
@@ -398,9 +398,6 @@ public final class Engine {
 		boolean skip = true;
 
 		for (Token token : scopes) {
-//			if (token instanceof ForEachToken) {
-//				skip = !((ForEachToken) token).iterator().hasNext();
-//			}
 			if (token instanceof IfToken) {
 				skip = (Boolean) token.evaluate(model, errorHandler);
 			} else if (token instanceof ElseToken) {
