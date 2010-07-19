@@ -19,7 +19,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.floreysoft.jmte.Engine.StartEndPair;
-import com.floreysoft.jmte.token.StringToken;
+import com.floreysoft.jmte.token.ExpressionToken;
 
 @SuppressWarnings("unchecked")
 public final class EngineTest {
@@ -156,7 +156,7 @@ public final class EngineTest {
 					int start, int end, Map<String, Object> model,
 					boolean skipMode, ErrorHandler errorHandler) {
 				String input = new String(template, start, end - start);
-				return new StringToken("${" + input + "}");
+				return new ExpressionToken("${" + input + "}");
 			}
 		});
 

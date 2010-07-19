@@ -1,9 +1,9 @@
 package com.floreysoft.jmte.token;
 
-public class StringToken extends DefaultToken {
+public class ExpressionToken extends DefaultToken {
 	protected String value;
 
-	public StringToken(String value) {
+	public ExpressionToken(String value) {
 		this.value = value;
 	}
 	
