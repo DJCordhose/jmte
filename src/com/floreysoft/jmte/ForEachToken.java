@@ -17,8 +17,8 @@ public class ForEachToken extends ExpressionToken {
 	private transient boolean first;
 	private transient int index;
 
-	public ForEachToken(String[]segments, String varName, String separator) {
-		super(segments);
+	public ForEachToken(String expression, String varName, String separator) {
+		super(expression);
 		this.varName = varName;
 		this.separator = separator;
 	}

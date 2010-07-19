@@ -7,25 +7,25 @@ public abstract class ExpressionToken extends AbstractToken {
 
 	protected transient Object evaluated = null;
 
-	public ExpressionToken(String[] segments) {
-		if (segments == null) {
+	public ExpressionToken(String expression) {
+		if (expression == null) {
 			throw new IllegalArgumentException(
-					"Parameter segements must not be null");
+					"Parameter expression must not be null");
 		}
-		this.segments = segments;
+		setSegments(expression);
 	}
 
 	public ExpressionToken(ExpressionToken expressionToken) {
 		super(expressionToken);
-		this.segments = expressionToken.segments;
+		this.setSegments(expressionToken.getSegments());
 	}
 
 	public boolean isComposed() {
-		return segments.length > 1;
+		return getSegments().length > 1;
 	}
 
 	public boolean isEmpty() {
-		return segments.length == 0;
+		return getSegments().length == 0;
 	}
 
 	public abstract Token dup();
@@ -33,6 +33,10 @@ public abstract class ExpressionToken extends AbstractToken {
 	public abstract Object evaluate(Map<String, Object> model,
 			ErrorHandler errorHandler);
 
+	public void setSegments(String expression) {
+		segments = expression.split("\\.");
+	}
+	
 	public String[] getSegments() {
 		return segments;
 	}
@@ -42,7 +46,7 @@ public abstract class ExpressionToken extends AbstractToken {
 			throw new IllegalStateException("There is no first segment");
 		}
 
-		return segments[0];
+		return getSegments()[0];
 	}
 
 	public String getLastSegment() {
@@ -50,7 +54,11 @@ public abstract class ExpressionToken extends AbstractToken {
 			throw new IllegalStateException("There is no first segment");
 		}
 
-		return segments[segments.length - 1];
+		return getSegments()[getSegments().length - 1];
+	}
+
+	public void setSegments(String[] segments) {
+		this.segments = segments;
 	}
 
 }

@@ -5,10 +5,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-
 public class StringToken extends ExpressionToken {
-	public StringToken(String[] segments) {
-		super(segments);
+	
+	public StringToken(String expression) {
+		super(expression);
 	}
 
 	public StringToken(ExpressionToken expressionToken) {
@@ -19,7 +19,7 @@ public class StringToken extends ExpressionToken {
 	public Token dup() {
 		return new StringToken(this);
 	}
-	
+
 	@Override
 	@SuppressWarnings("unchecked")
 	public Object evaluate(Map<String, Object> model, ErrorHandler errorHandler) {

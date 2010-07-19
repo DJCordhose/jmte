@@ -10,15 +10,9 @@ public class IfToken extends ExpressionToken {
 
 	private boolean negated;
 
-	public IfToken(String[] segments, boolean negated) {
-		super(segments);
+	public IfToken(String expression, boolean negated) {
+		super(expression);
 		this.negated = negated;
-	}
-
-	public IfToken(boolean value) {
-		this(new String[] {}, false);
-		evaluated = value;
-		
 	}
 
 	public IfToken(IfToken ifToken) {

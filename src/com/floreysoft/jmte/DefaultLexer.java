@@ -44,7 +44,7 @@ public class DefaultLexer implements Lexer {
 
 		if (split.length == 0) {
 			// empty expression like ${}
-			return new StringToken(new String[] {});
+			return new StringToken("");
 		}
 
 		// LENGTH 1
@@ -54,7 +54,7 @@ public class DefaultLexer implements Lexer {
 			// ${
 			// } which might be used for silent line breaks
 			if (objectExpression.equals("")) {
-				return new StringToken(new String[] {});
+				return new StringToken("");
 			}
 			final String cmd = objectExpression;
 			if (cmd.equalsIgnoreCase(ELSE)) {
@@ -66,8 +66,7 @@ public class DefaultLexer implements Lexer {
 			// this is not a keyword, in this
 			// case
 			// simply proceed parsing it as a variable expression
-			final String[] segments = segments(objectExpression);
-			return new StringToken(segments);
+			return new StringToken(objectExpression);
 		}
 
 		// LENGTH 2..n
@@ -85,11 +84,9 @@ public class DefaultLexer implements Lexer {
 				negated = false;
 				ifExpression = objectExpression;
 			}
-			final String[] segments = segments(ifExpression);
-			return new IfToken(segments, negated);
+			return new IfToken(objectExpression, negated);
 		}
 		if (cmd.equalsIgnoreCase(FOREACH)) {
-			final String[] segments = segments(objectExpression);
 			final String varName = split[2];
 			String separator = null;
 			// if we have more parameters, we also have
@@ -119,15 +116,10 @@ public class DefaultLexer implements Lexer {
 
 				separator = input.substring(separatorBegin);
 			}
-			return new ForEachToken(segments, varName, separator);
+			return new ForEachToken(objectExpression, varName, separator);
 		}
 
 		// if all this fails
 		return new InvalidToken();
-	}
-
-	protected String[] segments(String objectExpression) {
-		String[] split = objectExpression.split("\\.");
-		return split;
 	}
 }
