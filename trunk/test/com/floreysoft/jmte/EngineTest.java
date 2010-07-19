@@ -17,7 +17,6 @@ import java.util.Map;
 import org.junit.Test;
 
 import com.floreysoft.jmte.Engine.StartEndPair;
-import com.floreysoft.jmte.token.StringToken;
 
 @SuppressWarnings("unchecked")
 public final class EngineTest {

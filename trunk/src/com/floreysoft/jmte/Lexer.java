@@ -2,7 +2,6 @@ package com.floreysoft.jmte;
 
 import java.util.Map;
 
-import com.floreysoft.jmte.token.AbstractToken;
 
 /**
  * Interface for parsing script sections which are included inside the special
