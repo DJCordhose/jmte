@@ -11,6 +11,15 @@ public class StringToken extends ExpressionToken {
 		super(segments);
 	}
 
+	public StringToken(ExpressionToken expressionToken) {
+		super(expressionToken);
+	}
+
+	@Override
+	public Token dup() {
+		return new StringToken(this);
+	}
+	
 	@Override
 	@SuppressWarnings("unchecked")
 	public Object evaluate(Map<String, Object> model, ErrorHandler errorHandler) {

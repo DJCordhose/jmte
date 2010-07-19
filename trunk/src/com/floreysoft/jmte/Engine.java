@@ -445,6 +445,10 @@ public final class Engine {
 		}
 		return result;
 	}
+	
+	public String emitToken(Token token) {
+		return getExprStartToken() + token.getText() + getExprEndToken();
+	}
 
 	String applyEscapes(String input) {
 		String unescaped = input.replaceAll("\\\\\\\\",
@@ -539,5 +543,5 @@ public final class Engine {
 	public double getExpansionSizeFactor() {
 		return expansionSizeFactor;
 	}
-
+	
 }
