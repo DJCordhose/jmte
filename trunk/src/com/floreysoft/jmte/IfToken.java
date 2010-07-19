@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class IfToken extends ExpressionToken {
 
-	private final boolean negated;
+	private boolean negated;
 
 	public IfToken(String[] segments, boolean negated) {
 		super(segments);

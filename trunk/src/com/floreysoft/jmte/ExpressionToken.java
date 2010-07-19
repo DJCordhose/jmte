@@ -3,7 +3,7 @@ package com.floreysoft.jmte;
 import java.util.Map;
 
 public abstract class ExpressionToken extends AbstractToken {
-	private final String[] segments;
+	private String[] segments;
 
 	protected transient Object evaluated = null;
 
