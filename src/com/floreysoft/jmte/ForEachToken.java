@@ -32,7 +32,7 @@ public class ForEachToken extends ExpressionToken {
 		}
 
 		final Iterable<Object> iterable;
-		final Object value = traverse(segments, model, errorHandler);
+		final Object value = traverse(getSegments(), model, errorHandler);
 		if (value == null) {
 			iterable = Collections.emptyList();
 		} else if (value instanceof Map) {

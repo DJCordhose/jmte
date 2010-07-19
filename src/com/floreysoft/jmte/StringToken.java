@@ -20,7 +20,7 @@ public class StringToken extends ExpressionToken {
 		}
 
 		final String string;
-		final Object value = traverse(segments, model, errorHandler);
+		final Object value = traverse(getSegments(), model, errorHandler);
 		if (value == null) {
 			string = "";
 		} else if (value instanceof String) {

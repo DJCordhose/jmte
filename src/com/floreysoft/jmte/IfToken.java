@@ -16,7 +16,7 @@ public class IfToken extends ExpressionToken {
 	}
 
 	public IfToken(boolean value) {
-		this(null, false);
+		this(new String[] {}, false);
 		evaluated = value;
 		
 	}
@@ -34,7 +34,7 @@ public class IfToken extends ExpressionToken {
 		}
 		
 		final boolean condition;
-		final Object value = traverse(segments, model, errorHandler);
+		final Object value = traverse(getSegments(), model, errorHandler);
 		if (value == null || value.toString().equals("")) {
 			condition = false;
 		} else if (value instanceof Boolean) {
