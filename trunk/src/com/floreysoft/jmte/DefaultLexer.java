@@ -46,7 +46,8 @@ public class DefaultLexer implements Lexer {
 		input = Util.trimFront(input);
 		String[] split = input.split("( |\t|\r|\n)+");
 
-		DefaultToken token = innerNextToken(model, skipMode, errorHandler,
+		Token errorToken = new DefaultToken(template, start, end);
+		DefaultToken token = innerNextToken(errorToken, model, skipMode, errorHandler,
 				input, split);
 		token.setSourceName(sourceName);
 		token.setBuffer(template);
@@ -56,10 +57,9 @@ public class DefaultLexer implements Lexer {
 	}
 
 	@SuppressWarnings("unchecked")
-	private DefaultToken innerNextToken(final Map<String, Object> model,
+	private DefaultToken innerNextToken(final Token errorToken, final Map<String, Object> model,
 			final boolean skipMode, final ErrorHandler errorHandler,
 			final String input, final String[] split) {
-		Token errorToken = new DefaultToken();
 		if (split.length == 0) {
 			// empty expression like ${}
 			return new ExpressionToken("");
