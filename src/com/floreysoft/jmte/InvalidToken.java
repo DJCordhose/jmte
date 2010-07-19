@@ -10,4 +10,8 @@ public class InvalidToken extends AbstractToken {
 		return "";
 	}
 
+	public Token dup() {
+		return this;
+	}
+
 }

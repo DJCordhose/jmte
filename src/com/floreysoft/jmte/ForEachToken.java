@@ -23,6 +23,17 @@ public class ForEachToken extends ExpressionToken {
 		this.separator = separator;
 	}
 
+	public ForEachToken(ForEachToken forEachToken) {
+		super(forEachToken);
+		this.varName = forEachToken.varName;
+		this.separator = forEachToken.separator;
+	}
+
+	@Override
+	public Token dup() {
+		return new ForEachToken(this);
+	}
+	
 	@Override
 	@SuppressWarnings("unchecked")
 	public Object evaluate(Map<String, Object> model, ErrorHandler errorHandler) {

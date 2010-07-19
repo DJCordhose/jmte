@@ -21,6 +21,16 @@ public class IfToken extends ExpressionToken {
 		
 	}
 
+	public IfToken(IfToken ifToken) {
+		super(ifToken);
+		this.negated = ifToken.negated;
+	}
+
+	@Override
+	public Token dup() {
+		return new IfToken(this);
+	}
+	
 	public boolean isNegated() {
 		return negated;
 	}
