@@ -1,4 +1,13 @@
 package com.floreysoft.jmte.token;
 
-public class EndToken extends DefaultToken {
+import java.util.Map;
+
+import com.floreysoft.jmte.ErrorHandler;
+
+public class EndToken extends AbstractToken {
+
+	@Override
+	public Object evaluate(Map<String, Object> model, ErrorHandler errorHandler) {
+		return "";
+	}
 }

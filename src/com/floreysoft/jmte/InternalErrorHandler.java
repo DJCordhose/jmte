@@ -20,4 +20,10 @@ public class InternalErrorHandler implements ErrorHandler {
 				token.getColumn(), parameters != null ? parameters.toString()
 						: ""));
 	}
+	
+	@Override
+	public void error(String messageKey, Token token) throws ParseException {
+		error(messageKey, token, null);
+	}
+
 }

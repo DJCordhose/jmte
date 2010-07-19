@@ -13,7 +13,7 @@ import com.floreysoft.jmte.token.ElseToken;
 import com.floreysoft.jmte.token.EndToken;
 import com.floreysoft.jmte.token.ForEachToken;
 import com.floreysoft.jmte.token.IfToken;
-import com.floreysoft.jmte.token.ExpressionToken;
+import com.floreysoft.jmte.token.StringToken;
 
 /**
  * <p>
@@ -236,8 +236,8 @@ public final class Engine {
 		}
 	}
 
-	private String transformPure(String sourceName, String input, List<StartEndPair> scan,
-			Map<String, Object> model) {
+	private String transformPure(String sourceName, String input,
+			List<StartEndPair> scan, Map<String, Object> model) {
 		panicModelCleanupSet = new HashSet<String>();
 
 		try {
@@ -250,18 +250,19 @@ public final class Engine {
 				StartEndPair startEndPair = scan.get(i);
 				int length = startEndPair.start - getExprStartToken().length()
 						- offset;
-				boolean skipMode = isSkipMode();
+				boolean skipMode = isSkipMode(model);
 				if (!skipMode) {
 					output.append(inputChars, offset, length);
 				}
 				offset = startEndPair.end + getExprEndToken().length();
 				i++;
 
-				Token token = lexer.nextToken(sourceName, inputChars, startEndPair.start,
-						startEndPair.end, model, skipMode, getErrorHandler());
-				if (token instanceof ExpressionToken) {
+				Token token = lexer.nextToken(sourceName, inputChars,
+						startEndPair.start, startEndPair.end);
+				if (token instanceof StringToken) {
 					if (!skipMode) {
-						String expanded = ((ExpressionToken) token).getValue();
+						String expanded = (String) token.evaluate(model,
+								errorHandler);
 						output.append(expanded);
 					}
 				} else if (token instanceof ForEachToken) {
@@ -273,9 +274,9 @@ public final class Engine {
 								Engine.toModel("variableName", feToken
 										.getVarName()));
 					}
-					if (!feToken.iterator().hasNext()) {
-						token = new IfToken(false);
-					} else {
+					Iterable iterable = (Iterable)feToken.evaluate(model, errorHandler);
+					feToken.setIterator(iterable.iterator());
+					if (feToken.iterator().hasNext()) {
 						Object value = feToken.iterator().next();
 						model.put(feToken.getVarName(), value);
 						panicModelCleanupSet.add(feToken.getVarName());
@@ -395,16 +396,20 @@ public final class Engine {
 		}
 	}
 
-	private boolean isSkipMode() {
-		boolean condition = true;
+	private boolean isSkipMode(Map<String, Object> model) {
+		boolean skip = true;
+
 		for (Token token : scopes) {
+//			if (token instanceof ForEachToken) {
+//				skip = !((ForEachToken) token).iterator().hasNext();
+//			}
 			if (token instanceof IfToken) {
-				condition = ((IfToken) token).getCondition();
+				skip = (Boolean) token.evaluate(model, errorHandler);
 			} else if (token instanceof ElseToken) {
-				condition = !condition;
+				skip = !skip;
 			}
 		}
-		return !condition;
+		return !skip;
 	}
 
 	/**

@@ -21,4 +21,9 @@ public class DefaultErrorHandler implements ErrorHandler {
 //		LOG.severe(message.format());
 		throw new ParseException(message);
 	}
+
+	@Override
+	public void error(String messageKey, Token token) throws ParseException {
+		error(messageKey, token, null);
+	}
 }

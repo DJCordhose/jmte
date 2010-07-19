@@ -1,13 +1,18 @@
 package com.floreysoft.jmte.token;
 
-public class ExpressionToken extends DefaultToken {
-	protected String value;
+import java.util.Map;
 
-	public ExpressionToken(String value) {
-		this.value = value;
-	}
+import com.floreysoft.jmte.ErrorHandler;
+
+public abstract class ExpressionToken extends AbstractToken {
+	protected final String[] segments;
+
+	protected transient Object evaluated = null;
 	
-	public String getValue() {
-		return value;
+	public ExpressionToken(String[] segments) {
+		this.segments = segments;
 	}
+
+	public abstract Object evaluate(Map<String, Object> model,
+			ErrorHandler errorHandler);
 }

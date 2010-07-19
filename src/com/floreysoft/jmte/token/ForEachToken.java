@@ -1,32 +1,67 @@
 package com.floreysoft.jmte.token;
 
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
-public class ForEachToken extends DefaultToken {
+import com.floreysoft.jmte.ErrorHandler;
+import com.floreysoft.jmte.Util;
+
+public class ForEachToken extends ExpressionToken {
 	private final String varName;
-	private final Iterator<Object> iterator;
-	private String separator;
-	private int scanIndex;
-	private int offset;
-	private boolean last;
-	private boolean first;
-	private int index;
+	private final String separator;
+	
+	private transient Iterator<Object> iterator;
+	private transient int scanIndex;
+	private transient int offset;
+	private transient boolean last;
+	private transient boolean first;
+	private transient int index;
 
-	public ForEachToken(String varName, Iterable<Object> iterable) {
+	public ForEachToken(String[]segments, String varName, String separator) {
+		super(segments);
 		this.varName = varName;
-		this.iterator = iterable.iterator();
+		this.separator = separator;
 	}
 
+	@Override
+	@SuppressWarnings("unchecked")
+	public Object evaluate(Map<String, Object> model, ErrorHandler errorHandler) {
+		
+		if (evaluated != null) {
+			return evaluated;
+		}
+
+		final Iterable<Object> iterable;
+		final Object value = traverse(segments, model, errorHandler);
+		if (value == null) {
+			iterable = Collections.emptyList();
+		} else if (value instanceof Map) {
+			iterable = ((Map) value).entrySet();
+		} else if (value instanceof Iterable) {
+			iterable = ((Iterable) value);
+		} else {
+			List<Object> arrayAsList = Util.arrayAsList(value);
+			if (arrayAsList != null) {
+				iterable = arrayAsList;
+			} else {
+				// we have a single value here and simply wrap it in a List
+				iterable = Collections.singletonList(value);
+			}
+		}
+		
+		evaluated = iterable;
+		return evaluated;
+	}
+
+	
 	public Iterator<Object> iterator() {
-		return iterator;
+		return getIterator();
 	}
 
 	public String getVarName() {
 		return varName;
-	}
-
-	public void setSeparator(String separator) {
-		this.separator = separator;
 	}
 
 	public String getSeparator() {
@@ -73,4 +108,11 @@ public class ForEachToken extends DefaultToken {
 		return index;
 	}
 
+	public void setIterator(Iterator<Object> iterator) {
+		this.iterator = iterator;
+	}
+
+	public Iterator<Object> getIterator() {
+		return iterator;
+	}
 }
