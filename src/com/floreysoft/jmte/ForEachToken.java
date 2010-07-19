@@ -1,12 +1,10 @@
-package com.floreysoft.jmte.token;
+package com.floreysoft.jmte;
 
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import com.floreysoft.jmte.ErrorHandler;
-import com.floreysoft.jmte.Util;
 
 public class ForEachToken extends ExpressionToken {
 	private final String varName;

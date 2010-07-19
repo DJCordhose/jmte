@@ -1,10 +1,9 @@
-package com.floreysoft.jmte.token;
+package com.floreysoft.jmte;
 
 import java.util.Map;
 
-import com.floreysoft.jmte.ErrorHandler;
 
-public class EndToken extends AbstractToken {
+public class ElseToken extends AbstractToken {
 
 	@Override
 	public Object evaluate(Map<String, Object> model, ErrorHandler errorHandler) {

@@ -1,13 +1,9 @@
-package com.floreysoft.jmte.token;
+package com.floreysoft.jmte;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Map;
 
-import com.floreysoft.jmte.Engine;
-import com.floreysoft.jmte.ErrorHandler;
-import com.floreysoft.jmte.Token;
-import com.floreysoft.jmte.Util;
 
 public abstract class AbstractToken implements Token {
 

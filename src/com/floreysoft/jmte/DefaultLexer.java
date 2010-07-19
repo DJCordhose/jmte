@@ -1,13 +1,5 @@
 package com.floreysoft.jmte;
 
-import com.floreysoft.jmte.token.AbstractToken;
-import com.floreysoft.jmte.token.ElseToken;
-import com.floreysoft.jmte.token.EndToken;
-import com.floreysoft.jmte.token.ExpressionToken;
-import com.floreysoft.jmte.token.ForEachToken;
-import com.floreysoft.jmte.token.IfToken;
-import com.floreysoft.jmte.token.InvalidToken;
-import com.floreysoft.jmte.token.StringToken;
 
 /**
  * <p>

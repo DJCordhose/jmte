@@ -1,8 +1,7 @@
-package com.floreysoft.jmte.token;
+package com.floreysoft.jmte;
 
 import java.util.Map;
 
-import com.floreysoft.jmte.ErrorHandler;
 
 public class InvalidToken extends AbstractToken {
 
