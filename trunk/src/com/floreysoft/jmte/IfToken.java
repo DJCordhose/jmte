@@ -15,6 +15,12 @@ public class IfToken extends ExpressionToken {
 		this.negated = negated;
 	}
 
+	public IfToken(boolean value) {
+		this(null, false);
+		evaluated = value;
+		
+	}
+
 	public boolean isNegated() {
 		return negated;
 	}

@@ -95,6 +95,9 @@ public abstract class AbstractToken implements Token {
 	public abstract Object evaluate(Map<String, Object> model, ErrorHandler errorHandler);
 	
 	protected Object traverse(String[] segments, Map<String, Object> model, ErrorHandler errorHandler) {
+		if (segments.length == 0) {
+			return null;
+		}
 		String objectName = segments[0];
 		Object value = model.get(objectName);
 
