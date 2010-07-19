@@ -21,4 +21,10 @@ public class ProductionErrorHandler implements ErrorHandler {
 		}
 		LOG.severe(message.format());
 	}
+	
+	@Override
+	public void error(String messageKey, Token token) throws ParseException {
+		error(messageKey, token, null);
+	}
+
 }

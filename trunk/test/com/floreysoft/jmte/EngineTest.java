@@ -1,6 +1,5 @@
 package com.floreysoft.jmte;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -15,11 +14,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import com.floreysoft.jmte.Engine.StartEndPair;
-import com.floreysoft.jmte.token.ExpressionToken;
+import com.floreysoft.jmte.token.StringToken;
 
 @SuppressWarnings("unchecked")
 public final class EngineTest {
@@ -125,14 +123,13 @@ public final class EngineTest {
 		DEFAULT_MODEL.put("empty", "");
 	}
 
-	
 	@Test
 	public void unterminatedScan() throws Exception {
 		String line = "${no end";
 		List<StartEndPair> scan = new Engine().scan(line);
 		assertEquals(0, scan.size());
 	}
-	
+
 	@Test
 	public void extract() throws Exception {
 		String line = "${if adresse}Sie wohnen an ${adresse}";
@@ -153,10 +150,9 @@ public final class EngineTest {
 
 			@Override
 			public Token nextToken(String sourceName, char[] template,
-					int start, int end, Map<String, Object> model,
-					boolean skipMode, ErrorHandler errorHandler) {
+					int start, int end) {
 				String input = new String(template, start, end - start);
-				return new ExpressionToken("${" + input + "}");
+				return new StringToken(new String[] { input });
 			}
 		});
 
@@ -173,7 +169,8 @@ public final class EngineTest {
 
 	@Test
 	public void empty() throws Exception {
-		String output = new Engine().transform("${\n}${ \n }${}", DEFAULT_MODEL);
+		String output = new Engine()
+				.transform("${\n}${ \n }${}", DEFAULT_MODEL);
 		assertEquals("", output);
 	}
 
@@ -210,21 +207,24 @@ public final class EngineTest {
 
 	@Test
 	public void mapExpression() throws Exception {
-		String output = new Engine().transform("${map.mapEntry1}", DEFAULT_MODEL);
+		String output = new Engine().transform("${map.mapEntry1}",
+				DEFAULT_MODEL);
 		assertEquals(MAP.get("mapEntry1"), output);
 
 	}
 
 	@Test
 	public void propertyExpressionGetter() throws Exception {
-		String output = new Engine().transform("${bean.property1}", DEFAULT_MODEL);
+		String output = new Engine().transform("${bean.property1}",
+				DEFAULT_MODEL);
 		assertEquals(BEAN.getProperty1().toString(), output);
 
 	}
 
 	@Test
 	public void propertyExpressionField() throws Exception {
-		String output = new Engine().transform("${bean.property2}", DEFAULT_MODEL);
+		String output = new Engine().transform("${bean.property2}",
+				DEFAULT_MODEL);
 		assertEquals(BEAN.property2.toString(), output);
 
 	}
@@ -244,39 +244,42 @@ public final class EngineTest {
 
 	@Test
 	public void directEmptyMap() throws Exception {
-		// if we try to directly output an empty map, we simply get an empty string
+		// if we try to directly output an empty map, we simply get an empty
+		// string
 		String output = new Engine().transform("${emptyMap}", DEFAULT_MODEL);
 		assertEquals("", output);
 	}
-	
+
 	@Test
 	public void directList() throws Exception {
 		// if we try to directly output a list, we simply get the first value
 		String output = new Engine().transform("${list}", DEFAULT_MODEL);
 		assertEquals("1.1, 1.2", output);
 	}
-	
+
 	@Test
 	public void directArray() throws Exception {
 		// if we try to directly output an array, we simply get the first value
 		String output = new Engine().transform("${array}", DEFAULT_MODEL);
 		assertEquals("1.1, 1.2", output);
 	}
-	
+
 	@Test
 	public void directEmptyList() throws Exception {
-		// if we try to directly output an empty list, we simply get an empty string
+		// if we try to directly output an empty list, we simply get an empty
+		// string
 		String output = new Engine().transform("${emptyList}", DEFAULT_MODEL);
 		assertEquals("", output);
 	}
-	
+
 	@Test
 	public void directEmptyArray() throws Exception {
-		// if we try to directly output an empty array, we simply get an empty string
+		// if we try to directly output an empty array, we simply get an empty
+		// string
 		String output = new Engine().transform("${emptyArray}", DEFAULT_MODEL);
 		assertEquals("", output);
 	}
-	
+
 	@Test
 	public void ifEmptyFalseExpression() throws Exception {
 		String output = new Engine().transform(
@@ -325,8 +328,8 @@ public final class EngineTest {
 
 	@Test
 	public void ifMapTrueExpression() throws Exception {
-		String output = new Engine().transform("${if map}${address}${else}NIX${end}",
-				DEFAULT_MODEL);
+		String output = new Engine().transform(
+				"${if map}${address}${else}NIX${end}", DEFAULT_MODEL);
 		assertEquals(DEFAULT_MODEL.get("address"), output);
 	}
 
@@ -405,8 +408,8 @@ public final class EngineTest {
 
 	@Test
 	public void simpleForeach() throws Exception {
-		String output = new Engine().transform("${foreach list item}${item}\n${end}",
-				DEFAULT_MODEL);
+		String output = new Engine().transform(
+				"${foreach list item}${item}\n${end}", DEFAULT_MODEL);
 		assertEquals("1.1, 1.2\n" + "2.1, 2.2\n", output);
 		assertNull(DEFAULT_MODEL.get("item"));
 	}
@@ -415,10 +418,9 @@ public final class EngineTest {
 	public void foreachSingletonAsList() throws Exception {
 		// if the variable we want to iterate over is atomic, we simply wrap
 		// it into a singleton list
-		String output = new Engine().transform("${foreach address item}${item}${end}",
-				DEFAULT_MODEL);
-		String expected = new Engine().transform("${address}",
-				DEFAULT_MODEL);
+		String output = new Engine().transform(
+				"${foreach address item}${item}${end}", DEFAULT_MODEL);
+		String expected = new Engine().transform("${address}", DEFAULT_MODEL);
 		assertEquals(expected, output);
 	}
 
@@ -427,13 +429,17 @@ public final class EngineTest {
 		List amount = Arrays.asList(1, 2, 3);
 		List price = Arrays.asList(3.6, 2, 3.0);
 		List total = Arrays.asList("3.6", "4", "9");
-		
-		List<Map<String,Object>> mergedLists = Engine.mergeLists(new String[] {"amount", "price", "total"}, amount, price, total);
-		Map<String,Object> model = new HashMap<String, Object>();
+
+		List<Map<String, Object>> mergedLists = Engine.mergeLists(new String[] {
+				"amount", "price", "total" }, amount, price, total);
+		Map<String, Object> model = new HashMap<String, Object>();
 		model.put("mergedLists", mergedLists);
-		String output = new Engine().transform("${foreach mergedLists item}${item.amount} x ${item.price} = ${item.total}\n${end}",
-				model);
-		assertEquals("1 x 3.6 = 3.6\n" + "2 x 2 = 4\n"+ "3 x 3.0 = 9\n", output);
+		String output = new Engine()
+				.transform(
+						"${foreach mergedLists item}${item.amount} x ${item.price} = ${item.total}\n${end}",
+						model);
+		assertEquals("1 x 3.6 = 3.6\n" + "2 x 2 = 4\n" + "3 x 3.0 = 9\n",
+				output);
 	}
 
 	@Test
@@ -537,7 +543,7 @@ public final class EngineTest {
 		String output = new Engine().transform(template, DEFAULT_MODEL);
 		assertEquals("Nüscht", output);
 	}
-	
+
 	@Test
 	public void foreachDoubleVarNameError() throws Exception {
 		// XXX strange way of checking for exception as we need to make sure
@@ -563,7 +569,8 @@ public final class EngineTest {
 
 	@Test
 	public void escapingDeactivated() throws Exception {
-		String output = new Engine().useEscaping(false).transform("\\${address}\n\\}", DEFAULT_MODEL);
+		String output = new Engine().useEscaping(false).transform(
+				"\\${address}\n\\}", DEFAULT_MODEL);
 		assertEquals("\\Fillbert\n\\}", output);
 	}
 
@@ -631,9 +638,9 @@ public final class EngineTest {
 		String input = "${name}";
 		Map<String, Object> model = new HashMap<String, Object>();
 		model.put("name", "Minimal Template Engine");
-		Engine engine= new Engine();
+		Engine engine = new Engine();
 		String transformed = new Engine().transform(input, model);
 		System.out.println(transformed);
-		assert(transformed.equals("Minimal Template Engine"));
+		assert (transformed.equals("Minimal Template Engine"));
 	}
 }

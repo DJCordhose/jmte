@@ -1,5 +1,7 @@
 package com.floreysoft.jmte;
 
+import java.util.Map;
+
 /**
  * Internal structure returned by the {@link Lexer} passing parsed information
  * into the {@link Engine}.
@@ -18,4 +20,6 @@ public interface Token {
 	public int getColumn();
 
 	public String getSourceName();
+	
+	public Object evaluate(Map<String, Object> model, ErrorHandler errorHandler);
 }
