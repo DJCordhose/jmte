@@ -7,8 +7,8 @@ import java.util.Map;
 
 
 public class ForEachToken extends ExpressionToken {
-	private final String varName;
-	private final String separator;
+	private String varName;
+	private String separator;
 	
 	private transient Iterator<Object> iterator;
 	private transient int scanIndex;
