@@ -271,7 +271,10 @@ public final class Engine {
 					}
 					Iterable iterable = (Iterable)feToken.evaluate(model, errorHandler);
 					feToken.setIterator(iterable.iterator());
-					if (feToken.iterator().hasNext()) {
+					if (!feToken.iterator().hasNext()) {
+						// XXX Hack to make an empty iteration a false if 
+						token = new IfToken(false);
+					} else {
 						Object value = feToken.iterator().next();
 						model.put(feToken.getVarName(), value);
 						panicModelCleanupSet.add(feToken.getVarName());

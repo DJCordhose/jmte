@@ -144,23 +144,6 @@ public final class EngineTest {
 	}
 
 	@Test
-	public void identityTransform() throws Exception {
-		Engine engine = new Engine().withLexer(new Lexer() {
-
-			@Override
-			public Token nextToken(String sourceName, char[] template,
-					int start, int end) {
-				String input = new String(template, start, end - start);
-				return new StringToken(new String[] { input });
-			}
-		});
-
-		String line = "${if adresse}Sie wohnen an ${adresse}";
-		String output = engine.transform(line, null);
-		assertEquals(line, output);
-	}
-
-	@Test
 	public void simpleExpression() throws Exception {
 		String output = new Engine().transform("${address}", DEFAULT_MODEL);
 		assertEquals(DEFAULT_MODEL.get("address"), output);
@@ -196,7 +179,7 @@ public final class EngineTest {
 		} catch (ParseException e) {
 			String message = e.getMessage();
 			foundPosition = message
-					.equals("Error while parsing 'else' at location (3:8): Can't use else outside of if block");
+					.equals("Error while parsing 'else' at location (3:8): Can't use else outside of if block!");
 
 		}
 		assertTrue(
