@@ -13,6 +13,14 @@ public class ElseToken extends AbstractToken {
 	}
 
 	@Override
+	public String getText() {
+		if (text == null) {
+			text = ELSE;
+		}
+		return text;
+	}
+
+	@Override
 	public Token dup() {
 		return new ElseToken(this);
 	}

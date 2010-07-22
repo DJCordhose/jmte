@@ -13,6 +13,15 @@ public class EndToken extends AbstractToken {
 	}
 
 	@Override
+	public String getText() {
+		if (text == null) {
+			text = END;
+		}
+		return text;
+	}
+
+
+	@Override
 	public Token dup() {
 		return new EndToken(this);
 	}
