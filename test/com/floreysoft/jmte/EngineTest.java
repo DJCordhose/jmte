@@ -107,6 +107,7 @@ public final class EngineTest {
 
 	private final static Map<String, Object> DEFAULT_MODEL = new HashMap<String, Object>();
 	static {
+		DEFAULT_MODEL.put("something", "something");
 		DEFAULT_MODEL.put("address", "Fillbert");
 		DEFAULT_MODEL.put("map", MAP);
 		DEFAULT_MODEL.put("list", LIST);
@@ -386,6 +387,24 @@ public final class EngineTest {
 						"${if hugo}${address}${else}${if address}${address}${else}NIX${end}${end}",
 						DEFAULT_MODEL);
 		assertEquals(DEFAULT_MODEL.get("address"), output);
+	}
+
+	@Test
+	public void nestedIfSkip() throws Exception {
+		String output = new Engine()
+				.transform(
+						"${if nix}Something${if address}${address}${end}${end}",
+						DEFAULT_MODEL);
+		assertEquals("", output);
+	}
+
+	@Test
+	public void nestedIfElseSkip() throws Exception {
+		String output = new Engine()
+				.transform(
+						"${if something}${else}${if something}${else}Something${if address}${address}${end}${end}${end}",
+						DEFAULT_MODEL);
+		assertEquals("", output);
 	}
 
 	@Test

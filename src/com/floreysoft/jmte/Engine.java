@@ -273,13 +273,7 @@ public final class Engine {
 					feToken.setIterator(iterable.iterator());
 					if (!feToken.iterator().hasNext()) {
 						// XXX Hack to make an empty iteration a false if 
-						token = new IfToken("", false) {
-							@Override
-							public Object evaluate(Map<String, Object> model,
-									ErrorHandler errorHandler) {
-								return false;
-							}
-						};
+						token = new FixedBooleanToken(false);
 					} else {
 						Object value = feToken.iterator().next();
 						model.put(feToken.getVarName(), value);
@@ -295,7 +289,7 @@ public final class Engine {
 				} else if (token instanceof IfToken) {
 					push(token);
 				} else if (token instanceof ElseToken) {
-					Token poppedToken = peek();
+					Token poppedToken = pop();
 					if (!(poppedToken instanceof IfToken)) {
 						getErrorHandler()
 								.error(
@@ -304,7 +298,10 @@ public final class Engine {
 										Engine.toModel("surroundingToken",
 												poppedToken));
 					}
-					push(token);
+					// if we see an if we simply negate the value of the enclosing if and replace the if token with this fixed boolean value
+					boolean negatedFixedValue = !(Boolean)poppedToken.evaluate(model, errorHandler);
+					FixedBooleanToken fixedBooleanToken = new FixedBooleanToken(negatedFixedValue);
+					push(fixedBooleanToken);
 				} else if (token instanceof EndToken) {
 					Token poppedToken = pop();
 					if (poppedToken == null) {
@@ -327,6 +324,7 @@ public final class Engine {
 							feToken.setIndex(feToken.getIndex() + 1);
 							addSpecialVariables(feToken, model);
 						} else {
+							// this is if or fixed boolean value
 							removeSpecialVariables(feToken, model);
 							model.remove(feToken.getVarName());
 							panicModelCleanupSet.remove(feToken.getVarName());
@@ -383,11 +381,6 @@ public final class Engine {
 			return null;
 		} else {
 			Token token = scopes.removeLast();
-			if (token instanceof ElseToken) {
-				// we need to pop off the if token as well as the end token
-				// terminates both
-				pop();
-			}
 			return token;
 		}
 	}
@@ -400,17 +393,20 @@ public final class Engine {
 		}
 	}
 
+	// if anywhere in the stack trace there is a negated if, we surely are in skip mode
 	private boolean isSkipMode(Map<String, Object> model) {
-		boolean skip = true;
+		boolean skip = false;
 
 		for (Token token : scopes) {
-			if (token instanceof IfToken) {
-				skip = (Boolean) token.evaluate(model, errorHandler);
-			} else if (token instanceof ElseToken) {
-				skip = !skip;
+			if (token instanceof IfToken || token instanceof FixedBooleanToken ) {
+				boolean ifCondition = (Boolean) token.evaluate(model, errorHandler);
+				if (!ifCondition) {
+					skip = true;
+					break;
+				}
 			}
 		}
-		return !skip;
+		return skip;
 	}
 
 	/**
