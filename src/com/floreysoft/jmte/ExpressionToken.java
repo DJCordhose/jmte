@@ -59,6 +59,7 @@ public abstract class ExpressionToken extends AbstractToken {
 	}
 
 	public void setExpression(String expression) {
+		this.text = null;
 		this.expression = expression;
 		setSegments(expression);
 	}
@@ -78,6 +79,7 @@ public abstract class ExpressionToken extends AbstractToken {
 			}
 		}
 		this.expression = builder.toString();
+		this.text = null;
 	}
 
 }

@@ -33,11 +33,10 @@ public class ForEachToken extends ExpressionToken {
 
 	@Override
 	public String getText() {
-		if (!duped) {
-			return super.getText();
-		} else {
-			return FOREACH + " " + getExpression() + " " + varName + (separator == null ? "" : " " + separator);
+		if (text == null) {
+			text = FOREACH + " " + getExpression() + " " + varName + (separator == null ? "" : " " + separator);
 		}
+		return text;
 	}
 
 	@Override
