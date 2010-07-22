@@ -25,13 +25,12 @@ public class DefaultLexer implements Lexer {
 
 		AbstractToken token = innerNextToken(input);
 		token.setSourceName(sourceName);
-		token.setBuffer(template);
-		token.setStart(start);
-		token.setEnd(end);
+		token.setText(template, start, end);
+		token.setLine(template, start, end);
+		token.setColumn(template, start, end);
 		return token;
 	}
 
-	@SuppressWarnings("unchecked")
 	private AbstractToken innerNextToken(final String input) {
 		String[] split = input.split("( |\t|\r|\n)+");
 
@@ -79,7 +78,7 @@ public class DefaultLexer implements Lexer {
 				negated = false;
 				ifExpression = objectExpression;
 			}
-			return new IfToken(objectExpression, negated);
+			return new IfToken(ifExpression, negated);
 		}
 		if (cmd.equalsIgnoreCase(ForEachToken.FOREACH)) {
 			final String varName = split[2];

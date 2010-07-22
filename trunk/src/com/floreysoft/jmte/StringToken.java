@@ -22,11 +22,10 @@ public class StringToken extends ExpressionToken {
 	
 	@Override
 	public String getText() {
-		if (!duped) {
-			return super.getText();
-		} else {
-			return getExpression();
+		if (text == null) {
+			text = getExpression();
 		}
+		return text;
 	}
 
 	@Override
