@@ -3,6 +3,22 @@ package com.floreysoft.jmte;
 import java.util.Map;
 
 public abstract class ExpressionToken extends AbstractToken {
+	
+	public static String segmentsToString(String[] segments, int start, int end) {
+		if (start >= segments.length || end > segments.length ) {
+			throw new IllegalArgumentException("Range is not inside segments");
+		}
+		StringBuilder builder = new StringBuilder();
+		for (int i = start; i < end; i++) {
+			String segment = segments[i];
+			builder.append(segment);
+			if (i < end - 1) {
+				builder.append(".");
+			}
+		}
+		return builder.toString();
+	}
+
 	private String[] segments;
 	private String expression;
 
@@ -52,10 +68,18 @@ public abstract class ExpressionToken extends AbstractToken {
 
 	public String getLastSegment() {
 		if (isEmpty()) {
-			throw new IllegalStateException("There is no first segment");
+			throw new IllegalStateException("There is no last segment");
 		}
 
 		return getSegments()[getSegments().length - 1];
+	}
+
+	public String getAllButLastSegment() {
+		if (isEmpty()) {
+			throw new IllegalStateException("There are no segments");
+		}
+
+		return segmentsToString(segments, 0, getSegments().length - 1);
 	}
 
 	public void setExpression(String expression) {
@@ -70,16 +94,7 @@ public abstract class ExpressionToken extends AbstractToken {
 
 	public void setSegments(String[] segments) {
 		this.segments = segments;
-		StringBuilder builder = new StringBuilder();
-		for (int i = 0; i < segments.length; i++) {
-			String segment = segments[i];
-			builder.append(segment);
-			if (i < segments.length - 1) {
-				builder.append(".");
-			}
-		}
-		this.expression = builder.toString();
+		this.expression = segmentsToString(segments, 0, segments.length);
 		this.text = null;
 	}
-
 }

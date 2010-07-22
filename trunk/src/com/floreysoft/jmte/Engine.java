@@ -46,10 +46,10 @@ import java.util.Set;
  * @see Tool
  */
 public final class Engine {
-	private static final String ODD = "odd_";
-	private static final String EVEN = "even_";
-	private static final String LAST = "last_";
-	private static final String FIRST = "first_";
+	public static final String ODD_PREFIX = "odd_";
+	public static final String EVEN_PREFIX = "even_";
+	public static final String LAST_PREFIX = "last_";
+	public static final String FIRST_PREFIX = "first_";
 	private static final String EVIL_HACKY_DOUBLE_BACKSLASH_PLACEHOLDER = "EVIL_HACKY_DOUBLE_BACKSLASH_PLACEHOLDER";
 
 	/**
@@ -349,27 +349,27 @@ public final class Engine {
 	private void addSpecialVariables(ForEachToken feToken,
 			Map<String, Object> model) {
 		String suffix = feToken.getVarName();
-		model.put(FIRST + suffix, feToken.isFirst());
-		model.put(LAST + suffix, feToken.isLast());
-		model.put(EVEN + suffix, feToken.getIndex() % 2 == 0);
-		model.put(ODD + suffix, feToken.getIndex() % 2 == 1);
-		panicModelCleanupSet.add(FIRST + suffix);
-		panicModelCleanupSet.add(LAST + suffix);
-		panicModelCleanupSet.add(EVEN + suffix);
-		panicModelCleanupSet.add(ODD + suffix);
+		model.put(FIRST_PREFIX + suffix, feToken.isFirst());
+		model.put(LAST_PREFIX + suffix, feToken.isLast());
+		model.put(EVEN_PREFIX + suffix, feToken.getIndex() % 2 == 0);
+		model.put(ODD_PREFIX + suffix, feToken.getIndex() % 2 == 1);
+		panicModelCleanupSet.add(FIRST_PREFIX + suffix);
+		panicModelCleanupSet.add(LAST_PREFIX + suffix);
+		panicModelCleanupSet.add(EVEN_PREFIX + suffix);
+		panicModelCleanupSet.add(ODD_PREFIX + suffix);
 	}
 
 	private void removeSpecialVariables(ForEachToken feToken,
 			Map<String, Object> model) {
 		String suffix = feToken.getVarName();
-		model.remove(FIRST + suffix);
-		model.remove(LAST + suffix);
-		model.remove(EVEN + suffix);
-		model.remove(ODD + suffix);
-		panicModelCleanupSet.remove(FIRST + suffix);
-		panicModelCleanupSet.remove(LAST + suffix);
-		panicModelCleanupSet.remove(EVEN + suffix);
-		panicModelCleanupSet.remove(ODD + suffix);
+		model.remove(FIRST_PREFIX + suffix);
+		model.remove(LAST_PREFIX + suffix);
+		model.remove(EVEN_PREFIX + suffix);
+		model.remove(ODD_PREFIX + suffix);
+		panicModelCleanupSet.remove(FIRST_PREFIX + suffix);
+		panicModelCleanupSet.remove(LAST_PREFIX + suffix);
+		panicModelCleanupSet.remove(EVEN_PREFIX + suffix);
+		panicModelCleanupSet.remove(ODD_PREFIX + suffix);
 	}
 
 	private void push(Token token) {
