@@ -222,7 +222,7 @@ public final class EngineTest {
 	public void directMap() throws Exception {
 		// if we try to directly output a map, we simply get the first value
 		String output = new Engine().transform("${map}", DEFAULT_MODEL);
-		assertEquals("mapValue1", output);
+		assertEquals("{mapEntry1=mapValue1, mapEntry2=mapValue2}", output);
 	}
 
 	@Test
@@ -237,7 +237,7 @@ public final class EngineTest {
 	public void directList() throws Exception {
 		// if we try to directly output a list, we simply get the first value
 		String output = new Engine().transform("${list}", DEFAULT_MODEL);
-		assertEquals("1.1, 1.2", output);
+		assertEquals("[1.1, 1.2, 2.1, 2.2]", output);
 	}
 
 	@Test
