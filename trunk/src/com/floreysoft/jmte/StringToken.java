@@ -49,9 +49,22 @@ public class StringToken extends ExpressionToken {
 						: "";
 			} else if (value instanceof Map) {
 				final Map map = (Map) value;
-				final Collection values = map.values();
-				string = values.size() > 0 ? values.iterator().next()
-						.toString() : "";
+				if (map.size() == 0) {
+					string = "";
+				} else if (map.size() == 1) {
+					string = map.values().iterator().next().toString();
+				} else {
+					string = map.toString();
+				}
+			} else if (value instanceof Collection) {
+				final Collection collection = (Collection) value;
+				if (collection.size() == 0) {
+					string = "";
+				} else if (collection.size() == 1) {
+					string = collection.iterator().next().toString();
+				} else {
+					string = collection.toString();
+				}
 			} else if (value instanceof Iterable) {
 				final Iterable iterable = (Iterable) value;
 				final Iterator iterator = iterable.iterator();

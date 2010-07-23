@@ -103,4 +103,19 @@ public class ResourceBundleMessage implements Message {
 		return transformed;
 
 	}
+
+	@Override
+	public String formatPlain() {
+		return formatPlain(new Locale("en"));
+	}
+
+	@Override
+	public String formatPlain(Locale locale) {
+		final ResourceBundle messages = ResourceBundle.getBundle(baseName, locale);
+		final String messageTemplate = getTemplate(messages, messageCode, "");
+		
+		Engine engine = new Engine().withErrorHandler(new InternalErrorHandler());
+		String transformed = engine.transform(messageTemplate, argumentModel);
+		return transformed;
+	}
 }
