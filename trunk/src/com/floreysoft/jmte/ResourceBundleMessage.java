@@ -46,7 +46,9 @@ public class ResourceBundleMessage implements Message {
 	}
 
 	public ResourceBundleMessage withModel(Map<String, Object> model) {
-		this.argumentModel.putAll(model);
+		if (model != null) {
+			this.argumentModel.putAll(model);
+		}
 		return this;
 	}
 
