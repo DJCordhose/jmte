@@ -82,6 +82,14 @@ public abstract class ExpressionToken extends AbstractToken {
 		return segmentsToString(segments, 0, getSegments().length - 1);
 	}
 
+	public String getAllButFirstSegment() {
+		if (isEmpty()) {
+			throw new IllegalStateException("There are no segments");
+		}
+
+		return segmentsToString(segments, 1, getSegments().length);
+	}
+
 	public void setExpression(String expression) {
 		this.text = null;
 		this.expression = expression;
