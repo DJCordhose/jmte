@@ -151,8 +151,8 @@ public final class Engine {
 		if (lists.length != 0) {
 
 			// first check if all looks good
-			int expectedSize = names.length;
-			for (int i = 0; i < lists.length; i++) {
+			int expectedSize = lists[0].size();
+			for (int i = 1; i < lists.length; i++) {
 				List<Object> list = lists[i];
 				if (list.size() != expectedSize) {
 					throw new IllegalArgumentException(
