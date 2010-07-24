@@ -1,5 +1,6 @@
 package com.floreysoft.jmte;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -7,6 +8,8 @@ public class InternalErrorHandler implements ErrorHandler {
 
 	private static final Logger LOG = Logger.getLogger(InternalErrorHandler.class
 			.getName());
+
+	private Locale locale = new Locale("en");
 
 	/**
 	 * {@inheritDoc}
@@ -25,5 +28,12 @@ public class InternalErrorHandler implements ErrorHandler {
 	public void error(String messageKey, Token token) throws ParseException {
 		error(messageKey, token, null);
 	}
+	
+	@Override
+	public ErrorHandler withLocale(Locale locale) {
+		this.locale = locale;
+		return this;
+	}
+
 
 }
