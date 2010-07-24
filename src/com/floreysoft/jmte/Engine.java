@@ -5,9 +5,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-
 
 /**
  * <p>
@@ -54,7 +54,7 @@ public final class Engine {
 
 	/**
 	 * Pairs of begin/end.
-	 *
+	 * 
 	 */
 	public static class StartEndPair {
 		public final int start;
@@ -149,7 +149,7 @@ public final class Engine {
 			List<Object>... lists) {
 		List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
 		if (lists.length != 0) {
-			
+
 			// first check if all looks good
 			int expectedSize = names.length;
 			for (int i = 0; i < lists.length; i++) {
@@ -181,9 +181,10 @@ public final class Engine {
 	private double expansionSizeFactor = 1.2;
 	private Lexer lexer = new DefaultLexer();
 	private ErrorHandler errorHandler = new DefaultErrorHandler();
+	private Locale locale = new Locale("en");
 	private String sourceName = null;
 	private boolean useEscaping = true;
-	
+
 	private transient LinkedList<Token> scopes = new LinkedList<Token>();
 	private transient Set<String> panicModelCleanupSet;
 
@@ -198,7 +199,7 @@ public final class Engine {
 		this.sourceName = sourceName;
 		return this;
 	}
-	
+
 	/**
 	 * * @param useEscaping tells the method whether to use (<code>true</code>)
 	 * or ignore escape character \\
@@ -209,7 +210,7 @@ public final class Engine {
 		this.useEscaping = useEscaping;
 		return this;
 	}
-	
+
 	/**
 	 * Transforms a template into an expanded output using the given model.
 	 * 
@@ -269,10 +270,11 @@ public final class Engine {
 								Engine.toModel("variableName", feToken
 										.getVarName()));
 					}
-					Iterable iterable = (Iterable)feToken.evaluate(model, errorHandler);
+					Iterable iterable = (Iterable) feToken.evaluate(model,
+							errorHandler);
 					feToken.setIterator(iterable.iterator());
 					if (!feToken.iterator().hasNext()) {
-						// XXX Hack to make an empty iteration a false if 
+						// XXX Hack to make an empty iteration a false if
 						token = new FixedBooleanToken(false);
 					} else {
 						Object value = feToken.iterator().next();
@@ -298,9 +300,13 @@ public final class Engine {
 										Engine.toModel("surroundingToken",
 												poppedToken));
 					}
-					// if we see an if we simply negate the value of the enclosing if and replace the if token with this fixed boolean value
-					boolean negatedFixedValue = !(Boolean)poppedToken.evaluate(model, errorHandler);
-					FixedBooleanToken fixedBooleanToken = new FixedBooleanToken(negatedFixedValue);
+					// if we see an if we simply negate the value of the
+					// enclosing if and replace the if token with this fixed
+					// boolean value
+					boolean negatedFixedValue = !(Boolean) poppedToken
+							.evaluate(model, errorHandler);
+					FixedBooleanToken fixedBooleanToken = new FixedBooleanToken(
+							negatedFixedValue);
 					push(fixedBooleanToken);
 				} else if (token instanceof EndToken) {
 					Token poppedToken = pop();
@@ -393,13 +399,15 @@ public final class Engine {
 		}
 	}
 
-	// if anywhere in the stack trace there is a negated if, we surely are in skip mode
+	// if anywhere in the stack trace there is a negated if, we surely are in
+	// skip mode
 	private boolean isSkipMode(Map<String, Object> model) {
 		boolean skip = false;
 
 		for (Token token : scopes) {
-			if (token instanceof IfToken || token instanceof FixedBooleanToken ) {
-				boolean ifCondition = (Boolean) token.evaluate(model, errorHandler);
+			if (token instanceof IfToken || token instanceof FixedBooleanToken) {
+				boolean ifCondition = (Boolean) token.evaluate(model,
+						errorHandler);
 				if (!ifCondition) {
 					skip = true;
 					break;
@@ -447,7 +455,7 @@ public final class Engine {
 		}
 		return result;
 	}
-	
+
 	public String emitToken(Token token) {
 		return getExprStartToken() + token.getText() + getExprEndToken();
 	}
@@ -507,6 +515,7 @@ public final class Engine {
 	 */
 	public Engine withErrorHandler(ErrorHandler errorHandler) {
 		this.errorHandler = errorHandler;
+		this.errorHandler.withLocale(locale);
 		return this;
 	}
 
@@ -545,5 +554,16 @@ public final class Engine {
 	public double getExpansionSizeFactor() {
 		return expansionSizeFactor;
 	}
-	
+
+	public Engine withLocale(Locale locale) {
+		this.locale = locale;
+		if (this.errorHandler != null) {
+			this.errorHandler.withLocale(locale);
+		}
+		return this;
+	}
+
+	public Locale getLocale() {
+		return locale;
+	}
 }
