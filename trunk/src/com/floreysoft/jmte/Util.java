@@ -5,6 +5,7 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -137,6 +138,18 @@ public class Util {
 		return sb.toString();
 	}
 
+	public static byte[] streamToBa(InputStream is) throws IOException {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		byte[] buf = new byte[1024];
+		int numRead = 0;
+		while ((numRead = is.read(buf)) != -1) {
+			baos.write(buf, 0, numRead);
+		}
+		byte[] byteArray = baos.toByteArray();
+		return byteArray;
+	}
+
+	
 	/**
 	 * Transforms any array to a matching list
 	 * 
