@@ -634,6 +634,13 @@ public final class EngineTest {
 		assertEquals("arg2", output);
 	}
 
+	@Test
+	public void formatNamed() throws Exception {
+		String output = Engine.formatNamed("${if 1}${2}${else}broken${end}", "1", "arg1", "2",
+				"arg2");
+		assertEquals("arg2", output);
+	}
+
 	// sandbox just for quick testing
 	public static void main(String[] args) {
 		String input = "${name}";
