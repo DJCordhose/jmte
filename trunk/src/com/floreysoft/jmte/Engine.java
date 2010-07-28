@@ -88,6 +88,62 @@ public final class Engine {
 		return output;
 	}
 
+	public static String formatNamed(String pattern, String name1, Object value1) {
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put(name1, value1);
+		Engine engine = new Engine();
+		String output = engine.transform(pattern, model);
+		return output;
+	}
+
+	public static String formatNamed(String pattern, String name1, Object value1,
+			String name2, Object value2) {
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put(name1, value1);
+		model.put(name2, value2);
+		Engine engine = new Engine();
+		String output = engine.transform(pattern, model);
+		return output;
+	}
+
+	public static String formatNamed(String pattern, String name1, Object value1,
+			String name2, Object value2, String name3, Object value3) {
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put(name1, value1);
+		model.put(name2, value2);
+		model.put(name3, value3);
+		Engine engine = new Engine();
+		String output = engine.transform(pattern, model);
+		return output;
+	}
+
+	public static String formatNamed(String pattern, String name1, Object value1,
+			String name2, Object value2, String name3, Object value3,
+			String name4, Object value4) {
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put(name1, value1);
+		model.put(name2, value2);
+		model.put(name3, value3);
+		model.put(name4, value4);
+		Engine engine = new Engine();
+		String output = engine.transform(pattern, model);
+		return output;
+	}
+
+	public static String formatNamed(String pattern, String name1, Object value1,
+			String name2, Object value2, String name3, Object value3,
+			String name4, Object value4, String name5, Object value5) {
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put(name1, value1);
+		model.put(name2, value2);
+		model.put(name3, value3);
+		model.put(name4, value4);
+		model.put(name5, value4);
+		Engine engine = new Engine();
+		String output = engine.transform(pattern, model);
+		return output;
+	}
+
 	/**
 	 * Transforms an array to a model using the index of the elements (starting
 	 * from 1) in the array and a prefix to form their names.
