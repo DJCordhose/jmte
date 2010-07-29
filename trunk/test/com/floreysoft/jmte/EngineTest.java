@@ -499,6 +499,15 @@ public final class EngineTest {
 	}
 
 	@Test
+	public void newlineForeachSeparator() throws Exception {
+		String output = new Engine()
+				.transform("${ foreach list item \n}${item.property1}${end}",
+						DEFAULT_MODEL);
+		assertEquals("1.1\n2.1", output);
+		assertNull(DEFAULT_MODEL.get("item"));
+	}
+
+	@Test
 	public void propertyForeach() throws Exception {
 		String output = new Engine().transform(
 				"${foreach list item}${item.property1}\n${end}", DEFAULT_MODEL);

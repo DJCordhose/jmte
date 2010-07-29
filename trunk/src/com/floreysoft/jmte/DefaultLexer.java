@@ -82,35 +82,32 @@ public class DefaultLexer implements Lexer {
 		}
 		if (cmd.equalsIgnoreCase(ForEachToken.FOREACH)) {
 			final String varName = split[2];
-			String separator = null;
-			// if we have more parameters, we also have
+			// we might also have
 			// separator
 			// data
-			if (split.length > 3 || split.length == 3 && input.endsWith("  ")) {
-				// but as the separator itself can contain
-				// spaces
-				// and the number of spaces between the previous
-				// parts is unknown, we need to do this smarter
-				int gapCount = 0;
-				int separatorBegin = 0;
-				while (separatorBegin < input.length()) {
-					char c = input.charAt(separatorBegin);
-					separatorBegin++;
-					if (Character.isWhitespace(c)) {
-						gapCount++;
-						if (gapCount == 3) {
-							break;
-						} else {
-							while (Character.isWhitespace(c = input
-									.charAt(separatorBegin)))
-								separatorBegin++;
-						}
+			// but as the separator itself can contain
+			// spaces
+			// and the number of spaces between the previous
+			// parts is unknown, we need to do this smarter
+			int gapCount = 0;
+			int separatorBegin = 0;
+			while (separatorBegin < input.length()) {
+				char c = input.charAt(separatorBegin);
+				separatorBegin++;
+				if (Character.isWhitespace(c)) {
+					gapCount++;
+					if (gapCount == 3) {
+						break;
+					} else {
+						while (Character.isWhitespace(c = input
+								.charAt(separatorBegin)))
+							separatorBegin++;
 					}
 				}
-
-				separator = input.substring(separatorBegin);
 			}
-			return new ForEachToken(objectExpression, varName, separator);
+
+			String separator = input.substring(separatorBegin);
+			return new ForEachToken(objectExpression, varName, separator.length() != 0 ? separator : null);
 		}
 
 		// if all this fails
