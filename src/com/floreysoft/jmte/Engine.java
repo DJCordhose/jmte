@@ -516,7 +516,7 @@ public final class Engine {
 		return getExprStartToken() + token.getText() + getExprEndToken();
 	}
 
-	String applyEscapes(String input) {
+	static String applyEscapes(String input) {
 		String unescaped = input.replaceAll("\\\\\\\\",
 				EVIL_HACKY_DOUBLE_BACKSLASH_PLACEHOLDER);
 		unescaped = unescaped.replaceAll("\\\\", "");
@@ -526,7 +526,7 @@ public final class Engine {
 	}
 
 	// a character is escaped when it is preceded by an unescaped \
-	private boolean isEscaped(String input, int index) {
+	private static boolean isEscaped(String input, int index) {
 		boolean escaped;
 		int leftOfIndex = index - 1;
 		if (leftOfIndex >= 0) {
