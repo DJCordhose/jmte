@@ -7,12 +7,16 @@ import static org.junit.Assert.assertTrue;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.StringReader;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
+
+import javax.script.ScriptException;
 
 import org.junit.Test;
 
@@ -288,12 +292,85 @@ public final class EngineTest {
 	}
 
 	@Test
+	public void defaultShortcut() throws Exception {
+		String full = new Engine().transform(
+				"${if address}${address}${else}NIX${end}", DEFAULT_MODEL);
+		String shortCut = new Engine().transform("${address(NIX)}",
+				DEFAULT_MODEL);
+		assertEquals(full, shortCut);
+	}
+
+	@Test
+	public void defaultShortcutActivated() throws Exception {
+		String full = new Engine().transform(
+				"${if noAddress}${address}${else}NIX${end}", DEFAULT_MODEL);
+		String shortCut = new Engine().transform("${noAddress(NIX)}",
+				DEFAULT_MODEL);
+		assertEquals(full, shortCut);
+	}
+
+	@Test
+	public void wrapShortcut() throws Exception {
+		String full = new Engine().transform(
+				"<h1>${if address}${address}${else}NIX${end}</h1>",
+				DEFAULT_MODEL);
+		String shortCut = new Engine().transform(
+				"${<h1>,address(NIX),</h1>}", DEFAULT_MODEL);
+		assertEquals(full, shortCut);
+	}
+
+	@Test
+	public void wrapShortcutActivated() throws Exception {
+		String full = new Engine().transform(
+				"<h1>${if noAddress}${address}${else}NIX${end}</h1>",
+				DEFAULT_MODEL);
+		String shortCut = new Engine().transform(
+				"${<h1>,noAddress(NIX),</h1>}", DEFAULT_MODEL);
+		assertEquals(full, shortCut);
+	}
+	
+	@Test
+	public void wrapNoPre() throws Exception {
+		String shortCut = new Engine().transform(
+				"${,address,</h1>}", DEFAULT_MODEL);
+		assertEquals("Fillbert</h1>", shortCut);
+	}
+	@Test
+	public void wrapNoPost() throws Exception {
+		String shortCut = new Engine().transform(
+				"${<h1>,address,}", DEFAULT_MODEL);
+		assertEquals("<h1>Fillbert", shortCut);
+	}
+	
+
+	@Test
 	public void ifNotExpression() throws Exception {
 		String output = new Engine().transform(
 				"${if !hugo}${address}${else}NIX${end}", DEFAULT_MODEL);
 		assertEquals(DEFAULT_MODEL.get("address"), output);
 	}
 
+	@Test
+	public void ifNotElseExpression() throws Exception {
+		String output = new Engine().transform(
+				"${if !address}${address}${else}NIX${end}", DEFAULT_MODEL);
+		assertEquals("NIX", output);
+	}
+
+	@Test
+	public void stringEq() throws Exception {
+		String output = new Engine().transform(
+				"${if address='Fillbert'}${address}${else}NIX${end}", DEFAULT_MODEL);
+		assertEquals(DEFAULT_MODEL.get("address"), output);
+	}
+	
+	@Test
+	public void stringEqNotElse() throws Exception {
+		String output = new Engine().transform(
+				"${if !address='Fillbert'}${address}${else}NIX${end}", DEFAULT_MODEL);
+		assertEquals("NIX", output);
+	}
+	
 	@Test
 	public void ifBooleanTrueExpression() throws Exception {
 		String output = new Engine().transform(
@@ -391,10 +468,9 @@ public final class EngineTest {
 
 	@Test
 	public void nestedIfSkip() throws Exception {
-		String output = new Engine()
-				.transform(
-						"${if nix}Something${if address}${address}${end}${end}",
-						DEFAULT_MODEL);
+		String output = new Engine().transform(
+				"${if nix}Something${if address}${address}${end}${end}",
+				DEFAULT_MODEL);
 		assertEquals("", output);
 	}
 
@@ -500,9 +576,9 @@ public final class EngineTest {
 
 	@Test
 	public void newlineForeachSeparator() throws Exception {
-		String output = new Engine()
-				.transform("${ foreach list item \n}${item.property1}${end}",
-						DEFAULT_MODEL);
+		String output = new Engine().transform(
+				"${ foreach list item \n}${item.property1}${end}",
+				DEFAULT_MODEL);
 		assertEquals("1.1\n2.1", output);
 		assertNull(DEFAULT_MODEL.get("item"));
 	}
@@ -645,19 +721,12 @@ public final class EngineTest {
 
 	@Test
 	public void formatNamed() throws Exception {
-		String output = Engine.formatNamed("${if 1}${2}${else}broken${end}", "1", "arg1", "2",
-				"arg2");
+		String output = Engine.formatNamed("${if 1}${2}${else}broken${end}",
+				"1", "arg1", "2", "arg2");
 		assertEquals("arg2", output);
 	}
 
 	// sandbox just for quick testing
 	public static void main(String[] args) {
-		String input = "${name}";
-		Map<String, Object> model = new HashMap<String, Object>();
-		model.put("name", "Minimal Template Engine");
-		Engine engine = new Engine();
-		String transformed = new Engine().transform(input, model);
-		System.out.println(transformed);
-		assert (transformed.equals("Minimal Template Engine"));
 	}
 }

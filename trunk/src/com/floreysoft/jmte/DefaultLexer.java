@@ -1,6 +1,5 @@
 package com.floreysoft.jmte;
 
-
 /**
  * <p>
  * Default implementation for lexer. You are invited to subclass it if you want
@@ -57,6 +56,15 @@ public class DefaultLexer implements Lexer {
 			if (cmd.equalsIgnoreCase(EndToken.END)) {
 				return new EndToken();
 			}
+			AbstractToken defaultStringToken = WrappedDefaultStringToken.parse(objectExpression);
+			if (defaultStringToken != null) {
+				return defaultStringToken;
+			}
+			defaultStringToken = DefaultStringToken.parse(objectExpression);
+			if (defaultStringToken != null) {
+				return defaultStringToken;
+			}
+			
 			// this is not a keyword, in this
 			// case
 			// simply proceed parsing it as a variable expression
@@ -71,6 +79,7 @@ public class DefaultLexer implements Lexer {
 		if (cmd.equalsIgnoreCase(IfToken.IF)) {
 			final boolean negated;
 			final String ifExpression;
+			// TODO: Both '!' and '=' work only if there are no white space separators
 			if (objectExpression.startsWith("!")) {
 				negated = true;
 				ifExpression = objectExpression.substring(1);
@@ -78,7 +87,18 @@ public class DefaultLexer implements Lexer {
 				negated = false;
 				ifExpression = objectExpression;
 			}
-			return new IfToken(ifExpression, negated);
+			if (!ifExpression.contains("=")) {
+				return new IfToken(ifExpression, negated);
+			} else {
+				final String[] ifSplit = ifExpression.split("=");
+				final String variable = ifSplit[0];
+				String operand = ifSplit[1];
+				// remove optional quotations
+				if (operand.startsWith("'") || operand.startsWith("\"")) {
+					operand = operand.substring(1, operand.length() - 1);
+				}
+				return new IfCmpToken(variable, operand, negated);
+			}
 		}
 		if (cmd.equalsIgnoreCase(ForEachToken.FOREACH)) {
 			final String varName = split[2];
@@ -107,7 +127,8 @@ public class DefaultLexer implements Lexer {
 			}
 
 			String separator = input.substring(separatorBegin);
-			return new ForEachToken(objectExpression, varName, separator.length() != 0 ? separator : null);
+			return new ForEachToken(objectExpression, varName, separator
+					.length() != 0 ? separator : null);
 		}
 
 		// if all this fails
