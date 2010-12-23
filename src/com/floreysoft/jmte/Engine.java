@@ -1,5 +1,7 @@
 package com.floreysoft.jmte;
 
+import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -8,6 +10,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 
 /**
  * <p>
@@ -70,7 +76,7 @@ public final class Engine {
 			return "" + start + "-" + end;
 		}
 	}
-
+	
 	/**
 	 * Replacement for {@link java.lang.String.format}. All arguments will be
 	 * put into the model having their index starting from 1 as their name.

@@ -8,7 +8,7 @@ import java.util.Map;
 public class IfToken extends ExpressionToken {
 	public static final String IF = "if";
 
-	private boolean negated;
+	protected final boolean negated;
 
 	public IfToken(String expression, boolean negated) {
 		super(expression);
