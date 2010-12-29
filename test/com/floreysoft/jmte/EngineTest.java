@@ -7,16 +7,12 @@ import static org.junit.Assert.assertTrue;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.StringReader;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
-
-import javax.script.ScriptException;
 
 import org.junit.Test;
 
@@ -314,8 +310,8 @@ public final class EngineTest {
 		String full = new Engine().transform(
 				"<h1>${if address}${address}${else}NIX${end}</h1>",
 				DEFAULT_MODEL);
-		String shortCut = new Engine().transform(
-				"${<h1>,address(NIX),</h1>}", DEFAULT_MODEL);
+		String shortCut = new Engine().transform("${<h1>,address(NIX),</h1>}",
+				DEFAULT_MODEL);
 		assertEquals(full, shortCut);
 	}
 
@@ -328,20 +324,27 @@ public final class EngineTest {
 				"${<h1>,noAddress(NIX),</h1>}", DEFAULT_MODEL);
 		assertEquals(full, shortCut);
 	}
-	
+
 	@Test
 	public void wrapNoPre() throws Exception {
-		String shortCut = new Engine().transform(
-				"${,address,</h1>}", DEFAULT_MODEL);
+		String shortCut = new Engine().transform("${,address,</h1>}",
+				DEFAULT_MODEL);
 		assertEquals("Fillbert</h1>", shortCut);
 	}
+
+	@Test
+	public void wrapKeepWS() throws Exception {
+		String shortCut = new Engine().transform("${   ,address,  }",
+				DEFAULT_MODEL);
+		assertEquals("   Fillbert  ", shortCut);
+	}
+
 	@Test
 	public void wrapNoPost() throws Exception {
-		String shortCut = new Engine().transform(
-				"${<h1>,address,}", DEFAULT_MODEL);
+		String shortCut = new Engine().transform("${<h1>,address,}",
+				DEFAULT_MODEL);
 		assertEquals("<h1>Fillbert", shortCut);
 	}
-	
 
 	@Test
 	public void ifNotExpression() throws Exception {
@@ -360,17 +363,19 @@ public final class EngineTest {
 	@Test
 	public void stringEq() throws Exception {
 		String output = new Engine().transform(
-				"${if address='Fillbert'}${address}${else}NIX${end}", DEFAULT_MODEL);
+				"${if address='Fillbert'}${address}${else}NIX${end}",
+				DEFAULT_MODEL);
 		assertEquals(DEFAULT_MODEL.get("address"), output);
 	}
-	
+
 	@Test
 	public void stringEqNotElse() throws Exception {
 		String output = new Engine().transform(
-				"${if !address='Fillbert'}${address}${else}NIX${end}", DEFAULT_MODEL);
+				"${if !address='Fillbert'}${address}${else}NIX${end}",
+				DEFAULT_MODEL);
 		assertEquals("NIX", output);
 	}
-	
+
 	@Test
 	public void ifBooleanTrueExpression() throws Exception {
 		String output = new Engine().transform(

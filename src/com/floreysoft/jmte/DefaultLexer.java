@@ -20,7 +20,6 @@ public class DefaultLexer implements Lexer {
 	public Token nextToken(final String sourceName, final char[] template,
 			final int start, final int end) {
 		String input = new String(template, start, end - start);
-		input = Util.trimFront(input);
 
 		AbstractToken token = innerNextToken(input);
 		token.setSourceName(sourceName);
@@ -30,8 +29,9 @@ public class DefaultLexer implements Lexer {
 		return token;
 	}
 
-	private AbstractToken innerNextToken(final String input) {
-		String[] split = input.split("( |\t|\r|\n)+");
+	private AbstractToken innerNextToken(final String untrimmedInput) {
+		final String input = Util.trimFront(untrimmedInput);
+		final String[] split = input.split("( |\t|\r|\n)+");
 
 		// LENGTH 0
 
@@ -56,7 +56,8 @@ public class DefaultLexer implements Lexer {
 			if (cmd.equalsIgnoreCase(EndToken.END)) {
 				return new EndToken();
 			}
-			AbstractToken defaultStringToken = WrappedDefaultStringToken.parse(objectExpression);
+			// be sure to use the raw input as we might have to preserve whitespace for prefix and postfix
+			AbstractToken defaultStringToken = WrappedDefaultStringToken.parse(untrimmedInput);
 			if (defaultStringToken != null) {
 				return defaultStringToken;
 			}
