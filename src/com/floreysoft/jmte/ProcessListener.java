@@ -2,7 +2,22 @@ package com.floreysoft.jmte;
 
 public interface ProcessListener {
 	public static enum Action {
-		EVAL, SKIP, EMPTY_FOREACH, ITERATE_FOREACH;
+		/**
+		 * Expression being executed
+		 */
+		EVAL, 
+		/**
+		 * Expression being skipped or condition given for skipping an expression
+		 */
+		SKIP, 
+		/**
+		 * Foreach loop over empty iterable
+		 */
+		EMPTY_FOREACH, 
+		/**
+		 * Iteration over a loop
+		 */
+		ITERATE_FOREACH;
 	}
 	
 	void log(Token token, Action action);
