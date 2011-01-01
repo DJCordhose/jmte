@@ -657,20 +657,12 @@ public final class EngineTest {
 	}
 
 	@Test
-	public void foreachDoubleVarNameError() throws Exception {
-		// XXX strange way of checking for exception as we need to make sure
-		// model is clean even after exception
-		boolean exceptionFound = false;
-		try {
-			new Engine()
+	public void foreachDoubleVarName() throws Exception {
+		String output = 			new Engine()
 					.transform(
-							"${foreach list item}${foreach list item}${item}\n${end}${end}",
+							"${foreach list item  }${item}:${foreach strings item ,}${item}${end}${end}",
 							DEFAULT_MODEL);
-		} catch (ParseException e) {
-			exceptionFound = true;
-		}
-		assertTrue(exceptionFound);
-		assertNull(DEFAULT_MODEL.get("item"));
+		assertEquals("1.1, 1.2:String1,String2,String3 2.1, 2.2:String1,String2,String3", output);
 	}
 
 	@Test

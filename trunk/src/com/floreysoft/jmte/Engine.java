@@ -249,7 +249,6 @@ public final class Engine {
 	private boolean useEscaping = true;
 
 	private transient LinkedList<Token> scopes = new LinkedList<Token>();
-	private transient Set<String> panicModelCleanupSet;
 
 	/**
 	 * Creates a new engine having <code>${</code> and <code>}</code> as start
@@ -285,10 +284,9 @@ public final class Engine {
 	 */
 	public String transform(String template, Map<String, Object> model) {
 		List<StartEndPair> scan = scan(template);
-//		ScopedMap scopedMap = new ScopedMap(model);
+		ScopedMap scopedMap = new ScopedMap(model);
 		String transformed = transformPure(sourceName, template, scan,
-//				scopedMap);
-		model);
+				scopedMap);
 		if (!useEscaping) {
 			return transformed;
 		} else {
@@ -299,123 +297,100 @@ public final class Engine {
 
 	@SuppressWarnings("unchecked")
 	private String transformPure(String sourceName, String input,
-			List<StartEndPair> scan, Map<String, Object> model) {
-		panicModelCleanupSet = new HashSet<String>();
+			List<StartEndPair> scan, ScopedMap model) {
+		char[] inputChars = input.toCharArray();
+		StringBuilder output = new StringBuilder(
+				(int) (input.length() * getExpansionSizeFactor()));
+		int offset = 0;
+		int i = 0;
+		while (i < scan.size()) {
+			StartEndPair startEndPair = scan.get(i);
+			int length = startEndPair.start - getExprStartToken().length()
+					- offset;
+			boolean skipMode = isSkipMode(model);
+			if (!skipMode) {
+				output.append(inputChars, offset, length);
+			}
+			offset = startEndPair.end + getExprEndToken().length();
+			i++;
 
-		try {
-			char[] inputChars = input.toCharArray();
-			StringBuilder output = new StringBuilder(
-					(int) (input.length() * getExpansionSizeFactor()));
-			int offset = 0;
-			int i = 0;
-			while (i < scan.size()) {
-				StartEndPair startEndPair = scan.get(i);
-				int length = startEndPair.start - getExprStartToken().length()
-						- offset;
-				boolean skipMode = isSkipMode(model);
+			Token token = lexer.nextToken(sourceName, inputChars,
+					startEndPair.start, startEndPair.end);
+			if (token instanceof StringToken) {
 				if (!skipMode) {
-					output.append(inputChars, offset, length);
-				}
-				offset = startEndPair.end + getExprEndToken().length();
-				i++;
-
-				Token token = lexer.nextToken(sourceName, inputChars,
-						startEndPair.start, startEndPair.end);
-				if (token instanceof StringToken) {
-					if (!skipMode) {
-						String expanded = (String) token.evaluate(model,
-								errorHandler);
-						output.append(expanded);
-					}
-				} else if (token instanceof ForEachToken) {
-					ForEachToken feToken = (ForEachToken) token;
-					if (model.containsKey(feToken.getVarName())) {
-						getErrorHandler().error(
-								"variable-already-defined",
-								token,
-								Engine.toModel("variableName", feToken
-										.getVarName()));
-					}
-					Iterable iterable = (Iterable) feToken.evaluate(model,
+					String expanded = (String) token.evaluate(model,
 							errorHandler);
-					feToken.setIterator(iterable.iterator());
-					if (!feToken.iterator().hasNext()) {
-						// XXX Hack to make an empty iteration a false if
-						token = new FixedBooleanToken(false);
-					} else {
+					output.append(expanded);
+				}
+			} else if (token instanceof ForEachToken) {
+				ForEachToken feToken = (ForEachToken) token;
+				Iterable iterable = (Iterable) feToken.evaluate(model,
+						errorHandler);
+				feToken.setIterator(iterable.iterator());
+				if (!feToken.iterator().hasNext()) {
+					// XXX Hack to make an empty iteration a false if
+					token = new FixedBooleanToken(false);
+				} else {
+					model.enterScope();
+					Object value = feToken.iterator().next();
+					model.put(feToken.getVarName(), value);
+					feToken.setScanIndex(i);
+					feToken.setOffset(offset);
+					feToken.setFirst(true);
+					feToken.setIndex(0);
+					feToken.setLast(!feToken.iterator().hasNext());
+					addSpecialVariables(feToken, model);
+				}
+				push(token);
+			} else if (token instanceof IfToken) {
+				push(token);
+			} else if (token instanceof ElseToken) {
+				Token poppedToken = pop();
+				if (!(poppedToken instanceof IfToken)) {
+					getErrorHandler().error("else-out-of-scope", token,
+							Engine.toModel("surroundingToken", poppedToken));
+				}
+				// if we see an if we simply negate the value of the
+				// enclosing if and replace the if token with this fixed
+				// boolean value
+				boolean negatedFixedValue = !(Boolean) poppedToken.evaluate(
+						model, errorHandler);
+				FixedBooleanToken fixedBooleanToken = new FixedBooleanToken(
+						negatedFixedValue);
+				push(fixedBooleanToken);
+			} else if (token instanceof EndToken) {
+				Token poppedToken = pop();
+				if (poppedToken == null) {
+					getErrorHandler().error("unmatched-end", token, null);
+				} else if (poppedToken instanceof ForEachToken) {
+					ForEachToken feToken = (ForEachToken) poppedToken;
+					if (feToken.iterator().hasNext()) {
 						Object value = feToken.iterator().next();
 						model.put(feToken.getVarName(), value);
-						panicModelCleanupSet.add(feToken.getVarName());
-						feToken.setScanIndex(i);
-						feToken.setOffset(offset);
-						feToken.setFirst(true);
-						feToken.setIndex(0);
-						feToken.setLast(!feToken.iterator().hasNext());
-						addSpecialVariables(feToken, model);
-					}
-					push(token);
-				} else if (token instanceof IfToken) {
-					push(token);
-				} else if (token instanceof ElseToken) {
-					Token poppedToken = pop();
-					if (!(poppedToken instanceof IfToken)) {
-						getErrorHandler()
-								.error(
-										"else-out-of-scope",
-										token,
-										Engine.toModel("surroundingToken",
-												poppedToken));
-					}
-					// if we see an if we simply negate the value of the
-					// enclosing if and replace the if token with this fixed
-					// boolean value
-					boolean negatedFixedValue = !(Boolean) poppedToken
-							.evaluate(model, errorHandler);
-					FixedBooleanToken fixedBooleanToken = new FixedBooleanToken(
-							negatedFixedValue);
-					push(fixedBooleanToken);
-				} else if (token instanceof EndToken) {
-					Token poppedToken = pop();
-					if (poppedToken == null) {
-						getErrorHandler().error("unmatched-end", token, null);
-					} else if (poppedToken instanceof ForEachToken) {
-						ForEachToken feToken = (ForEachToken) poppedToken;
-						if (feToken.iterator().hasNext()) {
-							Object value = feToken.iterator().next();
-							model.put(feToken.getVarName(), value);
-							panicModelCleanupSet.add(feToken.getVarName());
-							i = feToken.getScanIndex();
-							offset = feToken.getOffset();
-							startEndPair = scan.get(i);
-							push(feToken);
-							if (!skipMode && feToken.getSeparator() != null) {
-								output.append(feToken.getSeparator());
-							}
-							feToken.setFirst(false);
-							feToken.setLast(!feToken.iterator().hasNext());
-							feToken.setIndex(feToken.getIndex() + 1);
-							addSpecialVariables(feToken, model);
-						} else {
-							// this is if or fixed boolean value
-							removeSpecialVariables(feToken, model);
-							model.remove(feToken.getVarName());
-							panicModelCleanupSet.remove(feToken.getVarName());
+						i = feToken.getScanIndex();
+						offset = feToken.getOffset();
+						startEndPair = scan.get(i);
+						push(feToken);
+						if (!skipMode && feToken.getSeparator() != null) {
+							output.append(feToken.getSeparator());
 						}
+						feToken.setFirst(false);
+						feToken.setLast(!feToken.iterator().hasNext());
+						feToken.setIndex(feToken.getIndex() + 1);
+						addSpecialVariables(feToken, model);
+					} else {
+						model.exitScope();
 					}
 				}
 			}
-
-			// do not forget to add the final chunk of pure text (might be the
-			// only
-			// chunk indeed)
-			int remainingChars = input.length() - offset;
-			output.append(inputChars, offset, remainingChars);
-			return output.toString();
-		} finally {
-			for (String varName : panicModelCleanupSet) {
-				model.remove(varName);
-			}
 		}
+
+		// do not forget to add the final chunk of pure text (might be the
+		// only
+		// chunk indeed)
+		int remainingChars = input.length() - offset;
+		output.append(inputChars, offset, remainingChars);
+		return output.toString();
 	}
 
 	private void addSpecialVariables(ForEachToken feToken,
@@ -425,23 +400,6 @@ public final class Engine {
 		model.put(LAST_PREFIX + suffix, feToken.isLast());
 		model.put(EVEN_PREFIX + suffix, feToken.getIndex() % 2 == 0);
 		model.put(ODD_PREFIX + suffix, feToken.getIndex() % 2 == 1);
-		panicModelCleanupSet.add(FIRST_PREFIX + suffix);
-		panicModelCleanupSet.add(LAST_PREFIX + suffix);
-		panicModelCleanupSet.add(EVEN_PREFIX + suffix);
-		panicModelCleanupSet.add(ODD_PREFIX + suffix);
-	}
-
-	private void removeSpecialVariables(ForEachToken feToken,
-			Map<String, Object> model) {
-		String suffix = feToken.getVarName();
-		model.remove(FIRST_PREFIX + suffix);
-		model.remove(LAST_PREFIX + suffix);
-		model.remove(EVEN_PREFIX + suffix);
-		model.remove(ODD_PREFIX + suffix);
-		panicModelCleanupSet.remove(FIRST_PREFIX + suffix);
-		panicModelCleanupSet.remove(LAST_PREFIX + suffix);
-		panicModelCleanupSet.remove(EVEN_PREFIX + suffix);
-		panicModelCleanupSet.remove(ODD_PREFIX + suffix);
 	}
 
 	private void push(Token token) {
