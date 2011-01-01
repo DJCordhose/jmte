@@ -56,7 +56,6 @@ public final class Engine {
 	public static final String EVEN_PREFIX = "even_";
 	public static final String LAST_PREFIX = "last_";
 	public static final String FIRST_PREFIX = "first_";
-	private static final String EVIL_HACKY_DOUBLE_BACKSLASH_PLACEHOLDER = "EVIL_HACKY_DOUBLE_BACKSLASH_PLACEHOLDER";
 
 	/**
 	 * Pairs of begin/end.
@@ -76,7 +75,7 @@ public final class Engine {
 			return "" + start + "-" + end;
 		}
 	}
-	
+
 	/**
 	 * Replacement for {@link java.lang.String.format}. All arguments will be
 	 * put into the model having their index starting from 1 as their name.
@@ -102,8 +101,8 @@ public final class Engine {
 		return output;
 	}
 
-	public static String formatNamed(String pattern, String name1, Object value1,
-			String name2, Object value2) {
+	public static String formatNamed(String pattern, String name1,
+			Object value1, String name2, Object value2) {
 		Map<String, Object> model = new HashMap<String, Object>();
 		model.put(name1, value1);
 		model.put(name2, value2);
@@ -112,8 +111,9 @@ public final class Engine {
 		return output;
 	}
 
-	public static String formatNamed(String pattern, String name1, Object value1,
-			String name2, Object value2, String name3, Object value3) {
+	public static String formatNamed(String pattern, String name1,
+			Object value1, String name2, Object value2, String name3,
+			Object value3) {
 		Map<String, Object> model = new HashMap<String, Object>();
 		model.put(name1, value1);
 		model.put(name2, value2);
@@ -123,9 +123,9 @@ public final class Engine {
 		return output;
 	}
 
-	public static String formatNamed(String pattern, String name1, Object value1,
-			String name2, Object value2, String name3, Object value3,
-			String name4, Object value4) {
+	public static String formatNamed(String pattern, String name1,
+			Object value1, String name2, Object value2, String name3,
+			Object value3, String name4, Object value4) {
 		Map<String, Object> model = new HashMap<String, Object>();
 		model.put(name1, value1);
 		model.put(name2, value2);
@@ -136,9 +136,10 @@ public final class Engine {
 		return output;
 	}
 
-	public static String formatNamed(String pattern, String name1, Object value1,
-			String name2, Object value2, String name3, Object value3,
-			String name4, Object value4, String name5, Object value5) {
+	public static String formatNamed(String pattern, String name1,
+			Object value1, String name2, Object value2, String name3,
+			Object value3, String name4, Object value4, String name5,
+			Object value5) {
 		Map<String, Object> model = new HashMap<String, Object>();
 		model.put(name1, value1);
 		model.put(name2, value2);
@@ -284,11 +285,14 @@ public final class Engine {
 	 */
 	public String transform(String template, Map<String, Object> model) {
 		List<StartEndPair> scan = scan(template);
-		String transformed = transformPure(sourceName, template, scan, model);
+//		ScopedMap scopedMap = new ScopedMap(model);
+		String transformed = transformPure(sourceName, template, scan,
+//				scopedMap);
+		model);
 		if (!useEscaping) {
 			return transformed;
 		} else {
-			String unescaped = applyEscapes(transformed);
+			String unescaped = Util.unescape(transformed);
 			return unescaped;
 		}
 	}
@@ -495,7 +499,7 @@ public final class Engine {
 			if (exprStart == -1) {
 				break;
 			}
-			if (useEscaping && isEscaped(input, exprStart)) {
+			if (useEscaping && Util.isEscaped(input, exprStart)) {
 				fromIndex = exprStart + getExprStartToken().length();
 				continue;
 			}
@@ -505,7 +509,7 @@ public final class Engine {
 			if (exprEnd == -1) {
 				break;
 			}
-			while (useEscaping && isEscaped(input, exprEnd)) {
+			while (useEscaping && Util.isEscaped(input, exprEnd)) {
 				exprEnd = input.indexOf(getExprEndToken(), exprEnd
 						+ getExprEndToken().length());
 			}
@@ -520,33 +524,6 @@ public final class Engine {
 
 	public String emitToken(Token token) {
 		return getExprStartToken() + token.getText() + getExprEndToken();
-	}
-
-	static String applyEscapes(String input) {
-		String unescaped = input.replaceAll("\\\\\\\\",
-				EVIL_HACKY_DOUBLE_BACKSLASH_PLACEHOLDER);
-		unescaped = unescaped.replaceAll("\\\\", "");
-		unescaped = unescaped.replaceAll(
-				EVIL_HACKY_DOUBLE_BACKSLASH_PLACEHOLDER, "\\\\");
-		return unescaped;
-	}
-
-	// a character is escaped when it is preceded by an unescaped \
-	private static boolean isEscaped(String input, int index) {
-		boolean escaped;
-		int leftOfIndex = index - 1;
-		if (leftOfIndex >= 0) {
-			if (input.charAt(leftOfIndex) == '\\') {
-				int leftOfleftOfIndex = leftOfIndex - 1;
-				escaped = leftOfleftOfIndex < 0
-						|| input.charAt(leftOfleftOfIndex) != '\\';
-			} else {
-				escaped = false;
-			}
-		} else {
-			escaped = false;
-		}
-		return escaped;
 	}
 
 	/**

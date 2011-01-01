@@ -3,9 +3,10 @@ package com.floreysoft.jmte;
 import java.util.Map;
 
 public abstract class ExpressionToken extends AbstractToken {
-	
-	public static String segmentsToString(String[] segments, int start, int end) {
-		if (start >= segments.length || end > segments.length ) {
+
+	public final static String segmentsToString(String[] segments, int start,
+			int end) {
+		if (start >= segments.length || end > segments.length) {
 			throw new IllegalArgumentException("Range is not inside segments");
 		}
 		StringBuilder builder = new StringBuilder();
@@ -50,10 +51,6 @@ public abstract class ExpressionToken extends AbstractToken {
 	public abstract Object evaluate(Map<String, Object> model,
 			ErrorHandler errorHandler);
 
-	private void setSegments(String expression) {
-		segments = expression.split("\\.");
-	}
-	
 	public String[] getSegments() {
 		return segments;
 	}
@@ -92,8 +89,8 @@ public abstract class ExpressionToken extends AbstractToken {
 
 	public void setExpression(String expression) {
 		this.text = null;
-		this.expression = expression;
-		setSegments(expression);
+		this.segments = Util.splitEscaped(expression, '.', '\\');
+		this.expression = Util.unescape(expression);
 	}
 
 	public String getExpression() {
@@ -105,4 +102,5 @@ public abstract class ExpressionToken extends AbstractToken {
 		this.expression = segmentsToString(segments, 0, segments.length);
 		this.text = null;
 	}
+
 }

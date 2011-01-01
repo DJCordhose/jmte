@@ -105,6 +105,8 @@ public final class EngineTest {
 
 	private final static MyBean BEAN = new MyBean();
 
+	private final static String[] STRINGS = {"String1", "String2", "String3"};
+	
 	private final static Map<String, Object> DEFAULT_MODEL = new HashMap<String, Object>();
 	static {
 		DEFAULT_MODEL.put("something", "something");
@@ -121,6 +123,7 @@ public final class EngineTest {
 		DEFAULT_MODEL.put("emptyIntArray", new int[0]);
 		DEFAULT_MODEL.put("emptyIterable", new MyIterable());
 		DEFAULT_MODEL.put("empty", "");
+		DEFAULT_MODEL.put("strings", STRINGS);
 	}
 
 	@Test
@@ -142,6 +145,16 @@ public final class EngineTest {
 		assertEquals(29, scan.get(1).start);
 		assertEquals(36, scan.get(1).end);
 
+	}
+
+	@Test
+	public void variableName() throws Exception {
+		Map<String, Object> simpleModel = new HashMap<String, Object>();
+		simpleModel.put("http://www.google.com/m8/feeds/groups/daniel.florey%40gmail.com/base/16e7715c8a9e5849", "true");
+		simpleModel.put("http://www.google.com/m8/feeds/groups/daniel.florey%40gmail.com/base/6", "true");
+		
+		String output = new Engine().transform("${if http://www\\.google\\.com/m8/feeds/groups/daniel\\.florey%40gmail\\.com/base/16e7715c8a9e5849}works${end}", simpleModel);
+		assertEquals("works", output);
 	}
 
 	@Test
@@ -374,6 +387,14 @@ public final class EngineTest {
 				"${if !address='Fillbert'}${address}${else}NIX${end}",
 				DEFAULT_MODEL);
 		assertEquals("NIX", output);
+	}
+
+	@Test
+	public void stringEqInForeach() throws Exception {
+		String output = new Engine().transform(
+				"${foreach strings string}${if string='String2'}${string}${end}${end}",
+				DEFAULT_MODEL);
+		assertEquals("String2", output);
 	}
 
 	@Test
@@ -667,7 +688,7 @@ public final class EngineTest {
 
 	@Test
 	public void escapingKernel() throws Exception {
-		String output = new Engine().applyEscapes("\\${\\}\n\\\\}");
+		String output = Util.unescape("\\${\\}\n\\\\}");
 		assertEquals("${}\n\\}", output);
 	}
 
