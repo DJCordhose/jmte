@@ -1,19 +1,13 @@
 package com.floreysoft.jmte;
 
-import java.io.IOException;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
+import com.floreysoft.jmte.ProcessListener.Action;
 
 /**
  * <p>
@@ -242,11 +236,13 @@ public final class Engine {
 	private String exprStartToken = "${";
 	private String exprEndToken = "}";
 	private double expansionSizeFactor = 1.2;
-	private Lexer lexer = new DefaultLexer();
+	private Lexer lexer = new Lexer();
 	private ErrorHandler errorHandler = new DefaultErrorHandler();
 	private Locale locale = new Locale("en");
 	private String sourceName = null;
 	private boolean useEscaping = true;
+	private final Map<Class<?>, AttributeRenderer> renderers = new HashMap<Class<?>, AttributeRenderer>();
+	private final List<ProcessListener> listeners = new ArrayList<ProcessListener>();
 
 	private transient LinkedList<Token> scopes = new LinkedList<Token>();
 
@@ -321,6 +317,9 @@ public final class Engine {
 					String expanded = (String) token.evaluate(model,
 							errorHandler);
 					output.append(expanded);
+					notifyListeners(token, ProcessListener.Action.EVAL);
+				} else {
+					notifyListeners(token, ProcessListener.Action.SKIP);
 				}
 			} else if (token instanceof ForEachToken) {
 				ForEachToken feToken = (ForEachToken) token;
@@ -328,8 +327,8 @@ public final class Engine {
 						errorHandler);
 				feToken.setIterator(iterable.iterator());
 				if (!feToken.iterator().hasNext()) {
-					// XXX Hack to make an empty iteration a false if
-					token = new FixedBooleanToken(false);
+					token = new EmptyForEachToken(feToken.getText());
+					notifyListeners(token, ProcessListener.Action.EMPTY_FOREACH);
 				} else {
 					model.enterScope();
 					Object value = feToken.iterator().next();
@@ -340,6 +339,8 @@ public final class Engine {
 					feToken.setIndex(0);
 					feToken.setLast(!feToken.iterator().hasNext());
 					addSpecialVariables(feToken, model);
+					notifyListeners(token,
+							ProcessListener.Action.ITERATE_FOREACH);
 				}
 				push(token);
 			} else if (token instanceof IfToken) {
@@ -349,15 +350,11 @@ public final class Engine {
 				if (!(poppedToken instanceof IfToken)) {
 					getErrorHandler().error("else-out-of-scope", token,
 							Engine.toModel("surroundingToken", poppedToken));
+				} else {
+					ElseToken elseToken = (ElseToken) token;
+					elseToken.setIfToken((IfToken) poppedToken);
+					push(token);
 				}
-				// if we see an if we simply negate the value of the
-				// enclosing if and replace the if token with this fixed
-				// boolean value
-				boolean negatedFixedValue = !(Boolean) poppedToken.evaluate(
-						model, errorHandler);
-				FixedBooleanToken fixedBooleanToken = new FixedBooleanToken(
-						negatedFixedValue);
-				push(fixedBooleanToken);
 			} else if (token instanceof EndToken) {
 				Token poppedToken = pop();
 				if (poppedToken == null) {
@@ -378,6 +375,8 @@ public final class Engine {
 						feToken.setLast(!feToken.iterator().hasNext());
 						feToken.setIndex(feToken.getIndex() + 1);
 						addSpecialVariables(feToken, model);
+						notifyListeners(token,
+								ProcessListener.Action.ITERATE_FOREACH);
 					} else {
 						model.exitScope();
 					}
@@ -423,22 +422,21 @@ public final class Engine {
 		}
 	}
 
-	// if anywhere in the stack trace there is a negated if, we surely are in
-	// skip mode
+	// if anywhere in the stack trace there is a negative condition, all the
+	// inner parts must be skipped
 	private boolean isSkipMode(Map<String, Object> model) {
-		boolean skip = false;
-
 		for (Token token : scopes) {
-			if (token instanceof IfToken || token instanceof FixedBooleanToken) {
-				boolean ifCondition = (Boolean) token.evaluate(model,
+			if (token instanceof IfToken || token instanceof ElseToken
+					|| token instanceof EmptyForEachToken) {
+				boolean condition = (Boolean) token.evaluate(model,
 						errorHandler);
-				if (!ifCondition) {
-					skip = true;
-					break;
+				if (!condition) {
+					notifyListeners(token, ProcessListener.Action.SKIP);
+					return true;
 				}
 			}
 		}
-		return skip;
+		return false;
 	}
 
 	/**
@@ -485,26 +483,6 @@ public final class Engine {
 	}
 
 	/**
-	 * Sets a new lexer - which might be different from standard one.
-	 * 
-	 * @param lexer
-	 *            the new lexer
-	 */
-	public Engine withLexer(Lexer lexer) {
-		this.lexer = lexer;
-		return this;
-	}
-
-	/**
-	 * Gets the currently used lexer.
-	 * 
-	 * @return the currently used lexer
-	 */
-	public Lexer getLexer() {
-		return lexer;
-	}
-
-	/**
 	 * Sets the error handler to be used in this engine
 	 * 
 	 * @param errorHandler
@@ -514,6 +492,28 @@ public final class Engine {
 		this.errorHandler = errorHandler;
 		this.errorHandler.withLocale(locale);
 		return this;
+	}
+
+	public void registerRenderer(Class<?> clazz, AttributeRenderer renderer) {
+		renderers.put(clazz, renderer);
+	}
+
+	public void deregisterRenderer(Class<?> clazz) {
+		renderers.remove(clazz);
+	}
+
+	public void registerListener(ProcessListener listener) {
+		listeners.add(listener);
+	}
+
+	public void deregisterListener(ProcessListener listener) {
+		listeners.remove(listener);
+	}
+
+	private void notifyListeners(Token token, Action action) {
+		for (ProcessListener processListener : listeners) {
+			processListener.log(token, action);
+		}
 	}
 
 	/**
