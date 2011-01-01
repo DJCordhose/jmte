@@ -32,13 +32,17 @@ import java.util.Map.Entry;
  * 
  */
 public class Util {
+	private static final String EVIL_HACKY_DOUBLE_BACKSLASH_PLACEHOLDER = "EVIL_HACKY_DOUBLE_BACKSLASH_PLACEHOLDER";
 
 	/**
 	 * Writes a string into a file.
 	 * 
-	 * @param string the string
-	 * @param file the file
-	 * @param charsetName encoding of the file
+	 * @param string
+	 *            the string
+	 * @param file
+	 *            the file
+	 * @param charsetName
+	 *            encoding of the file
 	 * @throws IOException
 	 */
 	public static void stringToFile(String string, File file, String charsetName)
@@ -149,7 +153,6 @@ public class Util {
 		return byteArray;
 	}
 
-	
 	/**
 	 * Transforms any array to a matching list
 	 * 
@@ -279,5 +282,68 @@ public class Util {
 			return result;
 		}
 		return null;
+	}
+
+	/**
+	 * A character is escaped when it is preceded by an unescaped slash.
+	 */
+	static boolean isEscaped(String input, int index) {
+		boolean escaped;
+		int leftOfIndex = index - 1;
+		if (leftOfIndex >= 0) {
+			if (input.charAt(leftOfIndex) == '\\') {
+				int leftOfleftOfIndex = leftOfIndex - 1;
+				escaped = leftOfleftOfIndex < 0
+						|| input.charAt(leftOfleftOfIndex) != '\\';
+			} else {
+				escaped = false;
+			}
+		} else {
+			escaped = false;
+		}
+		return escaped;
+	}
+
+	/**
+	 * Removes slashes meant as escape characters (while preserving escaped
+	 * slashes).
+	 */
+	static String unescape(String input) {
+		String unescaped = input.replaceAll("\\\\\\\\",
+				EVIL_HACKY_DOUBLE_BACKSLASH_PLACEHOLDER);
+		unescaped = unescaped.replaceAll("\\\\", "");
+		unescaped = unescaped.replaceAll(
+				EVIL_HACKY_DOUBLE_BACKSLASH_PLACEHOLDER, "\\\\");
+		return unescaped;
+	}
+
+	static String[] splitEscaped(String input, char splitCharacter,
+			char escapeCharacter) {
+		final String[] segments;
+		if (input.indexOf(escapeCharacter) == -1) {
+			// there is no escaping, so we simply take the simple
+			// regex-splitting
+			segments = input.split("\\" + splitCharacter);
+		} else {
+			final char[] chars = input.toCharArray();
+			final List<String> segmentList = new ArrayList<String>();
+			int latestSplitIndex = 0;
+			for (int i = 0; i < chars.length; i++) {
+				char c = chars[i];
+				if (c == splitCharacter && !isEscaped(input, i)) {
+					final String segment = Util.unescape(new String(chars,
+							latestSplitIndex, i - latestSplitIndex));
+					segmentList.add(segment);
+					latestSplitIndex = i + 1;
+				}
+			}
+			final String finalSegment = Util.unescape(new String(chars,
+					latestSplitIndex, chars.length - latestSplitIndex));
+			segmentList.add(finalSegment);
+
+			segments = new String[segmentList.size()];
+			segmentList.toArray(segments);
+		}
+		return segments;
 	}
 }
