@@ -27,7 +27,14 @@ class ScopedMap implements Map<String, Object> {
 	}
 
 	public Object get(Object key) {
-		return getCurrentScope().get(key);
+		for (int i = scope.size() - 1; i >= 0; i--) {
+			Map<String, Object> map = scope.get(i);
+			Object value = map.get(key);
+			if (value != null) {
+				return value;
+			}
+		}
+		return rawModel.get(key);
 	}
 
 	public boolean isEmpty() {
@@ -82,7 +89,7 @@ class ScopedMap implements Map<String, Object> {
 
 	protected Map<String, Object> getCurrentScope() {
 		if (scope.size() > 0) {
-			return scope.pop();
+			return scope.peek();
 		} else {
 			return rawModel;
 		}
