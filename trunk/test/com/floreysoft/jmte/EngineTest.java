@@ -1,5 +1,6 @@
 package com.floreysoft.jmte;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -744,6 +745,28 @@ public final class EngineTest {
 		assertEquals("arg2", output);
 	}
 
+	@Test
+	public void renderer() throws Exception {
+		String output = new Engine().withRenderer(MyBean.class,
+				new Renderer<MyBean>() {
+
+					@Override
+					public String render(MyBean o, String formatName) {
+						if (formatName == null) {
+							return o.property1.toString();
+						} else if (formatName.equals("long")) {
+							return o.property1.toString() + "_"
+									+ o.property2.toString();
+						} else {
+							throw new IllegalArgumentException(
+									"Unsupported format name");
+						}
+					}
+
+				}).transform("${bean} and ${bean;long}", DEFAULT_MODEL);
+		assertEquals("propertyValue1 and propertyValue1_propertyValue2", output);
+	}
+	
 	// sandbox just for quick testing
 	public static void main(String[] args) {
 	}

@@ -33,7 +33,7 @@ public class IfCmpToken extends IfToken {
 	}
 
 	@Override
-	public Object evaluate(Map<String, Object> model, ErrorHandler errorHandler) {
+	public Object evaluate(Engine engine, Map<String, Object> model, ErrorHandler errorHandler) {
 
 		if (evaluated != null) {
 			return evaluated;

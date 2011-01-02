@@ -3,9 +3,7 @@ package com.floreysoft.jmte;
 import java.util.Map;
 
 public class DefaultStringToken extends StringToken {
-
-	private final String defaultValue;
-
+	
 	public static AbstractToken parse(String expression) {
 		if (expression.contains("(")) {
 			final int defaultStart = expression.indexOf('(');
@@ -15,13 +13,16 @@ public class DefaultStringToken extends StringToken {
 			}
 			final String defaultValue = expression.substring(defaultStart + 1, defaultEnd);
 			final String variable = expression.substring(0, defaultStart);
-			return new DefaultStringToken(variable, defaultValue);
+			StringToken stringToken = (StringToken) StringToken.parse(variable);
+			return new DefaultStringToken(stringToken, defaultValue);
 		}
 		return null;
 	}
 	
-	public DefaultStringToken(String variable, String defaultValue) {
-		super(variable);
+	private final String defaultValue;
+	
+	public DefaultStringToken(StringToken stringToken, String defaultValue) {
+		super(stringToken);
 		this.defaultValue = defaultValue;
 	}
 
@@ -44,12 +45,12 @@ public class DefaultStringToken extends StringToken {
 	}
 
 	@Override
-	public Object evaluate(Map<String, Object> model, ErrorHandler errorHandler) {
+	public Object evaluate(Engine engine, Map<String, Object> model, ErrorHandler errorHandler) {
 
 		if (evaluated != null) {
 			return evaluated;
 		}
-		evaluated = super.evaluate(model, errorHandler);
+		evaluated = super.evaluate(engine, model, errorHandler);
 		if (evaluated == null || evaluated.equals("")) {
 			evaluated = getDefaultValue();
 		}

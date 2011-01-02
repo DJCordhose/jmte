@@ -18,7 +18,7 @@ public class EmptyForEachToken extends AbstractToken {
 	}
 
 	@Override
-	public Object evaluate(Map<String, Object> model, ErrorHandler errorHandler) {
+	public Object evaluate(Engine engine, Map<String, Object> model, ErrorHandler errorHandler) {
 		return false;
 	}
 

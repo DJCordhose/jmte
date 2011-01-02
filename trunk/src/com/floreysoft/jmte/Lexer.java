@@ -22,7 +22,7 @@ public class Lexer {
 
 		if (split.length == 0) {
 			// empty expression like ${}
-			return new StringToken("");
+			return new StringToken("", null);
 		}
 
 		// LENGTH 1
@@ -32,7 +32,7 @@ public class Lexer {
 			// ${
 			// } which might be used for silent line breaks
 			if (objectExpression.equals("")) {
-				return new StringToken("");
+				return new StringToken("", null);
 			}
 			final String cmd = objectExpression;
 			if (cmd.equalsIgnoreCase(ElseToken.ELSE)) {
@@ -42,19 +42,16 @@ public class Lexer {
 				return new EndToken();
 			}
 			// be sure to use the raw input as we might have to preserve whitespace for prefix and postfix
-			AbstractToken defaultStringToken = WrappedDefaultStringToken.parse(untrimmedInput);
-			if (defaultStringToken != null) {
-				return defaultStringToken;
+			AbstractToken stringToken = WrappedDefaultStringToken.parse(untrimmedInput);
+			if (stringToken != null) {
+				return stringToken;
 			}
-			defaultStringToken = DefaultStringToken.parse(objectExpression);
-			if (defaultStringToken != null) {
-				return defaultStringToken;
+			stringToken = DefaultStringToken.parse(objectExpression);
+			if (stringToken != null) {
+				return stringToken;
 			}
-			
-			// this is not a keyword, in this
-			// case
-			// simply proceed parsing it as a variable expression
-			return new StringToken(objectExpression);
+			stringToken = StringToken.parse(objectExpression);
+			return stringToken;
 		}
 
 		// LENGTH 2..n
