@@ -4,10 +4,6 @@ import java.util.Map;
 
 public class WrappedDefaultStringToken extends StringToken {
 
-	private final String prefix;
-	private final String postfix;
-	private final StringToken inner;
-
 	public static AbstractToken parse(String expression) {
 		if (expression.contains(",")) {
 			final int firstComma = expression.indexOf(',');
@@ -33,7 +29,7 @@ public class WrappedDefaultStringToken extends StringToken {
 			if (defaultToken != null) {
 				innerToken = (StringToken) defaultToken;
 			} else {
-				innerToken = new StringToken(innerString);
+				innerToken = (StringToken) StringToken.parse(innerString);
 			}
 
 			return new WrappedDefaultStringToken(prefix, postfix, innerToken);
@@ -41,6 +37,10 @@ public class WrappedDefaultStringToken extends StringToken {
 		}
 		return null;
 	}
+
+	private final String prefix;
+	private final String postfix;
+	private final StringToken inner;
 
 	public WrappedDefaultStringToken(String prefix, String postfix,
 			StringToken inner) {
@@ -80,12 +80,12 @@ public class WrappedDefaultStringToken extends StringToken {
 	}
 
 	@Override
-	public Object evaluate(Map<String, Object> model, ErrorHandler errorHandler) {
+	public Object evaluate(Engine engine, Map<String, Object> model, ErrorHandler errorHandler) {
 
 		if (evaluated != null) {
 			return evaluated;
 		}
-		evaluated = getPrefix() + inner.evaluate(model, errorHandler)
+		evaluated = getPrefix() + inner.evaluate(engine, model, errorHandler)
 				+ getPostfix();
 		return evaluated;
 	}

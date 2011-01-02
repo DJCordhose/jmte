@@ -48,7 +48,7 @@ public abstract class ExpressionToken extends AbstractToken {
 
 	public abstract Token dup();
 
-	public abstract Object evaluate(Map<String, Object> model,
+	public abstract Object evaluate(Engine engine, Map<String, Object> model,
 			ErrorHandler errorHandler);
 
 	public String[] getSegments() {

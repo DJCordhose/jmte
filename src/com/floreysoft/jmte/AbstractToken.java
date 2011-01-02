@@ -12,7 +12,6 @@ public abstract class AbstractToken implements Token {
 	protected String sourceName;
 
 	public AbstractToken() {
-
 	}
 
 	public AbstractToken(AbstractToken token) {
@@ -99,7 +98,7 @@ public abstract class AbstractToken implements Token {
 
 	public abstract Token dup();
 	
-	public abstract Object evaluate(Map<String, Object> model,
+	public abstract Object evaluate(Engine engine, Map<String, Object> model,
 			ErrorHandler errorHandler);
 
 	protected Object traverse(String[] segments, Map<String, Object> model,

@@ -241,7 +241,8 @@ public final class Engine {
 	private Locale locale = new Locale("en");
 	private String sourceName = null;
 	private boolean useEscaping = true;
-	private final Map<Class<?>, AttributeRenderer> renderers = new HashMap<Class<?>, AttributeRenderer>();
+	private final Map<Class<?>, Renderer<?>> renderers = new HashMap<Class<?>, Renderer<?>>();
+	private final Map<Class<?>, Renderer<?>> resolvedRendererCache = new HashMap<Class<?>, Renderer<?>>();
 	private final List<ProcessListener> listeners = new ArrayList<ProcessListener>();
 
 	private transient LinkedList<Token> scopes = new LinkedList<Token>();
@@ -314,7 +315,7 @@ public final class Engine {
 					startEndPair.start, startEndPair.end);
 			if (token instanceof StringToken) {
 				if (!skipMode) {
-					String expanded = (String) token.evaluate(model,
+					String expanded = (String) token.evaluate(this, model,
 							errorHandler);
 					output.append(expanded);
 					notifyListeners(token, ProcessListener.Action.EVAL);
@@ -323,7 +324,7 @@ public final class Engine {
 				}
 			} else if (token instanceof ForEachToken) {
 				ForEachToken feToken = (ForEachToken) token;
-				Iterable iterable = (Iterable) feToken.evaluate(model,
+				Iterable iterable = (Iterable) feToken.evaluate(this, model,
 						errorHandler);
 				feToken.setIterator(iterable.iterator());
 				if (!feToken.iterator().hasNext()) {
@@ -428,7 +429,7 @@ public final class Engine {
 		for (Token token : scopes) {
 			if (token instanceof IfToken || token instanceof ElseToken
 					|| token instanceof EmptyForEachToken) {
-				boolean condition = (Boolean) token.evaluate(model,
+				boolean condition = (Boolean) token.evaluate(this, model,
 						errorHandler);
 				if (!condition) {
 					notifyListeners(token, ProcessListener.Action.SKIP);
@@ -494,20 +495,54 @@ public final class Engine {
 		return this;
 	}
 
-	public void registerRenderer(Class<?> clazz, AttributeRenderer renderer) {
+	public <C> Engine withRenderer(Class<C> clazz, Renderer<C> renderer) {
 		renderers.put(clazz, renderer);
+		resolvedRendererCache.clear();
+		return this;
 	}
 
-	public void deregisterRenderer(Class<?> clazz) {
+	public Engine withoutRenderer(Class<?> clazz) {
 		renderers.remove(clazz);
+		resolvedRendererCache.clear();
+		return this;
 	}
 
-	public void registerListener(ProcessListener listener) {
+	@SuppressWarnings("unchecked")
+	protected Renderer rendererForClass(Class<?> clazz) {
+		Renderer resolvedRenderer = resolvedRendererCache.get(clazz);
+		if (resolvedRenderer != null) {
+			return resolvedRenderer;
+		}
+		resolvedRenderer = renderers.get(clazz);
+		if (resolvedRenderer == null) {
+			Class<?>[] interfaces = clazz.getInterfaces();
+			for (Class<?> interfaze : interfaces) {
+				resolvedRenderer = renderers.get(interfaze);
+				if (resolvedRenderer != null) {
+					break;
+				}
+			}
+		}
+		if (resolvedRenderer == null) {
+			Class<?> superclass = clazz.getSuperclass();
+			if (superclass != null) {
+				resolvedRenderer = rendererForClass(superclass);
+			}
+		}
+		if (resolvedRenderer != null) {
+			resolvedRendererCache.put(clazz, resolvedRenderer);
+		}
+		return resolvedRenderer;
+	}
+
+	public Engine withListener(ProcessListener listener) {
 		listeners.add(listener);
+		return this;
 	}
 
-	public void deregisterListener(ProcessListener listener) {
+	public Engine withoutListener(ProcessListener listener) {
 		listeners.remove(listener);
+		return this;
 	}
 
 	private void notifyListeners(Token token, Action action) {
