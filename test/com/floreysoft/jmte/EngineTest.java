@@ -106,8 +106,8 @@ public final class EngineTest {
 
 	private final static MyBean BEAN = new MyBean();
 
-	private final static String[] STRINGS = {"String1", "String2", "String3"};
-	
+	private final static String[] STRINGS = { "String1", "String2", "String3" };
+
 	private final static Map<String, Object> DEFAULT_MODEL = new HashMap<String, Object>();
 	static {
 		DEFAULT_MODEL.put("something", "something");
@@ -151,10 +151,19 @@ public final class EngineTest {
 	@Test
 	public void variableName() throws Exception {
 		Map<String, Object> simpleModel = new HashMap<String, Object>();
-		simpleModel.put("http://www.google.com/m8/feeds/groups/daniel.florey%40gmail.com/base/16e7715c8a9e5849", "true");
-		simpleModel.put("http://www.google.com/m8/feeds/groups/daniel.florey%40gmail.com/base/6", "true");
-		
-		String output = new Engine().transform("${if http://www\\.google\\.com/m8/feeds/groups/daniel\\.florey%40gmail\\.com/base/16e7715c8a9e5849}works${end}", simpleModel);
+		simpleModel
+				.put(
+						"http://www.google.com/m8/feeds/groups/daniel.florey%40gmail.com/base/16e7715c8a9e5849",
+						"true");
+		simpleModel
+				.put(
+						"http://www.google.com/m8/feeds/groups/daniel.florey%40gmail.com/base/6",
+						"true");
+
+		String output = new Engine()
+				.transform(
+						"${if http://www\\.google\\.com/m8/feeds/groups/daniel\\.florey%40gmail\\.com/base/16e7715c8a9e5849}works${end}",
+						simpleModel);
 		assertEquals("works", output);
 	}
 
@@ -392,9 +401,10 @@ public final class EngineTest {
 
 	@Test
 	public void stringEqInForeach() throws Exception {
-		String output = new Engine().transform(
-				"${foreach strings string}${if string='String2'}${string}${end}${end}",
-				DEFAULT_MODEL);
+		String output = new Engine()
+				.transform(
+						"${foreach strings string}${if string='String2'}${string}${end}${end}",
+						DEFAULT_MODEL);
 		assertEquals("String2", output);
 	}
 
@@ -659,11 +669,13 @@ public final class EngineTest {
 
 	@Test
 	public void foreachDoubleVarName() throws Exception {
-		String output = 			new Engine()
-					.transform(
-							"${foreach list item  }${item}:${foreach strings item ,}${item}${end}${end}",
-							DEFAULT_MODEL);
-		assertEquals("1.1, 1.2:String1,String2,String3 2.1, 2.2:String1,String2,String3", output);
+		String output = new Engine()
+				.transform(
+						"${foreach list item  }${item}:${foreach strings item ,}${item}${end}${end}",
+						DEFAULT_MODEL);
+		assertEquals(
+				"1.1, 1.2:String1,String2,String3 2.1, 2.2:String1,String2,String3",
+				output);
 	}
 
 	@Test
@@ -745,28 +757,59 @@ public final class EngineTest {
 		assertEquals("arg2", output);
 	}
 
+	private final static Engine ENGINE_WITH_SPECIAL_RENDERERS = new Engine()
+			.withRenderer(Object.class, new Renderer<Object>() {
+
+				@Override
+				public String render(Object o, String format) {
+					return o.toString() + "(" + format + ")";
+				}
+			}).withRenderer(MyBean.class, new Renderer<MyBean>() {
+
+				@Override
+				public String render(MyBean o, String format) {
+					if (format == null) {
+						return o.property1.toString();
+					} else if (format.equals("long")) {
+						return o.property1.toString() + "_"
+								+ o.property2.toString();
+					} else {
+						return null;
+					}
+				}
+
+			});
+
 	@Test
 	public void renderer() throws Exception {
-		String output = new Engine().withRenderer(MyBean.class,
-				new Renderer<MyBean>() {
-
-					@Override
-					public String render(MyBean o, String formatName) {
-						if (formatName == null) {
-							return o.property1.toString();
-						} else if (formatName.equals("long")) {
-							return o.property1.toString() + "_"
-									+ o.property2.toString();
-						} else {
-							throw new IllegalArgumentException(
-									"Unsupported format name");
-						}
-					}
-
-				}).transform("${bean} and ${bean;long}", DEFAULT_MODEL);
-		assertEquals("propertyValue1 and propertyValue1_propertyValue2", output);
+		String output = ENGINE_WITH_SPECIAL_RENDERERS
+				.transform(
+						"${bean} and ${bean;long} and ${address;this is the format(no matter what I type; - this is part of the format)}",
+						DEFAULT_MODEL);
+		assertEquals(
+				"propertyValue1 and propertyValue1_propertyValue2 and Fillbert(this is the format(no matter what I type; - this is part of the format))",
+				output);
 	}
-	
+
+	@Test
+	public void wrapShortcutFormat() throws Exception {
+		String full = ENGINE_WITH_SPECIAL_RENDERERS.transform(
+				"<h1>${if address}${address;long}${else}NIX${end}</h1>",
+				DEFAULT_MODEL);
+		String shortCut = ENGINE_WITH_SPECIAL_RENDERERS.transform(
+				"${<h1>,address(NIX),</h1>;long}", DEFAULT_MODEL);
+		assertEquals(full, shortCut);
+	}
+
+	@Test
+	public void defaultShortcutFormat() throws Exception {
+		String full = ENGINE_WITH_SPECIAL_RENDERERS.transform(
+				"${if address}${address;long}${else}NIX${end}", DEFAULT_MODEL);
+		String shortCut = ENGINE_WITH_SPECIAL_RENDERERS.transform(
+				"${address(NIX);long}", DEFAULT_MODEL);
+		assertEquals(full, shortCut);
+	}
+
 	// sandbox just for quick testing
 	public static void main(String[] args) {
 	}

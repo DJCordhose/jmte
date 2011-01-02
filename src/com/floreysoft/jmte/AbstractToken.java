@@ -2,6 +2,7 @@ package com.floreysoft.jmte;
 
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 public abstract class AbstractToken implements Token {
@@ -101,16 +102,15 @@ public abstract class AbstractToken implements Token {
 	public abstract Object evaluate(Engine engine, Map<String, Object> model,
 			ErrorHandler errorHandler);
 
-	protected Object traverse(String[] segments, Map<String, Object> model,
+	protected Object traverse(List<String> segments, Map<String, Object> model,
 			ErrorHandler errorHandler) {
-		if (segments.length == 0) {
+		if (segments.size() == 0) {
 			return null;
 		}
-		String objectName = segments[0];
+		String objectName = segments.get(0);
 		Object value = model.get(objectName);
 
-		LinkedList<String> attributeNames = new LinkedList<String>(Arrays
-				.asList(segments));
+		LinkedList<String> attributeNames = new LinkedList<String>(segments);
 		attributeNames.remove(0);
 		value = traverse(value, attributeNames, errorHandler);
 		return value;

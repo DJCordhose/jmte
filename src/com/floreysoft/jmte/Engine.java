@@ -55,7 +55,7 @@ public final class Engine {
 	 * Pairs of begin/end.
 	 * 
 	 */
-	public static class StartEndPair {
+	static class StartEndPair {
 		public final int start;
 		public final int end;
 
@@ -242,7 +242,6 @@ public final class Engine {
 	private String sourceName = null;
 	private boolean useEscaping = true;
 	private final Map<Class<?>, Renderer<?>> renderers = new HashMap<Class<?>, Renderer<?>>();
-	private final Map<Class<?>, Renderer<?>> resolvedRendererCache = new HashMap<Class<?>, Renderer<?>>();
 	private final List<ProcessListener> listeners = new ArrayList<ProcessListener>();
 
 	private transient LinkedList<Token> scopes = new LinkedList<Token>();
@@ -295,8 +294,8 @@ public final class Engine {
 	@SuppressWarnings("unchecked")
 	private String transformPure(String sourceName, String input,
 			List<StartEndPair> scan, ScopedMap model) {
-		char[] inputChars = input.toCharArray();
-		StringBuilder output = new StringBuilder(
+		final char[] inputChars = input.toCharArray();
+		final StringBuilder output = new StringBuilder(
 				(int) (input.length() * getExpansionSizeFactor()));
 		int offset = 0;
 		int i = 0;
@@ -305,7 +304,7 @@ public final class Engine {
 			int length = startEndPair.start - getExprStartToken().length()
 					- offset;
 			boolean skipMode = isSkipMode(model);
-			if (!skipMode) {
+			if (length != 0 && !skipMode) {
 				output.append(inputChars, offset, length);
 			}
 			offset = startEndPair.end + getExprEndToken().length();
@@ -449,34 +448,7 @@ public final class Engine {
 	 * @return the begin/end pairs telling you where expressions can be found
 	 */
 	public List<StartEndPair> scan(String input) {
-		List<StartEndPair> result = new ArrayList<StartEndPair>();
-		int fromIndex = 0;
-		while (true) {
-			int exprStart = input.indexOf(getExprStartToken(), fromIndex);
-			if (exprStart == -1) {
-				break;
-			}
-			if (useEscaping && Util.isEscaped(input, exprStart)) {
-				fromIndex = exprStart + getExprStartToken().length();
-				continue;
-			}
-
-			exprStart += getExprStartToken().length();
-			int exprEnd = input.indexOf(getExprEndToken(), exprStart);
-			if (exprEnd == -1) {
-				break;
-			}
-			while (useEscaping && Util.isEscaped(input, exprEnd)) {
-				exprEnd = input.indexOf(getExprEndToken(), exprEnd
-						+ getExprEndToken().length());
-			}
-
-			fromIndex = exprEnd + getExprEndToken().length();
-
-			StartEndPair startEndPair = new StartEndPair(exprStart, exprEnd);
-			result.add(startEndPair);
-		}
-		return result;
+		return Util.scan(input, getExprStartToken(), getExprEndToken(), useEscaping);
 	}
 
 	public String emitToken(Token token) {
@@ -497,42 +469,49 @@ public final class Engine {
 
 	public <C> Engine withRenderer(Class<C> clazz, Renderer<C> renderer) {
 		renderers.put(clazz, renderer);
-		resolvedRendererCache.clear();
 		return this;
 	}
 
 	public Engine withoutRenderer(Class<?> clazz) {
 		renderers.remove(clazz);
-		resolvedRendererCache.clear();
 		return this;
 	}
-
-	@SuppressWarnings("unchecked")
-	protected Renderer rendererForClass(Class<?> clazz) {
-		Renderer resolvedRenderer = resolvedRendererCache.get(clazz);
+	
+	private Renderer rendererForClass(Class<?> clazz) {
+		Renderer resolvedRenderer = renderers.get(clazz);
 		if (resolvedRenderer != null) {
 			return resolvedRenderer;
+		} else {
+			return new Renderer() {
+
+				@Override
+				public String render(Object o, String format) {
+					return null;
+				}
+				
+			};
 		}
-		resolvedRenderer = renderers.get(clazz);
-		if (resolvedRenderer == null) {
+	}
+	
+	@SuppressWarnings("unchecked")
+	protected String render(Class<?> clazz, Object value, String format) {
+		String result = rendererForClass(clazz).render(value, format);
+		if (result == null) {
 			Class<?>[] interfaces = clazz.getInterfaces();
 			for (Class<?> interfaze : interfaces) {
-				resolvedRenderer = renderers.get(interfaze);
-				if (resolvedRenderer != null) {
+				result = rendererForClass(interfaze).render(value, format);
+				if (result != null) {
 					break;
 				}
 			}
 		}
-		if (resolvedRenderer == null) {
+		if (result == null) {
 			Class<?> superclass = clazz.getSuperclass();
 			if (superclass != null) {
-				resolvedRenderer = rendererForClass(superclass);
+				result = render(superclass, value, format);
 			}
 		}
-		if (resolvedRenderer != null) {
-			resolvedRendererCache.put(clazz, resolvedRenderer);
-		}
-		return resolvedRenderer;
+		return result;
 	}
 
 	public Engine withListener(ProcessListener listener) {

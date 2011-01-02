@@ -1,17 +1,18 @@
 package com.floreysoft.jmte;
 
+import java.util.List;
 import java.util.Map;
 
 public abstract class ExpressionToken extends AbstractToken {
 
-	public final static String segmentsToString(String[] segments, int start,
+	public final static String segmentsToString(List<String> segments, int start,
 			int end) {
-		if (start >= segments.length || end > segments.length) {
+		if (start >= segments.size() || end > segments.size()) {
 			throw new IllegalArgumentException("Range is not inside segments");
 		}
 		StringBuilder builder = new StringBuilder();
 		for (int i = start; i < end; i++) {
-			String segment = segments[i];
+			String segment = segments.get(i);
 			builder.append(segment);
 			if (i < end - 1) {
 				builder.append(".");
@@ -20,7 +21,7 @@ public abstract class ExpressionToken extends AbstractToken {
 		return builder.toString();
 	}
 
-	private String[] segments;
+	private List<String> segments;
 	private String expression;
 
 	protected transient Object evaluated = null;
@@ -39,11 +40,11 @@ public abstract class ExpressionToken extends AbstractToken {
 	}
 
 	public boolean isComposed() {
-		return getSegments().length > 1;
+		return getSegments().size() > 1;
 	}
 
 	public boolean isEmpty() {
-		return getSegments().length == 0;
+		return getSegments().size() == 0;
 	}
 
 	public abstract Token dup();
@@ -51,7 +52,7 @@ public abstract class ExpressionToken extends AbstractToken {
 	public abstract Object evaluate(Engine engine, Map<String, Object> model,
 			ErrorHandler errorHandler);
 
-	public String[] getSegments() {
+	public List<String> getSegments() {
 		return segments;
 	}
 
@@ -60,7 +61,7 @@ public abstract class ExpressionToken extends AbstractToken {
 			throw new IllegalStateException("There is no first segment");
 		}
 
-		return getSegments()[0];
+		return getSegments().get(0);
 	}
 
 	public String getLastSegment() {
@@ -68,7 +69,7 @@ public abstract class ExpressionToken extends AbstractToken {
 			throw new IllegalStateException("There is no last segment");
 		}
 
-		return getSegments()[getSegments().length - 1];
+		return getSegments().get(getSegments().size() - 1);
 	}
 
 	public String getAllButLastSegment() {
@@ -76,7 +77,7 @@ public abstract class ExpressionToken extends AbstractToken {
 			throw new IllegalStateException("There are no segments");
 		}
 
-		return segmentsToString(segments, 0, getSegments().length - 1);
+		return segmentsToString(segments, 0, getSegments().size() - 1);
 	}
 
 	public String getAllButFirstSegment() {
@@ -84,12 +85,12 @@ public abstract class ExpressionToken extends AbstractToken {
 			throw new IllegalStateException("There are no segments");
 		}
 
-		return segmentsToString(segments, 1, getSegments().length);
+		return segmentsToString(segments, 1, getSegments().size());
 	}
 
 	public void setExpression(String expression) {
 		this.text = null;
-		this.segments = Util.splitEscaped(expression, '.', '\\');
+		this.segments = Util.splitEscaped(expression, '.');
 		this.expression = Util.unescape(expression);
 	}
 
@@ -97,9 +98,9 @@ public abstract class ExpressionToken extends AbstractToken {
 		return expression;
 	}
 
-	public void setSegments(String[] segments) {
+	public void setSegments(List<String> segments) {
 		this.segments = segments;
-		this.expression = segmentsToString(segments, 0, segments.length);
+		this.expression = segmentsToString(segments, 0, segments.size());
 		this.text = null;
 	}
 

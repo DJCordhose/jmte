@@ -4,40 +4,6 @@ import java.util.Map;
 
 public class WrappedDefaultStringToken extends StringToken {
 
-	public static AbstractToken parse(String expression) {
-		if (expression.contains(",")) {
-			final int firstComma = expression.indexOf(',');
-			final int lastComma = expression.lastIndexOf(',');
-
-			final String innerString;
-			final String prefix;
-			final String postfix;
-
-			if (firstComma != -1 && lastComma != -1 && firstComma != lastComma) {
-				innerString = expression.substring(firstComma + 1, lastComma);
-				prefix = expression.substring(0, firstComma);
-				postfix = expression.substring(lastComma + 1);
-			} else {
-				return new InvalidToken();
-			}
-
-			final StringToken innerToken;
-			AbstractToken defaultToken = DefaultStringToken.parse(innerString);
-			if (defaultToken instanceof InvalidToken) {
-				return defaultToken;
-			}
-			if (defaultToken != null) {
-				innerToken = (StringToken) defaultToken;
-			} else {
-				innerToken = (StringToken) StringToken.parse(innerString);
-			}
-
-			return new WrappedDefaultStringToken(prefix, postfix, innerToken);
-
-		}
-		return null;
-	}
-
 	private final String prefix;
 	private final String postfix;
 	private final StringToken inner;
