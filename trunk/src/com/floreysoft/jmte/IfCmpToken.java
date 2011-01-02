@@ -35,14 +35,10 @@ public class IfCmpToken extends IfToken {
 	@Override
 	public Object evaluate(Engine engine, Map<String, Object> model, ErrorHandler errorHandler) {
 
-		if (evaluated != null) {
-			return evaluated;
-		}
-
 		final Object value = traverse(getSegments(), model, errorHandler);
 		final boolean condition = getOperand().equals(value);
-		evaluated = negated ? !condition : condition;
 
+		final Object evaluated = negated ? !condition : condition;
 		return evaluated;
 	}
 

@@ -31,10 +31,7 @@ public class DefaultStringToken extends StringToken {
 	@Override
 	public Object evaluate(Engine engine, Map<String, Object> model, ErrorHandler errorHandler) {
 
-		if (evaluated != null) {
-			return evaluated;
-		}
-		evaluated = super.evaluate(engine, model, errorHandler);
+		Object evaluated = super.evaluate(engine, model, errorHandler);
 		if (evaluated == null || evaluated.equals("")) {
 			evaluated = getDefaultValue();
 		}

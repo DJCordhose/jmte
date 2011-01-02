@@ -41,10 +41,6 @@ public class IfToken extends ExpressionToken {
 	@SuppressWarnings("unchecked")
 	public Object evaluate(Engine engine, Map<String, Object> model, ErrorHandler errorHandler) {
 
-		if (evaluated != null) {
-			return evaluated;
-		}
-
 		final boolean condition;
 		final Object value = traverse(getSegments(), model, errorHandler);
 		if (value == null || value.toString().equals("")) {
@@ -65,7 +61,7 @@ public class IfToken extends ExpressionToken {
 			condition = list == null || !list.isEmpty();
 		}
 
-		evaluated = negated ? !condition : condition;
+		Object evaluated = negated ? !condition : condition;
 
 		return evaluated;
 	}

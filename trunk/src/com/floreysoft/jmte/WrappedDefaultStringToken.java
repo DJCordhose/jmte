@@ -48,10 +48,7 @@ public class WrappedDefaultStringToken extends StringToken {
 	@Override
 	public Object evaluate(Engine engine, Map<String, Object> model, ErrorHandler errorHandler) {
 
-		if (evaluated != null) {
-			return evaluated;
-		}
-		evaluated = getPrefix() + inner.evaluate(engine, model, errorHandler)
+		Object evaluated = getPrefix() + inner.evaluate(engine, model, errorHandler)
 				+ getPostfix();
 		return evaluated;
 	}
