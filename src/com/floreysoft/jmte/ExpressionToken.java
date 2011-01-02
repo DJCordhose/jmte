@@ -24,8 +24,6 @@ public abstract class ExpressionToken extends AbstractToken {
 	private List<String> segments;
 	private String expression;
 
-	protected transient Object evaluated = null;
-
 	public ExpressionToken(String expression) {
 		if (expression == null) {
 			throw new IllegalArgumentException(

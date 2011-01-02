@@ -1,0 +1,86 @@
+package com.floreysoft.jmte;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.floreysoft.jmte.Engine.StartEndPair;
+
+public class TokenStream {
+	private final String sourceName;
+	private final String input;
+	private final List<StartEndPair> scan;
+	private final Lexer lexer;
+	private final String splitStart;
+	private final String splitEnd;
+
+	private transient List<Token> tokens = null;
+	private transient int currentTokenIndex = -1;
+
+	public TokenStream(String sourceName, String input,
+			List<StartEndPair> scan, Lexer lexer, String splitStart,
+			String splitEnd) {
+		this.sourceName = sourceName;
+		this.input = input;
+		this.scan = scan;
+		this.lexer = lexer;
+		this.splitStart = splitStart;
+		this.splitEnd = splitEnd;
+	}
+
+	public List<Token> allTokens() {
+		final List<Token> tokens = new ArrayList<Token>();
+		final char[] inputChars = input.toCharArray();
+		int offset = 0;
+		for (StartEndPair startEndPair : scan) {
+			int plainTextLengthBeforeNextToken = startEndPair.start
+					- splitStart.length() - offset;
+			if (plainTextLengthBeforeNextToken != 0) {
+				Token token = new PlainTextToken(new String(inputChars, offset,
+						plainTextLengthBeforeNextToken));
+				tokens.add(token);
+			}
+			offset = startEndPair.end + splitEnd.length();
+
+			Token token = lexer.nextToken(sourceName, inputChars,
+					startEndPair.start, startEndPair.end);
+			tokens.add(token);
+		}
+
+		// do not forget to add the final chunk of pure text (might be the
+		// only
+		// chunk indeed)
+		int remainingChars = input.length() - offset;
+		if (remainingChars != 0) {
+			Token token = new PlainTextToken(new String(inputChars, offset,
+					remainingChars));
+			tokens.add(token);
+		}
+		return tokens;
+	}
+
+	private void initTokens() {
+		if (this.tokens == null) {
+			this.tokens = allTokens();
+			this.currentTokenIndex = 0;
+		}
+	}
+
+	public Token nextToken() {
+		initTokens();
+		if (currentTokenIndex < tokens.size()) {
+			return tokens.get(currentTokenIndex++);
+		} else {
+			return null;
+		}
+	}
+
+	public void rewind(Token tokenToRewindTo) {
+		initTokens();
+		for (int index = 0; index < this.tokens.size(); index++) {
+			Token token = this.tokens.get(index);
+			if (token == tokenToRewindTo) {
+				this.currentTokenIndex = index + 1;
+			}
+		}
+	}
+}

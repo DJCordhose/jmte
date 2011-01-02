@@ -36,10 +36,6 @@ public class StringToken extends ExpressionToken {
 	public Object evaluate(Engine engine, Map<String, Object> model,
 			ErrorHandler errorHandler) {
 
-		if (evaluated != null) {
-			return evaluated;
-		}
-
 		final String string;
 		final Object value = traverse(getSegments(), model, errorHandler);
 		if (value == null) {
@@ -84,9 +80,7 @@ public class StringToken extends ExpressionToken {
 			}
 		}
 
-		evaluated = string;
-
-		return evaluated;
+		return string;
 	}
 
 }

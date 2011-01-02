@@ -294,25 +294,18 @@ public final class Engine {
 	@SuppressWarnings("unchecked")
 	private String transformPure(String sourceName, String input,
 			List<StartEndPair> scan, ScopedMap model) {
-		final char[] inputChars = input.toCharArray();
+		final TokenStream tokenStream = new TokenStream(sourceName, input,
+				scan, lexer, getExprStartToken(), getExprEndToken());
 		final StringBuilder output = new StringBuilder(
 				(int) (input.length() * getExpansionSizeFactor()));
-		int offset = 0;
-		int i = 0;
-		while (i < scan.size()) {
-			StartEndPair startEndPair = scan.get(i);
-			int length = startEndPair.start - getExprStartToken().length()
-					- offset;
+		Token token;
+		while ((token = tokenStream.nextToken()) != null) {
 			boolean skipMode = isSkipMode(model);
-			if (length != 0 && !skipMode) {
-				output.append(inputChars, offset, length);
-			}
-			offset = startEndPair.end + getExprEndToken().length();
-			i++;
-
-			Token token = lexer.nextToken(sourceName, inputChars,
-					startEndPair.start, startEndPair.end);
-			if (token instanceof StringToken) {
+			if (token instanceof PlainTextToken) {
+				if (!skipMode) {
+					output.append(token.getText());
+				}
+			} else if (token instanceof StringToken) {
 				if (!skipMode) {
 					String expanded = (String) token.evaluate(this, model,
 							errorHandler);
@@ -333,8 +326,6 @@ public final class Engine {
 					model.enterScope();
 					Object value = feToken.iterator().next();
 					model.put(feToken.getVarName(), value);
-					feToken.setScanIndex(i);
-					feToken.setOffset(offset);
 					feToken.setFirst(true);
 					feToken.setIndex(0);
 					feToken.setLast(!feToken.iterator().hasNext());
@@ -362,11 +353,10 @@ public final class Engine {
 				} else if (poppedToken instanceof ForEachToken) {
 					ForEachToken feToken = (ForEachToken) poppedToken;
 					if (feToken.iterator().hasNext()) {
+						// for each iteration we need to rewind to the beginning of the for loop
+						tokenStream.rewind(feToken);
 						Object value = feToken.iterator().next();
 						model.put(feToken.getVarName(), value);
-						i = feToken.getScanIndex();
-						offset = feToken.getOffset();
-						startEndPair = scan.get(i);
 						push(feToken);
 						if (!skipMode && feToken.getSeparator() != null) {
 							output.append(feToken.getSeparator());
@@ -383,12 +373,6 @@ public final class Engine {
 				}
 			}
 		}
-
-		// do not forget to add the final chunk of pure text (might be the
-		// only
-		// chunk indeed)
-		int remainingChars = input.length() - offset;
-		output.append(inputChars, offset, remainingChars);
 		return output.toString();
 	}
 
@@ -448,7 +432,8 @@ public final class Engine {
 	 * @return the begin/end pairs telling you where expressions can be found
 	 */
 	public List<StartEndPair> scan(String input) {
-		return Util.scan(input, getExprStartToken(), getExprEndToken(), useEscaping);
+		return Util.scan(input, getExprStartToken(), getExprEndToken(),
+				useEscaping);
 	}
 
 	public String emitToken(Token token) {
@@ -476,7 +461,7 @@ public final class Engine {
 		renderers.remove(clazz);
 		return this;
 	}
-	
+
 	private Renderer rendererForClass(Class<?> clazz) {
 		Renderer resolvedRenderer = renderers.get(clazz);
 		if (resolvedRenderer != null) {
@@ -488,11 +473,11 @@ public final class Engine {
 				public String render(Object o, String format) {
 					return null;
 				}
-				
+
 			};
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	protected String render(Class<?> clazz, Object value, String format) {
 		String result = rendererForClass(clazz).render(value, format);

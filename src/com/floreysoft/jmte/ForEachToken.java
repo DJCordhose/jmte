@@ -13,8 +13,6 @@ public class ForEachToken extends ExpressionToken {
 	private String separator;
 	
 	private transient Iterator<Object> iterator;
-	private transient int scanIndex;
-	private transient int offset;
 	private transient boolean last;
 	private transient boolean first;
 	private transient int index;
@@ -48,10 +46,6 @@ public class ForEachToken extends ExpressionToken {
 	@SuppressWarnings("unchecked")
 	public Object evaluate(Engine engine, Map<String, Object> model, ErrorHandler errorHandler) {
 		
-		if (evaluated != null) {
-			return evaluated;
-		}
-
 		final Iterable<Object> iterable;
 		final Object value = traverse(getSegments(), model, errorHandler);
 		if (value == null) {
@@ -70,8 +64,7 @@ public class ForEachToken extends ExpressionToken {
 			}
 		}
 		
-		evaluated = iterable;
-		return evaluated;
+		return iterable;
 	}
 
 	
@@ -85,22 +78,6 @@ public class ForEachToken extends ExpressionToken {
 
 	public String getSeparator() {
 		return separator;
-	}
-
-	public void setScanIndex(int scanIndex) {
-		this.scanIndex = scanIndex;
-	}
-
-	public int getScanIndex() {
-		return scanIndex;
-	}
-
-	public void setOffset(int offset) {
-		this.offset = offset;
-	}
-
-	public int getOffset() {
-		return offset;
 	}
 
 	public void setLast(boolean last) {
