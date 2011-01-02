@@ -6,29 +6,16 @@ import java.util.List;
 import java.util.Map;
 
 public class StringToken extends ExpressionToken {
+	private final String format;
 
-	public static AbstractToken parse(String compoundExpression) {
-		if (compoundExpression.contains(";")) {
-			final int defaultStart = compoundExpression.indexOf(';');
-			final String formatName = compoundExpression
-					.substring(defaultStart + 1);
-			final String expression = compoundExpression.substring(0,
-					defaultStart);
-			return new StringToken(expression, formatName);
-		}
-		return new StringToken(compoundExpression, null);
-	}
-
-	private final String formatName;
-
-	public StringToken(String expression, String formatName) {
+	public StringToken(String expression, String format) {
 		super(expression);
-		this.formatName = formatName;
+		this.format = format;
 	}
 
 	public StringToken(StringToken stringToken) {
 		super(stringToken);
-		this.formatName = stringToken.formatName;
+		this.format = stringToken.format;
 	}
 
 	@Override
@@ -58,10 +45,9 @@ public class StringToken extends ExpressionToken {
 		if (value == null) {
 			string = "";
 		} else {
-			Renderer rendererForClass = engine.rendererForClass(value
-					.getClass());
-			if (rendererForClass != null) {
-				string = rendererForClass.render(value, formatName);
+			final String rendereredValue = engine.render(value.getClass(), value, format);
+			if (rendereredValue != null) {
+				string = rendereredValue;
 			} else if (value instanceof String) {
 				string = (String) value;
 			} else {

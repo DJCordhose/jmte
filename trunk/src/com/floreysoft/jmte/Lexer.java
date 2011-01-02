@@ -1,5 +1,7 @@
 package com.floreysoft.jmte;
 
+import java.util.List;
+
 public class Lexer {
 
 	public Token nextToken(final String sourceName, final char[] template,
@@ -25,9 +27,13 @@ public class Lexer {
 			return new StringToken("", null);
 		}
 
-		// LENGTH 1
+		// be sure to use the raw input as we might have to preserve
+		// whitespace for prefix and postfix
+		final List<String> strings = Util.splitEscaped(untrimmedInput, ';',
+				2);
+		// LENGTH 1 OR special formatting input is present
 
-		if (split.length == 1) {
+		if (split.length == 1 || strings.size() == 2) {
 			final String objectExpression = split[0];
 			// ${
 			// } which might be used for silent line breaks
@@ -41,17 +47,35 @@ public class Lexer {
 			if (cmd.equalsIgnoreCase(EndToken.END)) {
 				return new EndToken();
 			}
-			// be sure to use the raw input as we might have to preserve whitespace for prefix and postfix
-			AbstractToken stringToken = WrappedDefaultStringToken.parse(untrimmedInput);
-			if (stringToken != null) {
+
+			final String complexVariable = strings.get(0);
+			final String format = strings.size() == 2 ? strings.get(1) : null;
+
+			final List<String> wrappedStrings = Util.splitEscaped(
+					complexVariable, ',', 3);
+			final String completeDefaultString = (wrappedStrings.size() == 3 ? wrappedStrings
+					.get(1)
+					: complexVariable).trim();
+			final List<String> defaultStrings = Util.carveOut(
+					completeDefaultString, "(", ")", '\\');
+
+			final String variable = defaultStrings.get(0);
+			final StringToken stringToken = new StringToken(variable, format);
+			final DefaultStringToken defaultStringToken = defaultStrings.size() == 2 ? new DefaultStringToken(
+					stringToken, defaultStrings.get(1))
+					: null;
+			final WrappedDefaultStringToken wrappedDefaultStringToken = wrappedStrings
+					.size() == 3 ? new WrappedDefaultStringToken(wrappedStrings
+					.get(0), wrappedStrings.get(2),
+					defaultStringToken != null ? defaultStringToken
+							: stringToken) : null;
+			if (wrappedDefaultStringToken != null) {
+				return wrappedDefaultStringToken;
+			} else if (defaultStringToken != null) {
+				return defaultStringToken;
+			} else {
 				return stringToken;
 			}
-			stringToken = DefaultStringToken.parse(objectExpression);
-			if (stringToken != null) {
-				return stringToken;
-			}
-			stringToken = StringToken.parse(objectExpression);
-			return stringToken;
 		}
 
 		// LENGTH 2..n
@@ -62,7 +86,8 @@ public class Lexer {
 		if (cmd.equalsIgnoreCase(IfToken.IF)) {
 			final boolean negated;
 			final String ifExpression;
-			// TODO: Both '!' and '=' work only if there are no white space separators
+			// TODO: Both '!' and '=' work only if there are no white space
+			// separators
 			if (objectExpression.startsWith("!")) {
 				negated = true;
 				ifExpression = objectExpression.substring(1);

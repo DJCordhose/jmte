@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.floreysoft.jmte.Engine.StartEndPair;
+
 /**
  * Assorted static utility methods.
  * 
@@ -284,17 +286,87 @@ public class Util {
 		return null;
 	}
 
+	static List<String> serializePairs(String input, List<StartEndPair> pairs,
+			String splitStart, String splitEnd) {
+		final int splitStartLength = splitStart.length();
+		final int splitEndLength = splitEnd.length();
+		final List<String> segmentList = new ArrayList<String>();
+		final char[] inputChars = input.toCharArray();
+
+		int offset = 0;
+
+		for (StartEndPair startEndPair : pairs) {
+			int lengthOfTextBeforePairStart = startEndPair.start
+					- splitStartLength - offset;
+			if (lengthOfTextBeforePairStart != 0) {
+				segmentList.add(new String(inputChars, offset,
+						lengthOfTextBeforePairStart));
+			}
+			segmentList.add(new String(inputChars, startEndPair.start,
+					startEndPair.end - startEndPair.start));
+			offset = startEndPair.end + splitEndLength;
+
+		}
+
+		// do not forget to add the final chunk of pure text (might be the
+		// only
+		// chunk indeed)
+		int remainingChars = input.length() - offset;
+		if (remainingChars != 0) {
+			segmentList.add(new String(inputChars, offset,
+					remainingChars));
+
+		}
+		
+		return segmentList;
+	}
+
+	static List<StartEndPair> scan(String input, String splitStart,
+			String splitEnd, boolean useEscaping) {
+		List<StartEndPair> result = new ArrayList<StartEndPair>();
+		int fromIndex = 0;
+		while (true) {
+			int exprStart = input.indexOf(splitStart, fromIndex);
+			if (exprStart == -1) {
+				break;
+			}
+			if (useEscaping && Util.isEscaped(input, exprStart)) {
+				fromIndex = exprStart + splitStart.length();
+				continue;
+			}
+
+			exprStart += splitStart.length();
+			int exprEnd = input.indexOf(splitEnd, exprStart);
+			if (exprEnd == -1) {
+				break;
+			}
+			while (useEscaping && Util.isEscaped(input, exprEnd)) {
+				exprEnd = input.indexOf(splitEnd, exprEnd + splitEnd.length());
+			}
+
+			fromIndex = exprEnd + splitEnd.length();
+
+			StartEndPair startEndPair = new StartEndPair(exprStart, exprEnd);
+			result.add(startEndPair);
+		}
+		return result;
+	}
+
 	/**
 	 * A character is escaped when it is preceded by an unescaped slash.
 	 */
 	static boolean isEscaped(String input, int index) {
+		return isEscaped(input, index, '\\');
+	}
+
+	static boolean isEscaped(String input, int index, char escapeCharacter) {
 		boolean escaped;
 		int leftOfIndex = index - 1;
 		if (leftOfIndex >= 0) {
-			if (input.charAt(leftOfIndex) == '\\') {
+			if (input.charAt(leftOfIndex) == escapeCharacter) {
 				int leftOfleftOfIndex = leftOfIndex - 1;
 				escaped = leftOfleftOfIndex < 0
-						|| input.charAt(leftOfleftOfIndex) != '\\';
+						|| input.charAt(leftOfleftOfIndex) != escapeCharacter;
 			} else {
 				escaped = false;
 			}
@@ -317,33 +389,49 @@ public class Util {
 		return unescaped;
 	}
 
-	static String[] splitEscaped(String input, char splitCharacter,
-			char escapeCharacter) {
-		final String[] segments;
-		if (input.indexOf(escapeCharacter) == -1) {
-			// there is no escaping, so we simply take the simple
-			// regex-splitting
-			segments = input.split("\\" + splitCharacter);
-		} else {
-			final char[] chars = input.toCharArray();
-			final List<String> segmentList = new ArrayList<String>();
-			int latestSplitIndex = 0;
-			for (int i = 0; i < chars.length; i++) {
-				char c = chars[i];
-				if (c == splitCharacter && !isEscaped(input, i)) {
-					final String segment = Util.unescape(new String(chars,
-							latestSplitIndex, i - latestSplitIndex));
-					segmentList.add(segment);
-					latestSplitIndex = i + 1;
-				}
-			}
-			final String finalSegment = Util.unescape(new String(chars,
-					latestSplitIndex, chars.length - latestSplitIndex));
-			segmentList.add(finalSegment);
+	/**
+	 * Carves out the (TODO:largest possible) segment framed by the carve
+	 * characters and returns it preceded by the non-framed part.
+	 */
+	static List<String> carveOut(String input, String splitStart,
+			String splitEnd, char escapeCharacter) {
+		List<StartEndPair> pairs = Util.scan(input, splitStart,
+				splitEnd, true);
+		List<String> serializePairs = Util.serializePairs(input, pairs, splitStart, splitEnd);
+		return serializePairs;
+	}
 
-			segments = new String[segmentList.size()];
-			segmentList.toArray(segments);
+	static List<String> splitEscaped(String input, char splitCharacter) {
+		return splitEscaped(input, splitCharacter, '\\', Integer.MAX_VALUE);
+	}
+
+	static List<String> splitEscaped(String input, char splitCharacter,
+			int maxSegments) {
+		return splitEscaped(input, splitCharacter, '\\', maxSegments);
+	}
+
+	static List<String> splitEscaped(String input, char splitCharacter,
+			char escapeCharacter, int maxSegments) {
+		final char[] chars = input.toCharArray();
+		final List<String> segmentList = new ArrayList<String>();
+		int latestSplitIndex = 0;
+		for (int i = 0; i < chars.length; i++) {
+			if (segmentList.size() + 1 >= maxSegments) {
+				break;
+			}
+			char c = chars[i];
+			if (c == splitCharacter && !isEscaped(input, i)) {
+				final String segment = Util.unescape(new String(chars,
+						latestSplitIndex, i - latestSplitIndex));
+				segmentList.add(segment);
+				latestSplitIndex = i + 1;
+			}
 		}
-		return segments;
+
+		final String finalSegment = Util.unescape(new String(chars,
+				latestSplitIndex, chars.length - latestSplitIndex));
+		segmentList.add(finalSegment);
+
+		return segmentList;
 	}
 }

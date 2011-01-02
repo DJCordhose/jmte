@@ -3,22 +3,6 @@ package com.floreysoft.jmte;
 import java.util.Map;
 
 public class DefaultStringToken extends StringToken {
-	
-	public static AbstractToken parse(String expression) {
-		if (expression.contains("(")) {
-			final int defaultStart = expression.indexOf('(');
-			final int defaultEnd = expression.indexOf(')');
-			if (defaultEnd == -1 || defaultStart > defaultEnd) {
-				return new InvalidToken();
-			}
-			final String defaultValue = expression.substring(defaultStart + 1, defaultEnd);
-			final String variable = expression.substring(0, defaultStart);
-			StringToken stringToken = (StringToken) StringToken.parse(variable);
-			return new DefaultStringToken(stringToken, defaultValue);
-		}
-		return null;
-	}
-	
 	private final String defaultValue;
 	
 	public DefaultStringToken(StringToken stringToken, String defaultValue) {
