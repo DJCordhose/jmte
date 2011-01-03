@@ -253,7 +253,7 @@ public final class Engine {
 	public Engine() {
 	}
 
-	public Engine withSourceName(String sourceName) {
+	public Engine setSourceName(String sourceName) {
 		this.sourceName = sourceName;
 		return this;
 	}
@@ -262,7 +262,6 @@ public final class Engine {
 	 * * @param useEscaping tells the method whether to use (<code>true</code>)
 	 * or ignore escape character \\
 	 * 
-	 * @return
 	 */
 	public Engine useEscaping(boolean useEscaping) {
 		this.useEscaping = useEscaping;
@@ -431,13 +430,9 @@ public final class Engine {
 	 *            the input
 	 * @return the begin/end pairs telling you where expressions can be found
 	 */
-	public List<StartEndPair> scan(String input) {
+	List<StartEndPair> scan(String input) {
 		return Util.scan(input, getExprStartToken(), getExprEndToken(),
 				useEscaping);
-	}
-
-	public String emitToken(Token token) {
-		return getExprStartToken() + token.getText() + getExprEndToken();
 	}
 
 	/**
@@ -446,18 +441,18 @@ public final class Engine {
 	 * @param errorHandler
 	 *            the new error handler
 	 */
-	public Engine withErrorHandler(ErrorHandler errorHandler) {
+	public Engine setErrorHandler(ErrorHandler errorHandler) {
 		this.errorHandler = errorHandler;
 		this.errorHandler.withLocale(locale);
 		return this;
 	}
 
-	public <C> Engine withRenderer(Class<C> clazz, Renderer<C> renderer) {
+	public <C> Engine addRenderer(Class<C> clazz, Renderer<C> renderer) {
 		renderers.put(clazz, renderer);
 		return this;
 	}
 
-	public Engine withoutRenderer(Class<?> clazz) {
+	public Engine removeRenderer(Class<?> clazz) {
 		renderers.remove(clazz);
 		return this;
 	}
@@ -499,12 +494,12 @@ public final class Engine {
 		return result;
 	}
 
-	public Engine withListener(ProcessListener listener) {
+	public Engine addProcessListener(ProcessListener listener) {
 		listeners.add(listener);
 		return this;
 	}
 
-	public Engine withoutListener(ProcessListener listener) {
+	public Engine removeProcessListener(ProcessListener listener) {
 		listeners.remove(listener);
 		return this;
 	}
@@ -532,17 +527,17 @@ public final class Engine {
 		return exprEndToken;
 	}
 
-	public Engine withExprStartToken(String exprStartToken) {
+	public Engine setExprStartToken(String exprStartToken) {
 		this.exprStartToken = exprStartToken;
 		return this;
 	}
 
-	public Engine withExprEndToken(String exprEndToken) {
+	public Engine setExprEndToken(String exprEndToken) {
 		this.exprEndToken = exprEndToken;
 		return this;
 	}
 
-	public Engine withExpansionSizeFactor(double expansionSizeFactor) {
+	public Engine setExpansionSizeFactor(double expansionSizeFactor) {
 		this.expansionSizeFactor = expansionSizeFactor;
 		return this;
 	}
@@ -551,7 +546,7 @@ public final class Engine {
 		return expansionSizeFactor;
 	}
 
-	public Engine withLocale(Locale locale) {
+	public Engine setLocale(Locale locale) {
 		this.locale = locale;
 		if (this.errorHandler != null) {
 			this.errorHandler.withLocale(locale);

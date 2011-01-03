@@ -94,7 +94,7 @@ public class ResourceBundleMessage implements Message {
 		final String locationTemplate = getTemplate(messages, locationCode, "");
 		final String messageTemplate = getTemplate(messages, messageCode, "");
 		
-		Engine engine = new Engine().withErrorHandler(new InternalErrorHandler());
+		Engine engine = new Engine().setErrorHandler(new InternalErrorHandler());
 		argumentModel.put("prefix", engine.transform(prefixTemplate, argumentModel));
 		argumentModel.put("location", engine.transform(locationTemplate, argumentModel));
 		argumentModel.put("message", engine.transform(messageTemplate, argumentModel));
@@ -114,7 +114,7 @@ public class ResourceBundleMessage implements Message {
 		final ResourceBundle messages = ResourceBundle.getBundle(baseName, locale);
 		final String messageTemplate = getTemplate(messages, messageCode, "");
 		
-		Engine engine = new Engine().withErrorHandler(new InternalErrorHandler());
+		Engine engine = new Engine().setErrorHandler(new InternalErrorHandler());
 		String transformed = engine.transform(messageTemplate, argumentModel);
 		return transformed;
 	}
