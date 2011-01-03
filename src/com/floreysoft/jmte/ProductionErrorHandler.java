@@ -28,7 +28,7 @@ public class ProductionErrorHandler implements ErrorHandler {
 	}
 	
 	@Override
-	public ErrorHandler withLocale(Locale locale) {
+	public ErrorHandler setLocale(Locale locale) {
 		this.locale = locale;
 		return this;
 	}

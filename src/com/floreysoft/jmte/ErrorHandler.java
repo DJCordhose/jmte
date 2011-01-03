@@ -26,6 +26,6 @@ public interface ErrorHandler {
 	public void error(String messageKey, Token token,
 			Map<String, Object> parameters) throws ParseException;
 	public void error(String messageKey, Token token) throws ParseException;
-	public ErrorHandler withLocale(Locale locale);
+	public ErrorHandler setLocale(Locale locale);
 
 }

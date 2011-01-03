@@ -443,7 +443,7 @@ public final class Engine {
 	 */
 	public Engine setErrorHandler(ErrorHandler errorHandler) {
 		this.errorHandler = errorHandler;
-		this.errorHandler.withLocale(locale);
+		this.errorHandler.setLocale(locale);
 		return this;
 	}
 
@@ -549,7 +549,7 @@ public final class Engine {
 	public Engine setLocale(Locale locale) {
 		this.locale = locale;
 		if (this.errorHandler != null) {
-			this.errorHandler.withLocale(locale);
+			this.errorHandler.setLocale(locale);
 		}
 		return this;
 	}
