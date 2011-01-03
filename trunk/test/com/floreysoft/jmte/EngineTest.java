@@ -758,13 +758,13 @@ public final class EngineTest {
 	}
 
 	private final static Engine ENGINE_WITH_SPECIAL_RENDERERS = new Engine()
-			.withRenderer(Object.class, new Renderer<Object>() {
+			.addRenderer(Object.class, new Renderer<Object>() {
 
 				@Override
 				public String render(Object o, String format) {
 					return o.toString() + "(" + format + ")";
 				}
-			}).withRenderer(MyBean.class, new Renderer<MyBean>() {
+			}).addRenderer(MyBean.class, new Renderer<MyBean>() {
 
 				@Override
 				public String render(MyBean o, String format) {
