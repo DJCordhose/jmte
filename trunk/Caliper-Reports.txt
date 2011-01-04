@@ -1,0 +1,12 @@
+03.01.2011
+==========
+              benchmark      ns logarithmic runtime
+ StringBuilderReference   452,3 ===========
+  StringConcatReference   419,0 ===========
+        PrintfReference  3052,9 ==================
+             Expression 27318,1 =========================
+      NativeIfReference    23,4 =
+                     If 56660,2 ============================
+ NativeForeachReference   337,5 ==========
+                Foreach 63719,5 ============================
+               Renderer 88577,5 ==============================
