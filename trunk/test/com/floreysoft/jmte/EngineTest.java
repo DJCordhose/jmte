@@ -1,6 +1,5 @@
 package com.floreysoft.jmte;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -21,6 +20,9 @@ import com.floreysoft.jmte.Engine.StartEndPair;
 
 @SuppressWarnings("unchecked")
 public final class EngineTest {
+
+	private static final MyBean MyBean1 = new MyBean("1.1", "1.2");
+	private static final MyBean MyBean2 = new MyBean("2.1", "2.2");
 
 	private static class MyIterable implements Iterable {
 		List<Object> list = new ArrayList<Object>();
@@ -84,14 +86,14 @@ public final class EngineTest {
 
 	private final static List<MyBean> LIST = new ArrayList<MyBean>();
 	static {
-		LIST.add(new MyBean("1.1", "1.2"));
-		LIST.add(new MyBean("2.1", "2.2"));
+		LIST.add(MyBean1);
+		LIST.add(MyBean2);
 	}
 
 	private final static MyBean[] ARRAY = new MyBean[2];
 	static {
-		ARRAY[0] = new MyBean("1.1", "1.2");
-		ARRAY[1] = new MyBean("2.1", "2.2");
+		ARRAY[0] = MyBean1;
+		ARRAY[1] = MyBean2;
 	}
 
 	private final static int[] INT_ARRAY = { 1, 2 };
@@ -108,7 +110,7 @@ public final class EngineTest {
 
 	private final static String[] STRINGS = { "String1", "String2", "String3" };
 
-	private final static Map<String, Object> DEFAULT_MODEL = new HashMap<String, Object>();
+	final static Map<String, Object> DEFAULT_MODEL = new HashMap<String, Object>();
 	static {
 		DEFAULT_MODEL.put("something", "something");
 		DEFAULT_MODEL.put("address", "Fillbert");
@@ -656,6 +658,15 @@ public final class EngineTest {
 						DEFAULT_MODEL);
 		assertEquals("1.1, 1.2\n" + "2.1, 2.2\n", output);
 		assertNull(DEFAULT_MODEL.get("item"));
+	}
+
+	@Test
+	public void elseInForeach() throws Exception {
+		String output = new Engine()
+				.transform(
+						"${foreach strings string , }${if string=String1}nada${else}nüscht${end}${end}",
+						DEFAULT_MODEL);
+		assertEquals("nada, nüscht, nüscht", output);
 	}
 
 	@Test

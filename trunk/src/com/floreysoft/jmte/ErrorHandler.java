@@ -19,9 +19,9 @@ public interface ErrorHandler {
 	 * @param messageKey
 	 *            key for the error message
 	 * @param token
-	 *            the token this error occured on
+	 *            the token this error occurred on
 	 * @param parameters
-	 *            additionl parameters to be filled into message or <code>null</<code> if you do not have additional parameters
+	 *            additional parameters to be filled into message or <code>null</<code> if you do not have additional parameters
 	 */
 	public void error(String messageKey, Token token,
 			Map<String, Object> parameters) throws ParseException;
