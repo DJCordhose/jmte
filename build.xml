@@ -157,17 +157,33 @@
 
   <!-- 
   ===================================================================
-  Do JUnit tests
+  Do tests
   =================================================================== 
   -->
   
-  <target name="test" depends="build"  description="Exectutes JUnit tests">
+  <target name="test" depends="build" description="Exectutes JUnit tests">
     <mkdir dir="${tmp.dir}"/>
     <junit printsummary="yes" haltonfailure="yes">
       <classpath refid="classpath" />
       <formatter type="plain" />
       <test name="${test.class}" haltonfailure="yes" todir="${tmp.dir}"/>
      </junit>
+  </target>
+
+  <target name="caliper" depends="build" description="Exectutes Caliper MicroBenchmark tests">
+    <mkdir dir="${tmp.dir}"/>
+    <java classname="com.google.caliper.Runner" dir="${tmp.dir}" fork="true">
+    	<!--
+     <arg value="- -measureMemory"/>
+     <arg value="- -saveResults"/>
+     <arg value="${tmp.dir}"/>
+    	-->
+     <arg value="com.floreysoft.jmte.CaliperTest.PortfolioBenchmark"/>
+     <classpath>
+       <path refid="classpath"/>
+       <pathelement path="${build.dir}"/>
+     </classpath>
+    </java>
   </target>
 
 </project>

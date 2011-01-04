@@ -6,7 +6,6 @@ public class ElseToken extends AbstractToken {
 	public static final String ELSE = "else";
 
 	protected IfToken ifToken = null;
-	protected transient Object evaluated = null;
 
 	public ElseToken() {
 	}
@@ -32,10 +31,7 @@ public class ElseToken extends AbstractToken {
 
 	@Override
 	public Object evaluate(Engine engine, Map<String, Object> model, ErrorHandler errorHandler) {
-		if (evaluated != null) {
-			return evaluated;
-		}
-		evaluated = !(Boolean) getIfToken().evaluate(engine, model, errorHandler);
+		Boolean evaluated = !(Boolean) getIfToken().evaluate(engine, model, errorHandler);
 		return evaluated;
 	}
 
