@@ -56,8 +56,8 @@ public class Lexer {
 			final String completeDefaultString = (wrappedStrings.size() == 3 ? wrappedStrings
 					.get(1)
 					: complexVariable).trim();
-			final List<String> defaultStrings = Util.carveOut(
-					completeDefaultString, "(", ")", '\\');
+			final List<String> defaultStrings = Util.MINI_PARSER.carveOut(
+					completeDefaultString, "(", ")");
 
 			final String variable = defaultStrings.get(0);
 			final StringToken stringToken = new StringToken(variable, format);
