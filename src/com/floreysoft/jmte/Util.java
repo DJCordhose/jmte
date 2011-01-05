@@ -34,7 +34,8 @@ import com.floreysoft.jmte.Engine.StartEndPair;
  * 
  */
 public class Util {
-	private static final String EVIL_HACKY_DOUBLE_BACKSLASH_PLACEHOLDER = "EVIL_HACKY_DOUBLE_BACKSLASH_PLACEHOLDER";
+
+	final static MiniParser MINI_PARSER = new MiniParser();
 
 	/**
 	 * Writes a string into a file.
@@ -313,11 +314,10 @@ public class Util {
 		// chunk indeed)
 		int remainingChars = input.length() - offset;
 		if (remainingChars != 0) {
-			segmentList.add(new String(inputChars, offset,
-					remainingChars));
+			segmentList.add(new String(inputChars, offset, remainingChars));
 
 		}
-		
+
 		return segmentList;
 	}
 
@@ -380,13 +380,26 @@ public class Util {
 	 * Removes slashes meant as escape characters (while preserving escaped
 	 * slashes).
 	 */
-	static String unescape(String input) {
-		String unescaped = input.replaceAll("\\\\\\\\",
-				EVIL_HACKY_DOUBLE_BACKSLASH_PLACEHOLDER);
-		unescaped = unescaped.replaceAll("\\\\", "");
-		unescaped = unescaped.replaceAll(
-				EVIL_HACKY_DOUBLE_BACKSLASH_PLACEHOLDER, "\\\\");
-		return unescaped;
+	static String unescape(final String input) {
+		return unescape(input, MiniParser.DEFAULT_ESCAPE_CHAR);
+	}
+
+	static String unescape(final String input, final char escapeCharacter) {
+		final StringBuilder unescaped = new StringBuilder();
+		boolean escaped = false;
+		for (int i = 0; i < input.length(); i++) {
+			char c = input.charAt(i);
+			if (c == escapeCharacter) {
+				if (escaped) {
+					unescaped.append(c);
+				}
+				escaped = !escaped;
+			} else {
+				unescaped.append(c);
+				escaped = false;
+			}
+		}
+		return unescaped.toString();
 	}
 
 	/**
@@ -395,43 +408,17 @@ public class Util {
 	 */
 	static List<String> carveOut(String input, String splitStart,
 			String splitEnd, char escapeCharacter) {
-		List<StartEndPair> pairs = Util.scan(input, splitStart,
-				splitEnd, true);
-		List<String> serializePairs = Util.serializePairs(input, pairs, splitStart, splitEnd);
+		List<StartEndPair> pairs = Util.scan(input, splitStart, splitEnd, true);
+		List<String> serializePairs = Util.serializePairs(input, pairs,
+				splitStart, splitEnd);
 		return serializePairs;
 	}
 
-	static List<String> splitEscaped(String input, char splitCharacter) {
-		return splitEscaped(input, splitCharacter, '\\', Integer.MAX_VALUE);
-	}
-
-	static List<String> splitEscaped(String input, char splitCharacter,
-			int maxSegments) {
-		return splitEscaped(input, splitCharacter, '\\', maxSegments);
-	}
-
-	static List<String> splitEscaped(String input, char splitCharacter,
-			char escapeCharacter, int maxSegments) {
-		final char[] chars = input.toCharArray();
-		final List<String> segmentList = new ArrayList<String>();
-		int latestSplitIndex = 0;
-		for (int i = 0; i < chars.length; i++) {
-			if (segmentList.size() + 1 >= maxSegments) {
-				break;
-			}
-			char c = chars[i];
-			if (c == splitCharacter && !isEscaped(input, i)) {
-				final String segment = Util.unescape(new String(chars,
-						latestSplitIndex, i - latestSplitIndex));
-				segmentList.add(segment);
-				latestSplitIndex = i + 1;
-			}
-		}
-
-		final String finalSegment = Util.unescape(new String(chars,
-				latestSplitIndex, chars.length - latestSplitIndex));
-		segmentList.add(finalSegment);
-
-		return segmentList;
+	static List<String> carveOut(String input, String splitStart,
+			String splitEnd, char escapeCharacter, boolean greedy) {
+		List<StartEndPair> pairs = Util.scan(input, splitStart, splitEnd, true);
+		List<String> serializePairs = Util.serializePairs(input, pairs,
+				splitStart, splitEnd);
+		return serializePairs;
 	}
 }

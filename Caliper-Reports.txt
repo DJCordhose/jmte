@@ -10,3 +10,18 @@
  NativeForeachReference   337,5 ==========
                 Foreach 63719,5 ============================
                Renderer 88577,5 ==============================
+
+05.01.2011, after performance refactoring (no more regexp)
+==========================================================
+
+                             benchmark      ns logarithmic runtime
+                StringBuilderReference   458,2 =============
+                 StringConcatReference   409,7 ============
+                       PrintfReference  2771,9 ====================
+                            Expression  7613,2 ========================
+                     NativeIfReference    22,7 =
+                                    If 15772,6 ===========================
+                NativeForeachReference   335,4 ===========
+ NativeForeachNoStringBuilderReference   546,7 =============
+                              Foreach  24307,2 =============================
+                              Renderer 28773,4 ==============================
