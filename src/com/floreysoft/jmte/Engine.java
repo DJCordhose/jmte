@@ -240,7 +240,6 @@ public final class Engine {
 	private ErrorHandler errorHandler = new DefaultErrorHandler();
 	private Locale locale = new Locale("en");
 	private String sourceName = null;
-	private boolean useEscaping = true;
 	private final Map<Class<?>, Renderer<?>> renderers = new HashMap<Class<?>, Renderer<?>>();
 	private final List<ProcessListener> listeners = new ArrayList<ProcessListener>();
 
@@ -259,16 +258,6 @@ public final class Engine {
 	}
 
 	/**
-	 * * @param useEscaping tells the method whether to use (<code>true</code>)
-	 * or ignore escape character \\
-	 * 
-	 */
-	public Engine useEscaping(boolean useEscaping) {
-		this.useEscaping = useEscaping;
-		return this;
-	}
-
-	/**
 	 * Transforms a template into an expanded output using the given model.
 	 * 
 	 * @param template
@@ -282,12 +271,8 @@ public final class Engine {
 		ScopedMap scopedMap = new ScopedMap(model);
 		String transformed = transformPure(sourceName, template, scan,
 				scopedMap);
-		if (!useEscaping) {
-			return transformed;
-		} else {
-			String unescaped = Util.unescape(transformed);
-			return unescaped;
-		}
+		String unescaped = Util.unescape(transformed);
+		return unescaped;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -352,7 +337,8 @@ public final class Engine {
 				} else if (poppedToken instanceof ForEachToken) {
 					ForEachToken feToken = (ForEachToken) poppedToken;
 					if (feToken.iterator().hasNext()) {
-						// for each iteration we need to rewind to the beginning of the for loop
+						// for each iteration we need to rewind to the beginning
+						// of the for loop
 						tokenStream.rewind(feToken);
 						Object value = feToken.iterator().next();
 						model.put(feToken.getVarName(), value);
@@ -431,8 +417,7 @@ public final class Engine {
 	 * @return the begin/end pairs telling you where expressions can be found
 	 */
 	List<StartEndPair> scan(String input) {
-		return Util.scan(input, getExprStartToken(), getExprEndToken(),
-				useEscaping);
+		return Util.scan(input, getExprStartToken(), getExprEndToken(), true);
 	}
 
 	/**

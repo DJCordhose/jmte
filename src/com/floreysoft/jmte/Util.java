@@ -287,40 +287,6 @@ public class Util {
 		return null;
 	}
 
-	static List<String> serializePairs(String input, List<StartEndPair> pairs,
-			String splitStart, String splitEnd) {
-		final int splitStartLength = splitStart.length();
-		final int splitEndLength = splitEnd.length();
-		final List<String> segmentList = new ArrayList<String>();
-		final char[] inputChars = input.toCharArray();
-
-		int offset = 0;
-
-		for (StartEndPair startEndPair : pairs) {
-			int lengthOfTextBeforePairStart = startEndPair.start
-					- splitStartLength - offset;
-			if (lengthOfTextBeforePairStart != 0) {
-				segmentList.add(new String(inputChars, offset,
-						lengthOfTextBeforePairStart));
-			}
-			segmentList.add(new String(inputChars, startEndPair.start,
-					startEndPair.end - startEndPair.start));
-			offset = startEndPair.end + splitEndLength;
-
-		}
-
-		// do not forget to add the final chunk of pure text (might be the
-		// only
-		// chunk indeed)
-		int remainingChars = input.length() - offset;
-		if (remainingChars != 0) {
-			segmentList.add(new String(inputChars, offset, remainingChars));
-
-		}
-
-		return segmentList;
-	}
-
 	static List<StartEndPair> scan(String input, String splitStart,
 			String splitEnd, boolean useEscaping) {
 		List<StartEndPair> result = new ArrayList<StartEndPair>();
@@ -400,25 +366,5 @@ public class Util {
 			}
 		}
 		return unescaped.toString();
-	}
-
-	/**
-	 * Carves out the (TODO:largest possible) segment framed by the carve
-	 * characters and returns it preceded by the non-framed part.
-	 */
-	static List<String> carveOut(String input, String splitStart,
-			String splitEnd, char escapeCharacter) {
-		List<StartEndPair> pairs = Util.scan(input, splitStart, splitEnd, true);
-		List<String> serializePairs = Util.serializePairs(input, pairs,
-				splitStart, splitEnd);
-		return serializePairs;
-	}
-
-	static List<String> carveOut(String input, String splitStart,
-			String splitEnd, char escapeCharacter, boolean greedy) {
-		List<StartEndPair> pairs = Util.scan(input, splitStart, splitEnd, true);
-		List<String> serializePairs = Util.serializePairs(input, pairs,
-				splitStart, splitEnd);
-		return serializePairs;
 	}
 }

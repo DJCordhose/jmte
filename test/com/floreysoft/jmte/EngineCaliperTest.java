@@ -9,7 +9,7 @@ import java.util.List;
 import com.floreysoft.jmte.EngineTest.MyBean;
 import com.google.caliper.SimpleBenchmark;
 
-public class CaliperTest {
+public class EngineCaliperTest {
 
 	/**
 	 * Tests a selection of scripts supposed to be the most frequently used

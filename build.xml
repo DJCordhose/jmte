@@ -173,12 +173,14 @@
   <target name="caliper" depends="build" description="Exectutes Caliper MicroBenchmark tests">
     <mkdir dir="${tmp.dir}"/>
     <java classname="com.google.caliper.Runner" dir="${tmp.dir}" fork="true">
-    	<!--
-     <arg value="- -measureMemory"/>
-     <arg value="- -saveResults"/>
-     <arg value="${tmp.dir}"/>
-    	-->
-     <arg value="com.floreysoft.jmte.CaliperTest.PortfolioBenchmark"/>
+     <arg value="com.floreysoft.jmte.EngineCaliperTest.PortfolioBenchmark"/>
+     <classpath>
+       <path refid="classpath"/>
+       <pathelement path="${build.dir}"/>
+     </classpath>
+    </java>
+    <java classname="com.google.caliper.Runner" dir="${tmp.dir}" fork="true">
+     <arg value="com.floreysoft.jmte.MiniParserCaliperTest.PortfolioBenchmark"/>
      <classpath>
        <path refid="classpath"/>
        <pathelement path="${build.dir}"/>

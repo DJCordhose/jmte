@@ -696,13 +696,6 @@ public final class EngineTest {
 	}
 
 	@Test
-	public void escapingDeactivated() throws Exception {
-		String output = new Engine().useEscaping(false).transform(
-				"\\${address}\n\\}", DEFAULT_MODEL);
-		assertEquals("\\Fillbert\n\\}", output);
-	}
-
-	@Test
 	public void escapingKernel() throws Exception {
 		String output = Util.unescape("\\${\\}\n\\\\}");
 		assertEquals("${}\n\\}", output);
