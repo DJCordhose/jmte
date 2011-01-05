@@ -29,8 +29,8 @@ public class Lexer {
 
 		// be sure to use the raw input as we might have to preserve
 		// whitespace for prefix and postfix
-		final List<String> strings = Util.splitEscaped(untrimmedInput, ';',
-				2);
+		final List<String> strings = Util.MINI_PARSER.split(untrimmedInput,
+				';', 2);
 		// LENGTH 1 OR special formatting input is present
 
 		if (split.length == 1 || strings.size() == 2) {
@@ -51,7 +51,7 @@ public class Lexer {
 			final String complexVariable = strings.get(0);
 			final String format = strings.size() == 2 ? strings.get(1) : null;
 
-			final List<String> wrappedStrings = Util.splitEscaped(
+			final List<String> wrappedStrings = Util.MINI_PARSER.split(
 					complexVariable, ',', 3);
 			final String completeDefaultString = (wrappedStrings.size() == 3 ? wrappedStrings
 					.get(1)
