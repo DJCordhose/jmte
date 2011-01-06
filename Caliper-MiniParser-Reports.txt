@@ -8,10 +8,12 @@
 06.01.2011
 ==========
               benchmark   ns logarithmic runtime
- RegexpReplaceReference 1288 =========================
+ RegexpReplaceReference 1283 =====================
    CharReplaceReference  106 =
-                Replace  720 ====================
-   RegexpSplitReference 1921 ==============================
-                  Split 1001 =======================
-               SplitSet 1275 =========================
+                Replace  713 ================
+   RegexpSplitReference 1920 ========================
+                  Split 1049 ===================
+               SplitSet 1267 =====================
+ RegexpWSSplitReference 3629 ==============================
+                WSSplit  512 =============
                 

@@ -20,6 +20,7 @@ import org.junit.Test;
 import com.floreysoft.jmte.Engine.StartEndPair;
 
 public final class MiniParserTest {
+	static final String WS_SPLIT_STRING = " a  \t\n  \r b c";
 	static final String SPLIT_STRING = "1, \n adsdsdsdsd, \t5454545,\"67676,\\\"3434\"";
 	MiniParser miniParser = MiniParser.defaultInstance();
 	MiniParser trimmedMiniParser = MiniParser.trimmedInstance();
@@ -176,6 +177,17 @@ public final class MiniParserTest {
 		assertEquals("adsdsdsdsd", segments.get(1));
 		assertEquals("5454545", segments.get(2));
 		assertEquals("67676,\"3434", segments.get(3));
+	}
+	
+	@Test
+	public void splitOnWhitespace() throws Exception {
+		String input = WS_SPLIT_STRING;
+		List<String> segments = miniParser.splitOnWhitespace(input);
+		assertEquals(4, segments.size());
+		assertEquals("", segments.get(0));
+		assertEquals("a", segments.get(1));
+		assertEquals("b", segments.get(2));
+		assertEquals("c", segments.get(3));
 	}
 	
 }
