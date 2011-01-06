@@ -697,7 +697,7 @@ public final class EngineTest {
 
 	@Test
 	public void escapingKernel() throws Exception {
-		String output = Util.unescape("\\${\\}\n\\\\}");
+		String output = Util.MINI_PARSER.unescape("\\${\\}\n\\\\}");
 		assertEquals("${}\n\\}", output);
 	}
 

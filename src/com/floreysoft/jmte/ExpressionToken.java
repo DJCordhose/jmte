@@ -89,7 +89,7 @@ public abstract class ExpressionToken extends AbstractToken {
 	public void setExpression(String expression) {
 		this.text = null;
 		this.segments = Util.MINI_PARSER.split(expression, '.');
-		this.expression = Util.unescape(expression);
+		this.expression = Util.MINI_PARSER.unescape(expression);
 	}
 
 	public String getExpression() {
