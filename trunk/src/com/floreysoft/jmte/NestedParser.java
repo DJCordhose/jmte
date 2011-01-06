@@ -5,6 +5,32 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Mini parser for mini DSL stuff. Use it when you do not want 
+ * <ul>
+ * <li>a full parser, as it would be overkill
+ * <li>to code by hand it in an ad-hoc way, as you have done this wrong too many times (just think about escaping and quoting)
+ * <li>built-in regexp , as it is too slow and you actually do not quite up to it (true for me)
+ * </ul>
+ * 
+ * <p>This is a fast, simple parser that takes input and a single, global hierarchy of operators and spits out "AST" implemented as nested Lists.</p>
+ * <pre>
+ * String input = "string(maxLength=10, trim, uppercase)";
+ * String[] operators = { "()", ",", "=" }; // in order of precedence, can be pair of start/end or single char separator
+ * List<Object> parse = new NestedParser().parse(input, operators);
+ * System.out.println(parse);
+ * 
+ * Output =>
+ * 
+ * [string, [[maxLength, 10], trim, uppercase]]
+ * 
+ * TODO: Possible extensions could be
+ * <ul>
+ * <li>a hierarchy of operators (not a list, but a tree) to parser even more complicated inputs
+ * <li>Panic mode calling a user specified callback for further processing when either less or more segments as expected are found in a split
+ * </ul>
+ * 
+ */
 public class NestedParser {
 	MiniParser miniParser = MiniParser.rawOutputInstance();
 	MiniParser innerMiniParser = MiniParser.trimmedInstance();
