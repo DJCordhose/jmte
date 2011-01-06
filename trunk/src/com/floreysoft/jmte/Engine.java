@@ -271,7 +271,7 @@ public final class Engine {
 		ScopedMap scopedMap = new ScopedMap(model);
 		String transformed = transformPure(sourceName, template, scan,
 				scopedMap);
-		String unescaped = Util.unescape(transformed);
+		String unescaped = Util.MINI_PARSER.unescape(transformed);
 		return unescaped;
 	}
 

@@ -341,30 +341,4 @@ public class Util {
 		}
 		return escaped;
 	}
-
-	/**
-	 * Removes slashes meant as escape characters (while preserving escaped
-	 * slashes).
-	 */
-	static String unescape(final String input) {
-		return unescape(input, MiniParser.DEFAULT_ESCAPE_CHAR);
-	}
-
-	static String unescape(final String input, final char escapeCharacter) {
-		final StringBuilder unescaped = new StringBuilder();
-		boolean escaped = false;
-		for (int i = 0; i < input.length(); i++) {
-			char c = input.charAt(i);
-			if (c == escapeCharacter) {
-				if (escaped) {
-					unescaped.append(c);
-				}
-				escaped = !escaped;
-			} else {
-				unescaped.append(c);
-				escaped = false;
-			}
-		}
-		return unescaped.toString();
-	}
 }

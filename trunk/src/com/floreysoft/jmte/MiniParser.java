@@ -171,6 +171,15 @@ final class MiniParser {
 		}
 	}
 
+	public String unescape(final String input) {
+		final StringBuilder unescaped = new StringBuilder();
+		for (int i = 0; i < input.length(); i++) {
+			final char c = input.charAt(i);
+			append(unescaped, c);
+		}
+		return unescaped.toString();
+	}
+
 	// the heart of it all
 	private void append(StringBuilder buffer, char c) {
 		if (c == escapeChar) {
