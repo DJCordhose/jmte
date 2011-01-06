@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.floreysoft.jmte.Engine.StartEndPair;
@@ -25,6 +26,9 @@ public final class MiniParserTest {
 	MiniParser miniParser = MiniParser.defaultInstance();
 	MiniParser trimmedMiniParser = MiniParser.trimmedInstance();
 	MiniParser miniParserIgnoreCase = MiniParser.ignoreCaseInstance();
+	MiniParser rawMiniParser = MiniParser.rawOutputInstance();
+
+	NestedParser nestedParser = new NestedParser();
 
 	@Test
 	public void replaceSimple() throws Exception {
@@ -170,6 +174,7 @@ public final class MiniParserTest {
 
 	@Test
 	public void split() throws Exception {
+		// "1, \n adsdsdsdsd, \t5454545,\"67676,\\\"3434\"";
 		String input = SPLIT_STRING;
 		List<String> segments = trimmedMiniParser.split(input, ',');
 		assertEquals(4, segments.size());
@@ -178,7 +183,15 @@ public final class MiniParserTest {
 		assertEquals("5454545", segments.get(2));
 		assertEquals("67676,\"3434", segments.get(3));
 	}
-	
+
+	@Test
+	public void rawSplit() throws Exception {
+		// "1, \n adsdsdsdsd, \t5454545,\"67676,\\\"3434\"";
+		String input = SPLIT_STRING;
+		List<String> segments = rawMiniParser.split(input, ',');
+		assertEquals("\"67676,\\\"3434\"", segments.get(3));
+	}
+
 	@Test
 	public void splitOnWhitespace() throws Exception {
 		String input = WS_SPLIT_STRING;
@@ -189,5 +202,42 @@ public final class MiniParserTest {
 		assertEquals("b", segments.get(2));
 		assertEquals("c", segments.get(3));
 	}
-	
+
+	@Test
+	public void nestedParser() throws Exception {
+		String input = "string=unparsed,unprocessed(maxLength=10, trim, uppercase)";
+		String[] operators = { "()", ",", "=" };
+
+		List<Object> parsed = nestedParser.parse(input, Arrays
+				.asList(operators));
+		assertEquals(2, parsed.size());
+
+		String functionName = (String) parsed.get(0);
+		assertEquals("string=unparsed,unprocessed", functionName);
+
+		List<Object> params = (List<Object>) parsed.get(1);
+		assertEquals(3, params.size());
+
+		List<Object> nameValueParam = (List<Object>) params.get(0);
+		assertEquals(2, nameValueParam.size());
+		String maxLengthParam = (String) nameValueParam.get(0);
+		assertEquals("maxLength", maxLengthParam);
+		String maxLengthValue = (String) nameValueParam.get(1);
+		assertEquals("10", maxLengthValue);
+
+		String trimParam = (String) params.get(1);
+		assertEquals("trim", trimParam);
+		String uppercaseParam = (String) params.get(2);
+		assertEquals("uppercase", uppercaseParam);
+
+	}
+
+	public static void main(String[] args) {
+		List<Object> parse = new NestedParser().parse(
+				"string,cool(maxLength=10, trim(10), uppercase)", new String[] {
+						"()", ",", "=", "()" });
+		System.out.println(parse);
+
+	}
+
 }
