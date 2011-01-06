@@ -16,37 +16,43 @@ final class MiniParser {
 
 	public static MiniParser defaultInstance() {
 		return new MiniParser(DEFAULT_ESCAPE_CHAR, DEFAULT_QUOTE_CHAR, false,
-				false);
+				false, false);
 	}
 
 	public static MiniParser trimmedInstance() {
 		return new MiniParser(DEFAULT_ESCAPE_CHAR, DEFAULT_QUOTE_CHAR, false,
-				true);
+				true, false);
 	}
 
 	public static MiniParser ignoreCaseInstance() {
 		return new MiniParser(DEFAULT_ESCAPE_CHAR, DEFAULT_QUOTE_CHAR, true,
-				false);
+				false, false);
 	}
 
-	public static MiniParser rawInstance() {
-		return new MiniParser((char) -1, (char) -1, false, false);
+	public static MiniParser fullRawInstance() {
+		return new MiniParser((char) -1, (char) -1, false, false, true);
+	}
+
+	public static MiniParser rawOutputInstance() {
+		return new MiniParser(DEFAULT_ESCAPE_CHAR, DEFAULT_QUOTE_CHAR, false, false, true);
 	}
 
 	private final char escapeChar;
 	private final char quoteChar;
 	private final boolean ignoreCase;
 	private final boolean trim;
+	private final boolean rawOutput;
 
 	private transient boolean escaped = false;
 	private transient boolean quoted = false;
 
 	public MiniParser(final char escapeChar, final char quoteChar,
-			final boolean ignoreCase, final boolean trim) {
+			final boolean ignoreCase, final boolean trim, final boolean rawOutput) {
 		this.escapeChar = escapeChar;
 		this.quoteChar = quoteChar;
 		this.ignoreCase = ignoreCase;
 		this.trim = trim;
+		this.rawOutput = rawOutput;
 	}
 
 	public String replace(final String input, final String oldString,
@@ -234,7 +240,7 @@ final class MiniParser {
 	// the heart of it all
 	private void append(StringBuilder buffer, char c) {
 		if (c == escapeChar) {
-			if (escaped) {
+			if (escaped || rawOutput) {
 				buffer.append(c);
 			}
 			escaped = !escaped;
@@ -244,6 +250,9 @@ final class MiniParser {
 				escaped = false;
 			} else {
 				quoted = !quoted;
+				if (rawOutput) {
+					buffer.append(c);
+				}
 			}
 		} else {
 			buffer.append(c);
