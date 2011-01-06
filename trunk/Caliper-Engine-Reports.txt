@@ -25,3 +25,16 @@
  NativeForeachNoStringBuilderReference   546,7 =============
                               Foreach  24307,2 =============================
                               Renderer 28773,4 ==============================
+
+06.01.2011, after more performance refactoring on WS split
+==========================================================
+                StringBuilderReference   450,3 ==============
+                 StringConcatReference   404,8 =============
+                       PrintfReference  2789,4 ======================
+                            Expression  5894,7 =========================
+                     NativeIfReference    22,5 =
+                                    If  8686,7 ==========================
+                NativeForeachReference   336,1 ============
+ NativeForeachNoStringBuilderReference   543,4 ==============
+                               Foreach 15493,3 =============================
+                              Renderer 17295,8 =============================

@@ -29,6 +29,10 @@ final class MiniParser {
 				false);
 	}
 
+	public static MiniParser rawInstance() {
+		return new MiniParser((char) -1, (char) -1, false, false);
+	}
+
 	private final char escapeChar;
 	private final char quoteChar;
 	private final boolean ignoreCase;
@@ -76,29 +80,7 @@ final class MiniParser {
 
 	public List<String> split(final String input, final char separator,
 			final int maxSegments) {
-		try {
-			final List<String> segments = new ArrayList<String>();
-			StringBuilder buffer = new StringBuilder();
-
-			for (int index = 0; index < input.length(); index++) {
-				final char c = input.charAt(index);
-				// in case we are not already in the last segment and there is
-				// an
-				// unsecaped, unquoted separator, this segment is now done
-				if (segments.size() != maxSegments - 1 && c == separator
-						&& !isEscaped()) {
-					finish(segments, buffer);
-					buffer = new StringBuilder();
-				} else {
-					append(buffer, c);
-				}
-			}
-			finish(segments, buffer);
-			return segments;
-		} finally {
-			escaped = false;
-			quoted = false;
-		}
+		return splitInternal(input, false, separator, null, maxSegments);
 	}
 
 	public List<String> split(final String input, final String separatorSet) {
@@ -107,24 +89,59 @@ final class MiniParser {
 
 	public List<String> split(final String input, final String separatorSet,
 			final int maxSegments) {
+		return splitInternal(input, false, (char) -1, separatorSet, maxSegments);
+	}
+
+	public List<String> splitOnWhitespace(final String input,
+			final int maxSegments) {
+		return splitInternal(input, true, (char) -1, null, maxSegments);
+	}
+
+	public List<String> splitOnWhitespace(final String input) {
+		return splitOnWhitespace(input, Integer.MAX_VALUE);
+	}
+
+	// Common implementation for single char separator and string set separator.
+	// Has the benefit of shared code and caliper mini benchmarks showed no
+	// measurable performance penalty for additional check which separator to
+	// use
+	private List<String> splitInternal(final String input,
+			final boolean splitOnWhitespace, final char separator,
+			final String separatorSet, final int maxSegments) {
 		try {
 			final List<String> segments = new ArrayList<String>();
 			StringBuilder buffer = new StringBuilder();
 
 			for (int index = 0; index < input.length(); index++) {
 				final char c = input.charAt(index);
+				boolean separatedByWhitespace = false;
+				if (splitOnWhitespace) {
+					for (; index < input.length()
+							&& Character.isWhitespace(input.charAt(index)); index++) {
+						separatedByWhitespace = true;
+					}
+					if (separatedByWhitespace) {
+						index--;
+					}
+				}
+
+				final boolean separates = separatedByWhitespace
+						|| (separatorSet != null ? separatorSet.indexOf(c) != -1
+								: c == separator);
 				// in case we are not already in the last segment and there is
 				// an
 				// unsecaped, unquoted separator, this segment is now done
-				if (segments.size() != maxSegments - 1
-						&& separatorSet.indexOf(c) != -1 && !isEscaped()) {
+				if (segments.size() != maxSegments - 1 && separates
+						&& !isEscaped()) {
 					finish(segments, buffer);
 					buffer = new StringBuilder();
 				} else {
 					append(buffer, c);
 				}
 			}
-			finish(segments, buffer);
+			if (!splitOnWhitespace || buffer.length() != 0) {
+				finish(segments, buffer);
+			}
 			return segments;
 		} finally {
 			escaped = false;

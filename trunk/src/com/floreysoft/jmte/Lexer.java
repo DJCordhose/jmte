@@ -4,8 +4,8 @@ import java.util.List;
 
 public class Lexer {
 
-	public AbstractToken nextToken(final String sourceName, final char[] template,
-			final int start, final int end) {
+	public AbstractToken nextToken(final String sourceName,
+			final char[] template, final int start, final int end) {
 		String input = new String(template, start, end - start);
 
 		AbstractToken token = innerNextToken(input);
@@ -18,11 +18,11 @@ public class Lexer {
 
 	private AbstractToken innerNextToken(final String untrimmedInput) {
 		final String input = Util.trimFront(untrimmedInput);
-		final String[] split = input.split("( |\t|\r|\n)+");
-
+		final List<String> split = Util.RAW_MINI_PARSER.splitOnWhitespace(input);
+		
 		// LENGTH 0
 
-		if (split.length == 0) {
+		if (split.size() == 0) {
 			// empty expression like ${}
 			return new StringToken("", null);
 		}
@@ -33,8 +33,8 @@ public class Lexer {
 				';', 2);
 		// LENGTH 1 OR special formatting input is present
 
-		if (split.length == 1 || strings.size() == 2) {
-			final String objectExpression = split[0];
+		if (split.size() == 1 || strings.size() == 2) {
+			final String objectExpression = split.get(0);
 			// ${
 			// } which might be used for silent line breaks
 			if (objectExpression.equals("")) {
@@ -80,8 +80,8 @@ public class Lexer {
 
 		// LENGTH 2..n
 
-		final String cmd = split[0];
-		final String objectExpression = split[1];
+		final String cmd = split.get(0);
+		final String objectExpression = split.get(1);
 
 		if (cmd.equalsIgnoreCase(IfToken.IF)) {
 			final boolean negated;
@@ -109,7 +109,7 @@ public class Lexer {
 			}
 		}
 		if (cmd.equalsIgnoreCase(ForEachToken.FOREACH)) {
-			final String varName = split[2];
+			final String varName = split.get(2);
 			// we might also have
 			// separator
 			// data

@@ -164,7 +164,7 @@ public final class EngineTest {
 
 		String output = new Engine()
 				.transform(
-						"${if http://www\\.google\\.com/m8/feeds/groups/daniel\\.florey%40gmail\\.com/base/16e7715c8a9e5849}works${end}",
+						"${if http://www\\.google\\.com/m8/feeds/groups/daniel\\.florey%40gmail\\.com/base/16e7715c8a9e5849}works${else}does not work${end}",
 						simpleModel);
 		assertEquals("works", output);
 	}
