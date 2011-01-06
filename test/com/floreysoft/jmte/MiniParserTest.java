@@ -20,7 +20,9 @@ import org.junit.Test;
 import com.floreysoft.jmte.Engine.StartEndPair;
 
 public final class MiniParserTest {
+	static final String SPLIT_STRING = "1, \n adsdsdsdsd, \t5454545,\"67676,\\\"3434\"";
 	MiniParser miniParser = MiniParser.defaultInstance();
+	MiniParser trimmedMiniParser = MiniParser.trimmedInstance();
 	MiniParser miniParserIgnoreCase = MiniParser.ignoreCaseInstance();
 
 	@Test
@@ -165,4 +167,15 @@ public final class MiniParserTest {
 		assertEquals(" postfix", segments.get(4));
 	}
 
+	@Test
+	public void split() throws Exception {
+		String input = SPLIT_STRING;
+		List<String> segments = trimmedMiniParser.split(input, ',');
+		assertEquals(4, segments.size());
+		assertEquals("1", segments.get(0));
+		assertEquals("adsdsdsdsd", segments.get(1));
+		assertEquals("5454545", segments.get(2));
+		assertEquals("67676,\"3434", segments.get(3));
+	}
+	
 }

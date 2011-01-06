@@ -35,7 +35,7 @@ import com.floreysoft.jmte.Engine.StartEndPair;
  */
 public class Util {
 
-	final static MiniParser MINI_PARSER = new MiniParser();
+	final static MiniParser MINI_PARSER = MiniParser.defaultInstance();
 
 	/**
 	 * Writes a string into a file.

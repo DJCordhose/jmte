@@ -432,12 +432,17 @@ public final class Engine {
 		return this;
 	}
 
-	public <C> Engine addRenderer(Class<C> clazz, Renderer<C> renderer) {
+	public Engine registerNamedRenderer(String name, NamedRenderer<?> renderer) {
+		// TODO
+		return this;
+	}
+	
+	public <C> Engine registerRenderer(Class<C> clazz, Renderer<C> renderer) {
 		renderers.put(clazz, renderer);
 		return this;
 	}
 
-	public Engine removeRenderer(Class<?> clazz) {
+	public Engine unregisterRenderer(Class<?> clazz) {
 		renderers.remove(clazz);
 		return this;
 	}

@@ -4,3 +4,14 @@
  RegexpReplaceReference 1298 ==============================
    CharReplaceReference  107 =
                 Replace  682 ======================
+
+06.01.2011
+==========
+              benchmark   ns logarithmic runtime
+ RegexpReplaceReference 1288 =========================
+   CharReplaceReference  106 =
+                Replace  720 ====================
+   RegexpSplitReference 1921 ==============================
+                  Split 1001 =======================
+               SplitSet 1275 =========================
+                
