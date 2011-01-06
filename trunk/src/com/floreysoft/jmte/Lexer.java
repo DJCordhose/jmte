@@ -4,7 +4,7 @@ import java.util.List;
 
 public class Lexer {
 
-	public Token nextToken(final String sourceName, final char[] template,
+	public AbstractToken nextToken(final String sourceName, final char[] template,
 			final int start, final int end) {
 		String input = new String(template, start, end - start);
 

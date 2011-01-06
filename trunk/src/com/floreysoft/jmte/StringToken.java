@@ -19,11 +19,6 @@ public class StringToken extends ExpressionToken {
 	}
 
 	@Override
-	public Token dup() {
-		return new StringToken(this);
-	}
-
-	@Override
 	public String getText() {
 		if (text == null) {
 			text = getExpression();

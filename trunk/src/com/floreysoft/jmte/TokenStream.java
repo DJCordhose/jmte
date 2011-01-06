@@ -27,22 +27,25 @@ public class TokenStream {
 		this.splitEnd = splitEnd;
 	}
 
-	public List<Token> allTokens() {
-		final List<Token> tokens = new ArrayList<Token>();
+	private void fillTokens() {
+		this.tokens = new ArrayList<Token>();
 		final char[] inputChars = input.toCharArray();
 		int offset = 0;
+		int index = 0;
 		for (StartEndPair startEndPair : scan) {
 			int plainTextLengthBeforeNextToken = startEndPair.start
 					- splitStart.length() - offset;
 			if (plainTextLengthBeforeNextToken != 0) {
-				Token token = new PlainTextToken(new String(inputChars, offset,
-						plainTextLengthBeforeNextToken));
+				AbstractToken token = new PlainTextToken(new String(inputChars,
+						offset, plainTextLengthBeforeNextToken));
+				token.setTokenIndex(index++);
 				tokens.add(token);
 			}
 			offset = startEndPair.end + splitEnd.length();
 
-			Token token = lexer.nextToken(sourceName, inputChars,
+			AbstractToken token = lexer.nextToken(sourceName, inputChars,
 					startEndPair.start, startEndPair.end);
+			token.setTokenIndex(index++);
 			tokens.add(token);
 		}
 
@@ -51,16 +54,16 @@ public class TokenStream {
 		// chunk indeed)
 		int remainingChars = input.length() - offset;
 		if (remainingChars != 0) {
-			Token token = new PlainTextToken(new String(inputChars, offset,
-					remainingChars));
+			AbstractToken token = new PlainTextToken(new String(inputChars,
+					offset, remainingChars));
+			token.setTokenIndex(index++);
 			tokens.add(token);
 		}
-		return tokens;
 	}
 
 	private void initTokens() {
 		if (this.tokens == null) {
-			this.tokens = allTokens();
+			fillTokens();
 			this.currentTokenIndex = 0;
 		}
 	}
@@ -76,11 +79,6 @@ public class TokenStream {
 
 	public void rewind(Token tokenToRewindTo) {
 		initTokens();
-		for (int index = 0; index < this.tokens.size(); index++) {
-			Token token = this.tokens.get(index);
-			if (token == tokenToRewindTo) {
-				this.currentTokenIndex = index + 1;
-			}
-		}
+		this.currentTokenIndex = tokenToRewindTo.getTokenIndex() + 1;
 	}
 }

@@ -15,22 +15,12 @@ public class IfToken extends ExpressionToken {
 		this.negated = negated;
 	}
 
-	public IfToken(IfToken ifToken) {
-		super(ifToken);
-		this.negated = ifToken.negated;
-	}
-
 	@Override
 	public String getText() {
 		if (text == null) {
 			text = IF + " " + getExpression();
 		}
 		return text;
-	}
-
-	@Override
-	public Token dup() {
-		return new IfToken(this);
 	}
 
 	public boolean isNegated() {

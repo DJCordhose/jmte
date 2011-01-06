@@ -23,23 +23,12 @@ public class ForEachToken extends ExpressionToken {
 		this.separator = separator;
 	}
 
-	public ForEachToken(ForEachToken forEachToken) {
-		super(forEachToken);
-		this.varName = forEachToken.varName;
-		this.separator = forEachToken.separator;
-	}
-
 	@Override
 	public String getText() {
 		if (text == null) {
 			text = FOREACH + " " + getExpression() + " " + varName + (separator == null ? "" : " " + separator);
 		}
 		return text;
-	}
-
-	@Override
-	public Token dup() {
-		return new ForEachToken(this);
 	}
 	
 	@Override

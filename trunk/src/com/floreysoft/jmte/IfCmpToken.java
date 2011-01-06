@@ -9,12 +9,6 @@ public class IfCmpToken extends IfToken {
 		super(expression, negated);
 		this.operand = operand;
 	}
-
-	public IfCmpToken(IfCmpToken ifToken) {
-		super(ifToken);
-		this.operand = ifToken.operand;
-	}
-
 	public String getOperand() {
 		return operand;
 	}
@@ -25,11 +19,6 @@ public class IfCmpToken extends IfToken {
 			text = String.format(IF+" %s='%s'", getExpression(), getOperand());
 		}
 		return text;
-	}
-
-	@Override
-	public Token dup() {
-		return new IfCmpToken(this);
 	}
 
 	@Override
