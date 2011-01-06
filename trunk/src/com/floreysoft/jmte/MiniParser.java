@@ -127,12 +127,12 @@ final class MiniParser {
 
 	}
 
-	public List<String> carveOut(final String input, final String splitStart,
+	public List<String> scan(final String input, final String splitStart,
 			final String splitEnd) {
-		return carveOut(input, splitStart, splitEnd, false);
+		return scan(input, splitStart, splitEnd, false);
 	}
 
-	public List<String> carveOut(final String input, final String splitStart,
+	public List<String> scan(final String input, final String splitStart,
 			final String splitEnd, boolean greedy) {
 		try {
 			final List<String> segments = new ArrayList<String>();
@@ -140,7 +140,6 @@ final class MiniParser {
 			boolean started = false;
 			int lastIndexOfEnd = greedy ? lastIndexOfEnd = lastIndexOf(input,
 					splitEnd) : -1;
-
 			char c;
 			int index = 0;
 			while (index < input.length()) {
@@ -170,6 +169,7 @@ final class MiniParser {
 			quoted = false;
 		}
 	}
+
 
 	public String unescape(final String input) {
 		final StringBuilder unescaped = new StringBuilder();
