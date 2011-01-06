@@ -233,9 +233,9 @@ public final class MiniParserTest {
 	}
 
 	public static void main(String[] args) {
-		List<Object> parse = new NestedParser().parse(
-				"string,cool(maxLength=10, trim(10), uppercase)", new String[] {
-						"()", ",", "=", "()" });
+		String input = "string=unparsed,unprocessed(maxLength=10, trim, uppercase)";
+		String[] operators = { "()", ",", "=" };
+		List<Object> parse = new NestedParser().parse(input, operators);
 		System.out.println(parse);
 
 	}
