@@ -31,7 +31,8 @@ public final class MiniParserTest {
 
 	@Test
 	public void replaceIgnorecase() throws Exception {
-		String output = miniParserIgnoreCase.replace("Input String", "str", "R");
+		String output = miniParserIgnoreCase
+				.replace("Input String", "str", "R");
 		assertEquals("Input Ring", output);
 	}
 
@@ -67,27 +68,27 @@ public final class MiniParserTest {
 	}
 
 	@Test
-	public void carveOutSimple() throws Exception {
+	public void scanSimple() throws Exception {
 		String input = "function(param1, param2)";
-		List<String> segments = miniParser.carveOut(input, "(", ")");
+		List<String> segments = miniParser.scan(input, "(", ")");
 		assertEquals(2, segments.size());
 		assertEquals("function", segments.get(0));
 		assertEquals("param1, param2", segments.get(1));
 	}
 
 	@Test
-	public void carveOutStringSeparator() throws Exception {
+	public void scanStringSeparator() throws Exception {
 		String input = "function${param1, param2}$";
-		List<String> segments = miniParser.carveOut(input, "${", "}$");
+		List<String> segments = miniParser.scan(input, "${", "}$");
 		assertEquals(2, segments.size());
 		assertEquals("function", segments.get(0));
 		assertEquals("param1, param2", segments.get(1));
 	}
 
 	@Test
-	public void carveOutSimpleRest() throws Exception {
+	public void scanSimpleRest() throws Exception {
 		String input = "function(param1, param2)rest";
-		List<String> segments = miniParser.carveOut(input, "(", ")");
+		List<String> segments = miniParser.scan(input, "(", ")");
 		assertEquals(3, segments.size());
 		assertEquals("function", segments.get(0));
 		assertEquals("param1, param2", segments.get(1));
@@ -95,36 +96,36 @@ public final class MiniParserTest {
 	}
 
 	@Test
-	public void carveOutEndBeforeStartMissingEnd() throws Exception {
+	public void scanEndBeforeStartMissingEnd() throws Exception {
 		String input = "function)(param1, param2";
-		List<String> segments = miniParser.carveOut(input, "(", ")");
+		List<String> segments = miniParser.scan(input, "(", ")");
 		assertEquals(2, segments.size());
 		assertEquals("function)", segments.get(0));
 		assertEquals("param1, param2", segments.get(1));
 	}
 
 	@Test
-	public void carveOutEscape() throws Exception {
+	public void scanEscape() throws Exception {
 		String input = "fun\\(ction\\)(param1, param2)";
-		List<String> segments = miniParser.carveOut(input, "(", ")");
+		List<String> segments = miniParser.scan(input, "(", ")");
 		assertEquals(2, segments.size());
 		assertEquals("fun(ction)", segments.get(0));
 		assertEquals("param1, param2", segments.get(1));
 	}
 
 	@Test
-	public void carveOutQuote() throws Exception {
+	public void scanQuote() throws Exception {
 		String input = "\"fun(ction)\"(param1, param2)";
-		List<String> segments = miniParser.carveOut(input, "(", ")");
+		List<String> segments = miniParser.scan(input, "(", ")");
 		assertEquals(2, segments.size());
 		assertEquals("fun(ction)", segments.get(0));
 		assertEquals("param1, param2", segments.get(1));
 	}
 
 	@Test
-	public void carveOutNonGreedy() throws Exception {
+	public void scanNonGreedy() throws Exception {
 		String input = "function(param1, param2(innerParam))";
-		List<String> segments = miniParser.carveOut(input, "(", ")");
+		List<String> segments = miniParser.scan(input, "(", ")");
 		assertEquals(3, segments.size());
 		assertEquals("function", segments.get(0));
 		assertEquals("param1, param2(innerParam", segments.get(1));
@@ -132,11 +133,36 @@ public final class MiniParserTest {
 	}
 
 	@Test
-	public void carveOutGreedy() throws Exception {
+	public void scanGreedy() throws Exception {
 		String input = "function(param1, param2(innerParam))";
-		List<String> segments = miniParser.carveOut(input, "(", ")", true);
+		List<String> segments = miniParser.scan(input, "(", ")", true);
 		assertEquals(2, segments.size());
 		assertEquals("function", segments.get(0));
 		assertEquals("param1, param2(innerParam)", segments.get(1));
 	}
+
+	@Test
+	public void scanLong() throws Exception {
+		String input = "prefix ${inner1} interlude ${inner2} postfix";
+		List<String> segments = miniParser.scan(input, "${", "}");
+		assertEquals(5, segments.size());
+		assertEquals("prefix ", segments.get(0));
+		assertEquals("inner1", segments.get(1));
+		assertEquals(" interlude ", segments.get(2));
+		assertEquals("inner2", segments.get(3));
+		assertEquals(" postfix", segments.get(4));
+	}
+
+	@Test
+	public void scanNoPrefix() throws Exception {
+		String input = "${inner1} interlude ${inner2} postfix";
+		List<String> segments = miniParser.scan(input, "${", "}");
+		assertEquals(5, segments.size());
+		assertEquals("", segments.get(0));
+		assertEquals("inner1", segments.get(1));
+		assertEquals(" interlude ", segments.get(2));
+		assertEquals("inner2", segments.get(3));
+		assertEquals(" postfix", segments.get(4));
+	}
+
 }
