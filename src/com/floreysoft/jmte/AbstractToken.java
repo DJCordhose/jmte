@@ -1,6 +1,5 @@
 package com.floreysoft.jmte;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +10,7 @@ public abstract class AbstractToken implements Token {
 	protected int line;
 	protected int column;
 	protected String sourceName;
+	private int tokenIndex;
 
 	public AbstractToken() {
 	}
@@ -20,17 +20,20 @@ public abstract class AbstractToken implements Token {
 		this.line = token.line;
 		this.column = token.column;
 		this.sourceName = token.sourceName;
+		this.setTokenIndex(token.getTokenIndex());
 	}
 
-	public AbstractToken(char[] buffer, int start, int end) {
-		this(null, buffer, start, end);
+	public AbstractToken(char[] buffer, int start, int end, int tokenIndex) {
+		this(null, buffer, start, end, tokenIndex);
 	}
 
-	public AbstractToken(String sourceName, char[] buffer, int start, int end) {
+	public AbstractToken(String sourceName, char[] buffer, int start, int end,
+			int tokenIndex) {
 		this.setSourceName(sourceName);
 		setText(buffer, start, end);
 		setLine(buffer, start, end);
 		setColumn(buffer, start, end);
+		this.setTokenIndex(tokenIndex);
 	}
 
 	public String getText() {
@@ -97,8 +100,6 @@ public abstract class AbstractToken implements Token {
 		return sourceName;
 	}
 
-	public abstract Token dup();
-	
 	public abstract Object evaluate(Engine engine, Map<String, Object> model,
 			ErrorHandler errorHandler);
 
@@ -154,6 +155,15 @@ public abstract class AbstractToken implements Token {
 			}
 		}
 		return result;
+	}
+
+	@Override
+	public int getTokenIndex() {
+		return tokenIndex;
+	}
+
+	public void setTokenIndex(int tokenIndex) {
+		this.tokenIndex = tokenIndex;
 	}
 
 }

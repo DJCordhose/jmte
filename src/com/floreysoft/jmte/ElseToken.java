@@ -7,14 +7,6 @@ public class ElseToken extends AbstractToken {
 
 	protected IfToken ifToken = null;
 
-	public ElseToken() {
-	}
-
-	public ElseToken(ElseToken elseToken) {
-		super(elseToken);
-		this.ifToken = elseToken.ifToken;
-	}
-
 	@Override
 	public String getText() {
 		if (text == null) {
@@ -22,11 +14,6 @@ public class ElseToken extends AbstractToken {
 					+ ")" : "";
 		}
 		return text;
-	}
-
-	@Override
-	public Token dup() {
-		return new ElseToken(this);
 	}
 
 	@Override

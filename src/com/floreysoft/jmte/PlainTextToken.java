@@ -12,11 +12,6 @@ public class PlainTextToken extends AbstractToken {
 	}
 
 	@Override
-	public Token dup() {
-		return new PlainTextToken(this);
-	}
-
-	@Override
 	public Object evaluate(Engine engine, Map<String, Object> model, ErrorHandler errorHandler) {
 		return getText();
 	}

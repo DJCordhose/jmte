@@ -41,11 +41,6 @@ public class WrappedDefaultStringToken extends StringToken {
 	}
 
 	@Override
-	public Token dup() {
-		return new WrappedDefaultStringToken(this);
-	}
-
-	@Override
 	public Object evaluate(Engine engine, Map<String, Object> model, ErrorHandler errorHandler) {
 
 		Object evaluated = getPrefix() + inner.evaluate(engine, model, errorHandler)

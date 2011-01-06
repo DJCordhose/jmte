@@ -8,15 +8,6 @@ public class EmptyForEachToken extends AbstractToken {
 		this.text = text;
 	}
 
-	public EmptyForEachToken(EmptyForEachToken fixedValueToken) {
-		super(fixedValueToken);
-	}
-
-	@Override
-	public Token dup() {
-		return new EmptyForEachToken(this);
-	}
-
 	@Override
 	public Object evaluate(Engine engine, Map<String, Object> model, ErrorHandler errorHandler) {
 		return false;

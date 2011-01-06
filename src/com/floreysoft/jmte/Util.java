@@ -322,7 +322,7 @@ public class Util {
 	 * A character is escaped when it is preceded by an unescaped slash.
 	 */
 	static boolean isEscaped(String input, int index) {
-		return isEscaped(input, index, '\\');
+		return isEscaped(input, index, MiniParser.DEFAULT_ESCAPE_CHAR);
 	}
 
 	static boolean isEscaped(String input, int index, char escapeCharacter) {

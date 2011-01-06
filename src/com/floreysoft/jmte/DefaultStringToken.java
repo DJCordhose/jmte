@@ -10,22 +10,12 @@ public class DefaultStringToken extends StringToken {
 		this.defaultValue = defaultValue;
 	}
 
-	public DefaultStringToken(DefaultStringToken defaultToken) {
-		super(defaultToken);
-		this.defaultValue = defaultToken.defaultValue;
-	}
-
 	@Override
 	public String getText() {
 		if (text == null) {
 			text = String.format("%s(%s)", getExpression(), getDefaultValue());
 		}
 		return text;
-	}
-
-	@Override
-	public Token dup() {
-		return new DefaultStringToken(this);
 	}
 
 	@Override
