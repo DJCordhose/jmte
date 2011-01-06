@@ -11,10 +11,11 @@ public class MiniParserCaliperTest {
 	 * 
 	 */
 	public static class PortfolioBenchmark extends SimpleBenchmark {
-		MiniParser miniParser = new MiniParser();
+		MiniParser miniParser = MiniParser.defaultInstance();
 		String input = "Realisticly long string";
 		String oldString = "long";
 		String newString ="short";
+		String toSplit = "1,2,3,4,5,6,7,8";
 		
 		public void timeRegexpReplaceReference(int reps) throws Exception {
 			for (int i = 0; i < reps; i++) {
@@ -31,5 +32,23 @@ public class MiniParserCaliperTest {
 				miniParser.replace(input, oldString, newString);
 			}
 		}
+		
+		public void timeRegexpSplitReference(int reps) throws Exception {
+			for (int i = 0; i < reps; i++) {
+				MiniParserTest.SPLIT_STRING.split(",");
+			}
+		}
+		public void timeSplit(int reps) throws Exception {
+			for (int i = 0; i < reps; i++) {
+				miniParser.split(MiniParserTest.SPLIT_STRING, ',');
+			}
+		}
+		public void timeSplitSet(int reps) throws Exception {
+			for (int i = 0; i < reps; i++) {
+				miniParser.split(MiniParserTest.SPLIT_STRING, ",");
+			}
+		}
+		
+		
 	}
 }

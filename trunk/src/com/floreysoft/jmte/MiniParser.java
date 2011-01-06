@@ -11,34 +11,38 @@ import java.util.List;
  */
 final class MiniParser {
 
-	public final static char DEFAULT_SEPARATOR_CHAR = ',';
 	public final static char DEFAULT_ESCAPE_CHAR = '\\';
 	public final static char DEFAULT_QUOTE_CHAR = '"';
 
 	public static MiniParser defaultInstance() {
-		return new MiniParser();
+		return new MiniParser(DEFAULT_ESCAPE_CHAR, DEFAULT_QUOTE_CHAR, false,
+				false);
+	}
+
+	public static MiniParser trimmedInstance() {
+		return new MiniParser(DEFAULT_ESCAPE_CHAR, DEFAULT_QUOTE_CHAR, false,
+				true);
 	}
 
 	public static MiniParser ignoreCaseInstance() {
-		return new MiniParser(DEFAULT_ESCAPE_CHAR, DEFAULT_QUOTE_CHAR, true);
+		return new MiniParser(DEFAULT_ESCAPE_CHAR, DEFAULT_QUOTE_CHAR, true,
+				false);
 	}
 
 	private final char escapeChar;
 	private final char quoteChar;
 	private final boolean ignoreCase;
+	private final boolean trim;
 
 	private transient boolean escaped = false;
 	private transient boolean quoted = false;
 
-	public MiniParser() {
-		this(DEFAULT_ESCAPE_CHAR, DEFAULT_QUOTE_CHAR, false);
-	}
-
 	public MiniParser(final char escapeChar, final char quoteChar,
-			final boolean ignoreCase) {
+			final boolean ignoreCase, final boolean trim) {
 		this.escapeChar = escapeChar;
 		this.quoteChar = quoteChar;
 		this.ignoreCase = ignoreCase;
+		this.trim = trim;
 	}
 
 	public String replace(final String input, final String oldString,
@@ -66,10 +70,6 @@ final class MiniParser {
 		}
 	}
 
-	public List<String> split(final String input) {
-		return split(input, DEFAULT_SEPARATOR_CHAR, Integer.MAX_VALUE);
-	}
-
 	public List<String> split(final String input, final char separator) {
 		return split(input, separator, Integer.MAX_VALUE);
 	}
@@ -87,19 +87,54 @@ final class MiniParser {
 				// unsecaped, unquoted separator, this segment is now done
 				if (segments.size() != maxSegments - 1 && c == separator
 						&& !isEscaped()) {
-					segments.add(buffer.toString());
+					finish(segments, buffer);
 					buffer = new StringBuilder();
 				} else {
 					append(buffer, c);
 				}
 			}
-			// add trailing element to result
-			segments.add(buffer.toString());
+			finish(segments, buffer);
 			return segments;
 		} finally {
 			escaped = false;
 			quoted = false;
 		}
+	}
+
+	public List<String> split(final String input, final String separatorSet) {
+		return split(input, separatorSet, Integer.MAX_VALUE);
+	}
+
+	public List<String> split(final String input, final String separatorSet,
+			final int maxSegments) {
+		try {
+			final List<String> segments = new ArrayList<String>();
+			StringBuilder buffer = new StringBuilder();
+
+			for (int index = 0; index < input.length(); index++) {
+				final char c = input.charAt(index);
+				// in case we are not already in the last segment and there is
+				// an
+				// unsecaped, unquoted separator, this segment is now done
+				if (segments.size() != maxSegments - 1
+						&& separatorSet.indexOf(c) != -1 && !isEscaped()) {
+					finish(segments, buffer);
+					buffer = new StringBuilder();
+				} else {
+					append(buffer, c);
+				}
+			}
+			finish(segments, buffer);
+			return segments;
+		} finally {
+			escaped = false;
+			quoted = false;
+		}
+	}
+
+	private void finish(final List<String> segments, StringBuilder buffer) {
+		String string = buffer.toString();
+		segments.add(trim ? string.trim() : string);
 	}
 
 	public int lastIndexOf(final String input, final String substring) {
@@ -150,7 +185,7 @@ final class MiniParser {
 				if (input.regionMatches(ignoreCase, index, separator, 0,
 						separator.length())
 						&& !isEscaped() && greedyCond) {
-					segments.add(buffer.toString());
+					finish(segments, buffer);
 					buffer = new StringBuilder();
 					started = !started;
 					index += separator.length();
@@ -161,7 +196,7 @@ final class MiniParser {
 			}
 			// add trailing element to result
 			if (buffer.length() != 0) {
-				segments.add(buffer.toString());
+				finish(segments, buffer);
 			}
 			return segments;
 		} finally {
@@ -169,7 +204,6 @@ final class MiniParser {
 			quoted = false;
 		}
 	}
-
 
 	public String unescape(final String input) {
 		final StringBuilder unescaped = new StringBuilder();
@@ -188,7 +222,12 @@ final class MiniParser {
 			}
 			escaped = !escaped;
 		} else if (c == quoteChar) {
-			quoted = !quoted;
+			if (escaped) {
+				buffer.append(c);
+				escaped = false;
+			} else {
+				quoted = !quoted;
+			}
 		} else {
 			buffer.append(c);
 			escaped = false;
