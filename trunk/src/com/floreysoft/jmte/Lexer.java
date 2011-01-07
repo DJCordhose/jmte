@@ -61,8 +61,16 @@ public class Lexer {
 					completeDefaultString, "(", ")");
 
 			final String variable = defaultStrings.get(0);
-			// TODO separate format name from parameters and pass them individually
-			final StringToken stringToken = new StringToken(variable, format, null);
+
+			// separate renderer name from parameters and pass them individually
+			String rendererName = null;
+			String parameters = null;
+			if (format != null) {
+				List<String> scannedFormat = Util.MINI_PARSER.scan(format, "(", ")", true);
+				rendererName = scannedFormat.size() != 0 ? scannedFormat.get(0) : null;
+				parameters = scannedFormat.size() > 1 ? scannedFormat.get(1) : null;
+			}
+			final StringToken stringToken = new StringToken(variable, rendererName, parameters);
 			final DefaultStringToken defaultStringToken = defaultStrings.size() == 2 ? new DefaultStringToken(
 					stringToken, defaultStrings.get(1))
 					: null;

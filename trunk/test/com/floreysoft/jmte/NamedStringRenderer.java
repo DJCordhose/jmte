@@ -1,6 +1,5 @@
 package com.floreysoft.jmte;
 
-
 public class NamedStringRenderer implements NamedRenderer {
 
 	String convert(Object o) {
@@ -25,12 +24,12 @@ public class NamedStringRenderer implements NamedRenderer {
 			return o.toUpperCase();
 		}
 
-		return o;
+		return "String=" + o + "(" + parameters + ")";
 	}
 
 	@Override
 	public RenderFormatInfo getFormatInfo() {
-		return new OptionRenderFormatInfo(new String[] {"uppercase", ""});
+		return new OptionRenderFormatInfo(new String[] { "uppercase", "" });
 	}
 
 	@Override

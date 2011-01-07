@@ -40,6 +40,8 @@ public class Util {
 
 	final static MiniParser MINI_PARSER = MiniParser.defaultInstance();
 	final static MiniParser RAW_MINI_PARSER = MiniParser.fullRawInstance();
+	final static MiniParser NO_QUOTE_MINI_PARSER = new MiniParser(
+			MiniParser.DEFAULT_ESCAPE_CHAR, (char) -1, false, false, false);
 
 	/**
 	 * Writes a string into a file.
@@ -345,9 +347,10 @@ public class Util {
 		}
 		return escaped;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	static <T> Set<T> asSet(T... a) {
-		return a != null ? new HashSet(Arrays.asList(a)) : Collections.emptySet();
+		return a != null ? new HashSet(Arrays.asList(a)) : Collections
+				.emptySet();
 	}
 }

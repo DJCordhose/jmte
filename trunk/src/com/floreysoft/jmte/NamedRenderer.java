@@ -17,6 +17,6 @@ public interface NamedRenderer {
 
 	public RenderFormatInfo getFormatInfo();
 
-	public Class[] getSupportedClasses();
+	public Class<?>[] getSupportedClasses();
 
 }

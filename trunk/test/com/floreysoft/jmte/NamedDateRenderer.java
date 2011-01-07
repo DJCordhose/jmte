@@ -7,6 +7,7 @@ import java.util.Date;
 
 public class NamedDateRenderer implements NamedRenderer {
 
+	private static final String DEFAULT_PATTERN = "dd.MM.yyyy HH:mm:ss Z";
 	private final String regexPatternDescription = "Was weiß ich denn?";
 
 	Date convert(Object o, DateFormat dateFormat) {
@@ -42,8 +43,9 @@ public class NamedDateRenderer implements NamedRenderer {
 
 	@Override
 	public String render(Object o, String pattern) {
+		String patternToUse = pattern != null ? pattern : DEFAULT_PATTERN;
 		try {
-			DateFormat dateFormat =  new SimpleDateFormat(pattern);
+			DateFormat dateFormat =  new SimpleDateFormat(patternToUse);
 			Date value = convert(o, dateFormat);
 			if (value != null) {
 				String format = dateFormat.format(value);
