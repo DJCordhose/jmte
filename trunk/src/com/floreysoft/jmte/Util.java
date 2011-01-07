@@ -23,8 +23,11 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import com.floreysoft.jmte.Engine.StartEndPair;
@@ -341,5 +344,10 @@ public class Util {
 			escaped = false;
 		}
 		return escaped;
+	}
+	
+	@SuppressWarnings("unchecked")
+	static <T> Set<T> asSet(T... a) {
+		return a != null ? new HashSet(Arrays.asList(a)) : Collections.emptySet();
 	}
 }

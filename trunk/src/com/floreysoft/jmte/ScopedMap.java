@@ -50,7 +50,7 @@ class ScopedMap implements Map<String, Object> {
 	}
 
 	public void putAll(Map<? extends String, ? extends Object> m) {
-		getCurrentScope().putAll(m);
+		throw new UnsupportedOperationException();
 	}
 
 	public Object remove(Object key) {

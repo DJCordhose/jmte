@@ -1,6 +1,9 @@
 package com.floreysoft.jmte;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class StringToken extends ExpressionToken {
 	private final String namedRenderer;
@@ -27,6 +30,7 @@ public class StringToken extends ExpressionToken {
 		return text;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Object evaluate(Engine engine, Map<String, Object> model,
 			ErrorHandler errorHandler) {
@@ -38,11 +42,10 @@ public class StringToken extends ExpressionToken {
 		} else {
 			String namedRendererResult = null;
 			if (namedRenderer != null && !namedRenderer.equals("")) {
-				NamedRenderer<Object> rendererForName = engine
+				NamedRenderer rendererForName = engine
 						.resolveNamedRenderer(namedRenderer);
 				if (rendererForName != null) {
-					Object converted = rendererForName.convert(value);
-					namedRendererResult = rendererForName.render(converted,
+					namedRendererResult = rendererForName.render(value,
 							namedRendererParameters);
 				}
 			}
@@ -61,5 +64,4 @@ public class StringToken extends ExpressionToken {
 
 		return renderedResult;
 	}
-
 }
