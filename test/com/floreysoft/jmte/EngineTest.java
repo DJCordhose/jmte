@@ -135,6 +135,8 @@ public final class EngineTest {
 		DEFAULT_MODEL.put("emptyIterable", new MyIterable());
 		DEFAULT_MODEL.put("empty", "");
 		DEFAULT_MODEL.put("strings", STRINGS);
+		DEFAULT_MODEL.put("date", new Date(0));
+		DEFAULT_MODEL.put("int", 0);
 	}
 
 	@Test
@@ -746,6 +748,13 @@ public final class EngineTest {
 	}
 
 	@Test
+	public void quotes() throws Exception {
+		String output = new Engine()
+				.transform("\"${int}\" \\\"", DEFAULT_MODEL);
+		assertEquals("\"0\" \"", output);
+	}
+
+	@Test
 	public void stream2String() throws Exception {
 		String charsetName = "ISO-8859-15";
 		String input = "stream content";
@@ -796,7 +805,7 @@ public final class EngineTest {
 		assertEquals("arg2", output);
 	}
 
-	private final static Engine ENGINE_WITH_SPECIAL_RENDERERS = new Engine()
+	private final static Engine ENGINE_WITH_CUSTOM_RENDERERS = new Engine()
 			.registerRenderer(Object.class, new Renderer<Object>() {
 
 				@Override
@@ -812,71 +821,82 @@ public final class EngineTest {
 
 			});
 
-	private final static Engine ENGINE_WITH_NAMED_RENDERERS = ENGINE_WITH_SPECIAL_RENDERERS
-			.registerNamedRenderer(new NamedDateRenderer())
-			.registerNamedRenderer(new NamedStringRenderer());
-
 	@Test
 	public void renderer() throws Exception {
-		String output = ENGINE_WITH_SPECIAL_RENDERERS
+		String output = ENGINE_WITH_CUSTOM_RENDERERS
 				.transform(
 						"${bean} and ${bean;long} and ${address;this is the format(no matter what I type; - this is part of the format)}",
 						DEFAULT_MODEL);
 		assertEquals(
 				"Render=propertyValue1 and Render=propertyValue1 and Object=Fillbert",
 				output);
-		Map<Class<?>, Renderer<?>> resolvedRendererCache = ENGINE_WITH_SPECIAL_RENDERERS.resolvedRendererCache;
-		// one for MyBean, one for Object and one for String
-		assertEquals(3, resolvedRendererCache.size());
-	}
-
-	@Test
-	public void namedRendererRegistry() throws Exception {
-		NamedRenderer stringRenderer = ENGINE_WITH_NAMED_RENDERERS.resolveNamedRenderer("string");
-		assertNotNull(stringRenderer);
-		RenderFormatInfo formatInfo = stringRenderer.getFormatInfo();
-		assertTrue(formatInfo instanceof OptionRenderFormatInfo);
-		OptionRenderFormatInfo optionRenderInfo = (OptionRenderFormatInfo) formatInfo;
-		assertArrayEquals(new String[] {"uppercase", ""}, optionRenderInfo.getOptions());
-		
-		NamedRenderer dateRenderer = ENGINE_WITH_NAMED_RENDERERS.resolveNamedRenderer("date");
-		assertNotNull(dateRenderer);
-		
-		Collection<NamedRenderer> allNamedRenderers = ENGINE_WITH_NAMED_RENDERERS.getAllNamedRenderers();
-		assertEquals(2, allNamedRenderers.size());
-		
-		Collection<NamedRenderer> compatibleRenderers2 = ENGINE_WITH_NAMED_RENDERERS.getCompatibleRenderers(Long.class);
-		assertEquals(1, compatibleRenderers2.size());
-		
-		Collection<NamedRenderer> compatibleRenderers1 = ENGINE_WITH_NAMED_RENDERERS.getCompatibleRenderers(Number.class);
-		assertEquals(2, compatibleRenderers1.size());
-		
-		Collection<NamedRenderer> compatibleRenderers3 = ENGINE_WITH_NAMED_RENDERERS.getCompatibleRenderers(Boolean.class);
-		assertEquals(0, compatibleRenderers3.size());
-		
-	}
-	@Test
-	public void namedRenderer() throws Exception {
-		fail("TODO - need to implement proper parsing of format name and parameters");
 	}
 
 	@Test
 	public void wrapShortcutFormat() throws Exception {
-		String full = ENGINE_WITH_SPECIAL_RENDERERS.transform(
+		String full = ENGINE_WITH_CUSTOM_RENDERERS.transform(
 				"<h1>${if address}${address;long}${else}NIX${end}</h1>",
 				DEFAULT_MODEL);
-		String shortCut = ENGINE_WITH_SPECIAL_RENDERERS.transform(
+		String shortCut = ENGINE_WITH_CUSTOM_RENDERERS.transform(
 				"${<h1>,address(NIX),</h1>;long}", DEFAULT_MODEL);
 		assertEquals(full, shortCut);
 	}
 
 	@Test
 	public void defaultShortcutFormat() throws Exception {
-		String full = ENGINE_WITH_SPECIAL_RENDERERS.transform(
+		String full = ENGINE_WITH_CUSTOM_RENDERERS.transform(
 				"${if address}${address;long}${else}NIX${end}", DEFAULT_MODEL);
-		String shortCut = ENGINE_WITH_SPECIAL_RENDERERS.transform(
+		String shortCut = ENGINE_WITH_CUSTOM_RENDERERS.transform(
 				"${address(NIX);long}", DEFAULT_MODEL);
 		assertEquals(full, shortCut);
+	}
+
+	private final static Engine ENGINE_WITH_NAMED_RENDERERS = ENGINE_WITH_CUSTOM_RENDERERS
+			.registerNamedRenderer(new NamedDateRenderer())
+			.registerNamedRenderer(new NamedStringRenderer());
+
+	@Test
+	public void namedRendererRegistry() throws Exception {
+		NamedRenderer stringRenderer = ENGINE_WITH_NAMED_RENDERERS
+				.resolveNamedRenderer("string");
+		assertNotNull(stringRenderer);
+		RenderFormatInfo formatInfo = stringRenderer.getFormatInfo();
+		assertTrue(formatInfo instanceof OptionRenderFormatInfo);
+		OptionRenderFormatInfo optionRenderInfo = (OptionRenderFormatInfo) formatInfo;
+		assertArrayEquals(new String[] { "uppercase", "" }, optionRenderInfo
+				.getOptions());
+
+		NamedRenderer dateRenderer = ENGINE_WITH_NAMED_RENDERERS
+				.resolveNamedRenderer("date");
+		assertNotNull(dateRenderer);
+
+		Collection<NamedRenderer> allNamedRenderers = ENGINE_WITH_NAMED_RENDERERS
+				.getAllNamedRenderers();
+		assertEquals(2, allNamedRenderers.size());
+
+		Collection<NamedRenderer> compatibleRenderers2 = ENGINE_WITH_NAMED_RENDERERS
+				.getCompatibleRenderers(Long.class);
+		assertEquals(1, compatibleRenderers2.size());
+
+		Collection<NamedRenderer> compatibleRenderers1 = ENGINE_WITH_NAMED_RENDERERS
+				.getCompatibleRenderers(Number.class);
+		assertEquals(2, compatibleRenderers1.size());
+
+		Collection<NamedRenderer> compatibleRenderers3 = ENGINE_WITH_NAMED_RENDERERS
+				.getCompatibleRenderers(Boolean.class);
+		assertEquals(0, compatibleRenderers3.size());
+
+	}
+
+	@Test
+	public void namedRenderer() throws Exception {
+		String output = ENGINE_WITH_NAMED_RENDERERS
+				.transform(
+						"\"${date;date(yyyy.MM.dd HH:mm:ss z)}\" and \"${int;date}\" and ${bean;date(long)} and ${address;string(this is the format(no matter what I type; - this is part of the format))}",
+						DEFAULT_MODEL);
+		assertEquals(
+				"\"1970.01.01 01:00:00 MEZ\" and \"01.01.1970 01:00:00 +0100\" and Render=propertyValue1 and String=Fillbert(this is the format(no matter what I type; - this is part of the format))",
+				output);
 	}
 
 	// sandbox just for quick testing

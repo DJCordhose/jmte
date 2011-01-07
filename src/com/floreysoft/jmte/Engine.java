@@ -245,7 +245,7 @@ public final class Engine {
 	private String sourceName = null;
 
 	private final Map<Class<?>, Renderer<?>> renderers = new HashMap<Class<?>, Renderer<?>>();
-	final Map<Class<?>, Renderer<?>> resolvedRendererCache = new HashMap<Class<?>, Renderer<?>>();
+	private final Map<Class<?>, Renderer<?>> resolvedRendererCache = new HashMap<Class<?>, Renderer<?>>();
 
 	private final Map<String, NamedRenderer> namedRenderers = new HashMap<String, NamedRenderer>();
 	private final Map<Class<?>, Set<NamedRenderer>> namedRenderersForClass = new HashMap<Class<?>, Set<NamedRenderer>>();
@@ -288,7 +288,7 @@ public final class Engine {
 		ScopedMap scopedMap = new ScopedMap(model);
 		String transformed = transformPure(sourceName, template, scan,
 				scopedMap);
-		String unescaped = Util.MINI_PARSER.unescape(transformed);
+		String unescaped = Util.NO_QUOTE_MINI_PARSER.unescape(transformed);
 		return unescaped;
 	}
 
@@ -451,9 +451,9 @@ public final class Engine {
 
 	public Engine registerNamedRenderer(NamedRenderer renderer) {
 		namedRenderers.put(renderer.getName(), renderer);
-		Set<Class> supportedClasses = Util.asSet(renderer.getSupportedClasses());
-		for (Class clazz : supportedClasses) {
-			Class classInHierarchy = clazz;
+		Set<Class<?>> supportedClasses = Util.asSet(renderer.getSupportedClasses());
+		for (Class<?> clazz : supportedClasses) {
+			Class<?> classInHierarchy = clazz;
 			while (classInHierarchy != null) {
 				addSupportedRenderer(classInHierarchy, renderer);
 				classInHierarchy = classInHierarchy.getSuperclass();
@@ -462,12 +462,12 @@ public final class Engine {
 		return this;
 	}
 
-	private void addSupportedRenderer(Class clazz, NamedRenderer renderer) {
+	private void addSupportedRenderer(Class<?> clazz, NamedRenderer renderer) {
 		Collection<NamedRenderer> compatibleRenderers = getCompatibleRenderers(clazz);
 		compatibleRenderers.add(renderer);
 	}
 
-	public Collection<NamedRenderer> getCompatibleRenderers(Class inputType) {
+	public Collection<NamedRenderer> getCompatibleRenderers(Class<?> inputType) {
 		Set<NamedRenderer> collection = namedRenderersForClass.get(inputType);
 		if (collection == null) {
 			collection = new HashSet<NamedRenderer>();
