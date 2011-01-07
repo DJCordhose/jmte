@@ -1,6 +1,7 @@
 package com.floreysoft.jmte;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -241,6 +242,7 @@ public final class Engine {
 	private Locale locale = new Locale("en");
 	private String sourceName = null;
 	private final Map<Class<?>, Renderer<?>> renderers = new HashMap<Class<?>, Renderer<?>>();
+	final Map<Class<?>, Renderer<?>> resolvedRendererCache = new HashMap<Class<?>, Renderer<?>>();
 	private final List<ProcessListener> listeners = new ArrayList<ProcessListener>();
 
 	private transient LinkedList<Token> scopes = new LinkedList<Token>();
@@ -250,6 +252,14 @@ public final class Engine {
 	 * and end strings for expressions.
 	 */
 	public Engine() {
+		init();
+	}
+
+	private void init() {
+		registerRenderer(Object.class, new DefaultObjectRenderer());
+		registerRenderer(Map.class, new DefaultMapRenderer());
+		registerRenderer(Collection.class, new DefaultCollectionRenderer());
+		registerRenderer(Iterable.class, new DefaultIterableRenderer());
 	}
 
 	public Engine setSourceName(String sourceName) {
@@ -436,52 +446,52 @@ public final class Engine {
 		// TODO
 		return this;
 	}
-	
+
+
+	public NamedRenderer<Object> resolveNamedRenderer(
+			String rendererName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	public <C> Engine registerRenderer(Class<C> clazz, Renderer<C> renderer) {
 		renderers.put(clazz, renderer);
+		resolvedRendererCache.clear();
 		return this;
 	}
 
 	public Engine unregisterRenderer(Class<?> clazz) {
 		renderers.remove(clazz);
+		resolvedRendererCache.clear();
 		return this;
 	}
 
-	private Renderer rendererForClass(Class<?> clazz) {
-		Renderer resolvedRenderer = renderers.get(clazz);
+	@SuppressWarnings("unchecked")
+	public Renderer<Object> resolveRendererForClass(Class<?> clazz) {
+		Renderer resolvedRenderer = resolvedRendererCache.get(clazz);
 		if (resolvedRenderer != null) {
 			return resolvedRenderer;
-		} else {
-			return new Renderer() {
-
-				@Override
-				public String render(Object o, String format) {
-					return null;
-				}
-
-			};
 		}
-	}
 
-	@SuppressWarnings("unchecked")
-	protected String render(Class<?> clazz, Object value, String format) {
-		String result = rendererForClass(clazz).render(value, format);
-		if (result == null) {
+		resolvedRenderer = renderers.get(clazz);
+		if (resolvedRenderer == null) {
 			Class<?>[] interfaces = clazz.getInterfaces();
 			for (Class<?> interfaze : interfaces) {
-				result = rendererForClass(interfaze).render(value, format);
-				if (result != null) {
+				resolvedRenderer = resolveRendererForClass(interfaze);
+				if (resolvedRenderer != null) {
 					break;
 				}
 			}
 		}
-		if (result == null) {
+		if (resolvedRenderer == null) {
 			Class<?> superclass = clazz.getSuperclass();
 			if (superclass != null) {
-				result = render(superclass, value, format);
+				resolvedRenderer = resolveRendererForClass(superclass);
 			}
 		}
-		return result;
+		if (resolvedRenderer != null) {
+			resolvedRendererCache.put(clazz, resolvedRenderer);
+		}
+		return resolvedRenderer;
 	}
 
 	public Engine addProcessListener(ProcessListener listener) {

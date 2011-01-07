@@ -28,6 +28,8 @@
 
 06.01.2011, after more performance refactoring on WS split
 ==========================================================
+
+                             benchmark      ns logarithmic runtime
                 StringBuilderReference   450,3 ==============
                  StringConcatReference   404,8 =============
                        PrintfReference  2789,4 ======================
@@ -38,3 +40,19 @@
  NativeForeachNoStringBuilderReference   543,4 ==============
                                Foreach 15493,3 =============================
                               Renderer 17295,8 =============================
+
+07.01.2011, paying a performance penalty for the generally applied renderer architecture which now allows to override all rendering
+==========================================================
+
+                             benchmark      ns logarithmic runtime
+                StringBuilderReference   451,9 ==============
+                 StringConcatReference   407,0 =============
+                       PrintfReference  2793,0 ======================
+                            Expression  6798,6 ==========================
+                     NativeIfReference    22,5 =
+                                    If  9119,2 ===========================
+                NativeForeachReference   330,0 ============
+ NativeForeachNoStringBuilderReference   548,5 ===============
+                               Foreach 15812,1 ==============================
+                              Renderer 14676,3 =============================
+                              

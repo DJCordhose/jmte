@@ -1,21 +1,22 @@
 package com.floreysoft.jmte;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 public class StringToken extends ExpressionToken {
-	private final String format;
+	private final String namedRenderer;
+	private final String namedRendererParameters;
 
-	public StringToken(String expression, String format) {
+	public StringToken(String expression, String namedRenderer,
+			String namedRendererParameters) {
 		super(expression);
-		this.format = format;
+		this.namedRenderer = namedRenderer;
+		this.namedRendererParameters = namedRendererParameters;
 	}
 
 	public StringToken(StringToken stringToken) {
 		super(stringToken);
-		this.format = stringToken.format;
+		this.namedRenderer = stringToken.namedRenderer;
+		this.namedRendererParameters = stringToken.namedRendererParameters;
 	}
 
 	@Override
@@ -27,55 +28,38 @@ public class StringToken extends ExpressionToken {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public Object evaluate(Engine engine, Map<String, Object> model,
 			ErrorHandler errorHandler) {
 
-		final String string;
+		final String renderedResult;
 		final Object value = traverse(getSegments(), model, errorHandler);
 		if (value == null) {
-			string = "";
+			renderedResult = "";
 		} else {
-			final String rendereredValue = engine.render(value.getClass(), value, format);
-			if (rendereredValue != null) {
-				string = rendereredValue;
-			} else if (value instanceof String) {
-				string = (String) value;
+			String namedRendererResult = null;
+			if (namedRenderer != null && !namedRenderer.equals("")) {
+				NamedRenderer<Object> rendererForName = engine
+						.resolveNamedRenderer(namedRenderer);
+				if (rendererForName != null) {
+					Object converted = rendererForName.convert(value);
+					namedRendererResult = rendererForName.render(converted,
+							namedRendererParameters);
+				}
+			}
+			if (namedRendererResult != null) {
+				renderedResult = namedRendererResult;
 			} else {
-				final List<Object> arrayAsList = Util.arrayAsList(value);
-				if (arrayAsList != null) {
-					string = arrayAsList.size() > 0 ? arrayAsList.get(0)
-							.toString() : "";
-				} else if (value instanceof Map) {
-					final Map map = (Map) value;
-					if (map.size() == 0) {
-						string = "";
-					} else if (map.size() == 1) {
-						string = map.values().iterator().next().toString();
-					} else {
-						string = map.toString();
-					}
-				} else if (value instanceof Collection) {
-					final Collection collection = (Collection) value;
-					if (collection.size() == 0) {
-						string = "";
-					} else if (collection.size() == 1) {
-						string = collection.iterator().next().toString();
-					} else {
-						string = collection.toString();
-					}
-				} else if (value instanceof Iterable) {
-					final Iterable iterable = (Iterable) value;
-					final Iterator iterator = iterable.iterator();
-					string = iterator.hasNext() ? iterator.next().toString()
-							: "";
+				Renderer<Object> rendererForClass = engine
+						.resolveRendererForClass(value.getClass());
+				if (rendererForClass != null) {
+					renderedResult = rendererForClass.render(value);
 				} else {
-					string = value.toString();
+					renderedResult = value.toString();
 				}
 			}
 		}
 
-		return string;
+		return renderedResult;
 	}
 
 }
