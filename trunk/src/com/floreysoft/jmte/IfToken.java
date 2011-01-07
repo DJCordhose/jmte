@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 public class IfToken extends ExpressionToken {
 	public static final String IF = "if";
@@ -33,26 +34,35 @@ public class IfToken extends ExpressionToken {
 			ErrorHandler errorHandler) {
 
 		final boolean condition;
-		final Object value = traverse(getSegments(), model, errorHandler);
-		if (value == null || value.toString().equals("")
-				|| value.toString().equalsIgnoreCase("false")) {
+		Object value = traverse(getSegments(), model, errorHandler);
+		if (value == null) {
 			condition = false;
-		} else if (value instanceof Boolean) {
-			condition = (Boolean) value;
-		} else if (value instanceof Map) {
-			condition = !((Map) value).isEmpty();
-		} else if (value instanceof Collection) {
-			condition = !((Collection) value).isEmpty();
-		} else if (value instanceof Iterable) {
-			Iterator iterator = ((Iterable) value).iterator();
-			condition = iterator.hasNext();
 		} else {
-			List list = Util.arrayAsList(value);
-			// XXX looks strange, but is ok: list will be null if is
-			// is not an array which results to true
-			condition = list == null || !list.isEmpty();
+			if (value instanceof Callable) {
+				try {
+					value = ((Callable) value).call();
+				} catch (Exception e) {
+				}
+			}
+			if (value.toString().equals("")
+					|| value.toString().equalsIgnoreCase("false")) {
+				condition = false;
+			} else if (value instanceof Boolean) {
+				condition = (Boolean) value;
+			} else if (value instanceof Map) {
+				condition = !((Map) value).isEmpty();
+			} else if (value instanceof Collection) {
+				condition = !((Collection) value).isEmpty();
+			} else if (value instanceof Iterable) {
+				Iterator iterator = ((Iterable) value).iterator();
+				condition = iterator.hasNext();
+			} else {
+				List list = Util.arrayAsList(value);
+				// XXX looks strange, but is ok: list will be null if is
+				// is not an array which results to true
+				condition = list == null || !list.isEmpty();
+			}
 		}
-
 		Object evaluated = negated ? !condition : condition;
 
 		return evaluated;
