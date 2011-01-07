@@ -1,3 +1,17 @@
+JMTE 1.0
+========
+                             benchmark      ns logarithmic runtime
+                StringBuilderReference   453,3 ==============
+                 StringConcatReference   409,2 =============
+                       PrintfReference  2929,6 ======================
+                            Expression  7089,5 ==========================
+                     NativeIfReference    22,5 =
+                                    If  9690,3 ===========================
+                NativeForeachReference   336,2 ============
+ NativeForeachNoStringBuilderReference   553,2 ===============
+                               Foreach 15850,0 ==============================
+
+
 03.01.2011
 ==========
               benchmark      ns logarithmic runtime
