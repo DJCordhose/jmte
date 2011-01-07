@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import com.floreysoft.jmte.ProcessListener.Action;
 
@@ -241,8 +242,13 @@ public final class Engine {
 	private ErrorHandler errorHandler = new DefaultErrorHandler();
 	private Locale locale = new Locale("en");
 	private String sourceName = null;
+
 	private final Map<Class<?>, Renderer<?>> renderers = new HashMap<Class<?>, Renderer<?>>();
 	final Map<Class<?>, Renderer<?>> resolvedRendererCache = new HashMap<Class<?>, Renderer<?>>();
+
+	private final Map<String, NamedRenderer<?>> namedRenderers = new HashMap<String, NamedRenderer<?>>();
+	private final Map<Class<?>, Collection<NamedRenderer>> namedRenderersForClass = new HashMap<Class<?>, Collection<NamedRenderer>>();
+
 	private final List<ProcessListener> listeners = new ArrayList<ProcessListener>();
 
 	private transient LinkedList<Token> scopes = new LinkedList<Token>();
@@ -442,17 +448,34 @@ public final class Engine {
 		return this;
 	}
 
-	public Engine registerNamedRenderer(String name, NamedRenderer<?> renderer) {
-		// TODO
+	public Engine registerNamedRenderer(NamedRenderer<?> renderer) {
+		namedRenderers.put(renderer.getName(), renderer);
+		Set<Class> supportedClasses = renderer.getSupportedClasses();
+		for (Class clazz : supportedClasses) {
+			addSupportedClass(renderer, clazz);
+		}
 		return this;
 	}
 
-
-	public NamedRenderer<Object> resolveNamedRenderer(
-			String rendererName) {
-		// TODO Auto-generated method stub
-		return null;
+	private void addSupportedClass(NamedRenderer<?> renderer, Class clazz) {
+		getCompatibleRenderers(clazz);
 	}
+	
+	public Collection<NamedRenderer> getCompatibleRenderers(Class inputType) {
+		Collection<NamedRenderer> collection = namedRenderersForClass
+				.get(inputType);
+		if (collection == null) {
+			collection = new ArrayList<NamedRenderer>();
+			namedRenderersForClass.put(inputType, collection);
+		}
+		return collection;
+	}
+
+	@SuppressWarnings("unchecked")
+	public NamedRenderer<Object> resolveNamedRenderer(String rendererName) {
+		return (NamedRenderer<Object>) namedRenderers.get(rendererName);
+	}
+
 	public <C> Engine registerRenderer(Class<C> clazz, Renderer<C> renderer) {
 		renderers.put(clazz, renderer);
 		resolvedRendererCache.clear();

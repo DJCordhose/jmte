@@ -46,6 +46,7 @@ public final class EngineTest {
 		private Object property1 = "propertyValue1";
 		public Object property2 = "propertyValue2";
 		public boolean falseCond = false;
+		public Boolean falseCondObj = new Boolean(false);
 
 		public MyBean(Object property1, Object property2) {
 			this.property1 = property1;
@@ -71,6 +72,9 @@ public final class EngineTest {
 			return true;
 		}
 
+		public Boolean getTrueCondObj() {
+			return new Boolean(true);
+		}
 		@Override
 		public String toString() {
 			return property1.toString() + ", " + property2.toString();
@@ -418,9 +422,35 @@ public final class EngineTest {
 	}
 
 	@Test
+	public void ifBooleanObjTrueExpression() throws Exception {
+		String output = new Engine().transform(
+				"${if bean.trueCondObj}${address}${else}NIX${end}", DEFAULT_MODEL);
+		assertEquals(DEFAULT_MODEL.get("address"), output);
+	}
+
+	@Test
 	public void ifBooleanFalseExpression() throws Exception {
 		String output = new Engine()
 				.transform("${if bean.falseCond}${address}${else}NIX${end}",
+						DEFAULT_MODEL);
+		assertEquals("NIX", output);
+	}
+
+	@Test
+	public void ifBooleanStringExpression() throws Exception {
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put("falseString", "false");
+		String output = new Engine()
+				.transform("${if falseString}NO${end}",
+						model);
+		assertEquals("", output);
+	}
+
+	
+	@Test
+	public void ifBooleanObjFalseExpression() throws Exception {
+		String output = new Engine()
+				.transform("${if bean.falseCondObj}${address}${else}NIX${end}",
 						DEFAULT_MODEL);
 		assertEquals("NIX", output);
 	}

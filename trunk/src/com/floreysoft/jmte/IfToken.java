@@ -29,11 +29,13 @@ public class IfToken extends ExpressionToken {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public Object evaluate(Engine engine, Map<String, Object> model, ErrorHandler errorHandler) {
+	public Object evaluate(Engine engine, Map<String, Object> model,
+			ErrorHandler errorHandler) {
 
 		final boolean condition;
 		final Object value = traverse(getSegments(), model, errorHandler);
-		if (value == null || value.toString().equals("")) {
+		if (value == null || value.toString().equals("")
+				|| value.toString().equalsIgnoreCase("false")) {
 			condition = false;
 		} else if (value instanceof Boolean) {
 			condition = (Boolean) value;
