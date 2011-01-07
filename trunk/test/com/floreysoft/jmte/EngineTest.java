@@ -765,21 +765,14 @@ public final class EngineTest {
 			.registerRenderer(Object.class, new Renderer<Object>() {
 
 				@Override
-				public String render(Object o, String format) {
-					return o.toString() + "(" + format + ")";
+				public String render(Object o) {
+					return "Object=" + o.toString();
 				}
 			}).registerRenderer(MyBean.class, new Renderer<MyBean>() {
 
 				@Override
-				public String render(MyBean o, String format) {
-					if (format == null) {
-						return o.property1.toString();
-					} else if (format.equals("long")) {
-						return o.property1.toString() + "_"
-								+ o.property2.toString();
-					} else {
-						return null;
-					}
+				public String render(MyBean o) {
+					return "Render=" + o.property1.toString();
 				}
 
 			});
@@ -791,8 +784,11 @@ public final class EngineTest {
 						"${bean} and ${bean;long} and ${address;this is the format(no matter what I type; - this is part of the format)}",
 						DEFAULT_MODEL);
 		assertEquals(
-				"propertyValue1 and propertyValue1_propertyValue2 and Fillbert(this is the format(no matter what I type; - this is part of the format))",
+				"Render=propertyValue1 and Render=propertyValue1 and Object=Fillbert",
 				output);
+		Map<Class<?>, Renderer<?>> resolvedRendererCache = ENGINE_WITH_SPECIAL_RENDERERS.resolvedRendererCache;
+		// one for MyBean, one for Object and one for String
+		assertEquals(3, resolvedRendererCache.size());
 	}
 
 	@Test

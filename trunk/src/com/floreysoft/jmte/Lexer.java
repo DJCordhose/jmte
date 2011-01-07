@@ -18,13 +18,14 @@ public class Lexer {
 
 	private AbstractToken innerNextToken(final String untrimmedInput) {
 		final String input = Util.trimFront(untrimmedInput);
-		final List<String> split = Util.RAW_MINI_PARSER.splitOnWhitespace(input);
-		
+		final List<String> split = Util.RAW_MINI_PARSER
+				.splitOnWhitespace(input);
+
 		// LENGTH 0
 
 		if (split.size() == 0) {
 			// empty expression like ${}
-			return new StringToken("", null);
+			return new StringToken("", null, null);
 		}
 
 		// be sure to use the raw input as we might have to preserve
@@ -38,7 +39,7 @@ public class Lexer {
 			// ${
 			// } which might be used for silent line breaks
 			if (objectExpression.equals("")) {
-				return new StringToken("", null);
+				return new StringToken("", null, null);
 			}
 			final String cmd = objectExpression;
 			if (cmd.equalsIgnoreCase(ElseToken.ELSE)) {
@@ -60,7 +61,8 @@ public class Lexer {
 					completeDefaultString, "(", ")");
 
 			final String variable = defaultStrings.get(0);
-			final StringToken stringToken = new StringToken(variable, format);
+			// TODO separate format name from parameters and pass them individually
+			final StringToken stringToken = new StringToken(variable, format, null);
 			final DefaultStringToken defaultStringToken = defaultStrings.size() == 2 ? new DefaultStringToken(
 					stringToken, defaultStrings.get(1))
 					: null;
