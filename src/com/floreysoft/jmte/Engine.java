@@ -461,6 +461,19 @@ public final class Engine {
 		}
 		return this;
 	}
+	public Engine deregisterNamedRenderer(NamedRenderer renderer) {
+		namedRenderers.remove(renderer.getName());
+		Set<Class<?>> supportedClasses = Util.asSet(renderer.getSupportedClasses());
+		for (Class<?> clazz : supportedClasses) {
+			Class<?> classInHierarchy = clazz;
+			while (classInHierarchy != null) {
+				Set<NamedRenderer> renderers = namedRenderersForClass.get(classInHierarchy);
+				renderers.remove(renderer);
+				classInHierarchy = classInHierarchy.getSuperclass();
+			}
+		}
+		return this;
+	}
 
 	private void addSupportedRenderer(Class<?> clazz, NamedRenderer renderer) {
 		Collection<NamedRenderer> compatibleRenderers = getCompatibleRenderers(clazz);
@@ -468,12 +481,12 @@ public final class Engine {
 	}
 
 	public Collection<NamedRenderer> getCompatibleRenderers(Class<?> inputType) {
-		Set<NamedRenderer> collection = namedRenderersForClass.get(inputType);
-		if (collection == null) {
-			collection = new HashSet<NamedRenderer>();
-			namedRenderersForClass.put(inputType, collection);
+		Set<NamedRenderer> renderers = namedRenderersForClass.get(inputType);
+		if (renderers == null) {
+			renderers = new HashSet<NamedRenderer>();
+			namedRenderersForClass.put(inputType, renderers);
 		}
-		return collection;
+		return renderers;
 	}
 
 	public Collection<NamedRenderer> getAllNamedRenderers() {
@@ -491,7 +504,7 @@ public final class Engine {
 		return this;
 	}
 
-	public Engine unregisterRenderer(Class<?> clazz) {
+	public Engine deregisterRenderer(Class<?> clazz) {
 		renderers.remove(clazz);
 		resolvedRendererCache.clear();
 		return this;

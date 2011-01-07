@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import org.junit.Test;
 
@@ -452,6 +453,22 @@ public final class EngineTest {
 		String output = new Engine().transform("${if falseString}NO${end}",
 				model);
 		assertEquals("", output);
+	}
+
+	@Test
+	public void ifBooleanCallableExpression() throws Exception {
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put("falseCallable", new Callable<Boolean>() {
+
+			@Override
+			public Boolean call() throws Exception {
+				return false;
+			}
+			
+		});
+		String output = new Engine().transform("${if !falseCallable}YES${end}",
+				model);
+		assertEquals("YES", output);
 	}
 
 	@Test
