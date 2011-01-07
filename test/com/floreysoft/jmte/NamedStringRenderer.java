@@ -1,6 +1,10 @@
 package com.floreysoft.jmte;
 
-@CompatibleWith( { String.class, Integer.class })
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 public class NamedStringRenderer implements NamedRenderer<String> {
 
 	@Override
@@ -23,5 +27,22 @@ public class NamedStringRenderer implements NamedRenderer<String> {
 		}
 
 		return o;
+	}
+
+	@Override
+	public RenderFormatInfo formatInfo() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getName() {
+		return "string";
+	}
+
+	@Override
+	public Set<Class> getSupportedClasses() {
+		Class[] clazzes = { String.class, Integer.class };
+		return new HashSet(Arrays.asList(clazzes));
 	}
 }

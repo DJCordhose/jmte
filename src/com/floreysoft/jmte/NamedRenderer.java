@@ -1,5 +1,7 @@
 package com.floreysoft.jmte;
 
+import java.util.Set;
+
 public interface NamedRenderer<T> {
 	/**
 	 * Converts any object to the input this renderer requires.
@@ -15,9 +17,16 @@ public interface NamedRenderer<T> {
 	 * 
 	 * @param o
 	 *            the object to render
-	 * @param parameters
-	 *            any parameter string
+	 * @param format
+	 *            anything that tells the renderer how to do its work
 	 * @return the renderer object
 	 */
-	public String render(T o, String parameters);
+	public String render(T o, String format);
+
+	public String getName();
+
+	public RenderFormatInfo formatInfo();
+
+	public Set<Class> getSupportedClasses();
+
 }
