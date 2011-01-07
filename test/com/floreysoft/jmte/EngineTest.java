@@ -1,6 +1,6 @@
 package com.floreysoft.jmte;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -9,10 +9,13 @@ import java.io.File;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Test;
 
@@ -75,6 +78,7 @@ public final class EngineTest {
 		public Boolean getTrueCondObj() {
 			return new Boolean(true);
 		}
+
 		@Override
 		public String toString() {
 			return property1.toString() + ", " + property2.toString();
@@ -424,7 +428,8 @@ public final class EngineTest {
 	@Test
 	public void ifBooleanObjTrueExpression() throws Exception {
 		String output = new Engine().transform(
-				"${if bean.trueCondObj}${address}${else}NIX${end}", DEFAULT_MODEL);
+				"${if bean.trueCondObj}${address}${else}NIX${end}",
+				DEFAULT_MODEL);
 		assertEquals(DEFAULT_MODEL.get("address"), output);
 	}
 
@@ -439,19 +444,19 @@ public final class EngineTest {
 	@Test
 	public void ifBooleanStringExpression() throws Exception {
 		Map<String, Object> model = new HashMap<String, Object>();
-		model.put("falseString", "false");
-		String output = new Engine()
-				.transform("${if falseString}NO${end}",
-						model);
+		String falseString = new Boolean(false).toString();
+		assertEquals("false", falseString);
+		model.put("falseString", falseString);
+		String output = new Engine().transform("${if falseString}NO${end}",
+				model);
 		assertEquals("", output);
 	}
 
-	
 	@Test
 	public void ifBooleanObjFalseExpression() throws Exception {
-		String output = new Engine()
-				.transform("${if bean.falseCondObj}${address}${else}NIX${end}",
-						DEFAULT_MODEL);
+		String output = new Engine().transform(
+				"${if bean.falseCondObj}${address}${else}NIX${end}",
+				DEFAULT_MODEL);
 		assertEquals("NIX", output);
 	}
 
@@ -807,6 +812,10 @@ public final class EngineTest {
 
 			});
 
+	private final static Engine ENGINE_WITH_NAMED_RENDERERS = ENGINE_WITH_SPECIAL_RENDERERS
+			.registerNamedRenderer(new NamedDateRenderer())
+			.registerNamedRenderer(new NamedStringRenderer());
+
 	@Test
 	public void renderer() throws Exception {
 		String output = ENGINE_WITH_SPECIAL_RENDERERS
@@ -819,6 +828,36 @@ public final class EngineTest {
 		Map<Class<?>, Renderer<?>> resolvedRendererCache = ENGINE_WITH_SPECIAL_RENDERERS.resolvedRendererCache;
 		// one for MyBean, one for Object and one for String
 		assertEquals(3, resolvedRendererCache.size());
+	}
+
+	@Test
+	public void namedRendererRegistry() throws Exception {
+		NamedRenderer stringRenderer = ENGINE_WITH_NAMED_RENDERERS.resolveNamedRenderer("string");
+		assertNotNull(stringRenderer);
+		RenderFormatInfo formatInfo = stringRenderer.getFormatInfo();
+		assertTrue(formatInfo instanceof OptionRenderFormatInfo);
+		OptionRenderFormatInfo optionRenderInfo = (OptionRenderFormatInfo) formatInfo;
+		assertArrayEquals(new String[] {"uppercase", ""}, optionRenderInfo.getOptions());
+		
+		NamedRenderer dateRenderer = ENGINE_WITH_NAMED_RENDERERS.resolveNamedRenderer("date");
+		assertNotNull(dateRenderer);
+		
+		Collection<NamedRenderer> allNamedRenderers = ENGINE_WITH_NAMED_RENDERERS.getAllNamedRenderers();
+		assertEquals(2, allNamedRenderers.size());
+		
+		Collection<NamedRenderer> compatibleRenderers2 = ENGINE_WITH_NAMED_RENDERERS.getCompatibleRenderers(Long.class);
+		assertEquals(1, compatibleRenderers2.size());
+		
+		Collection<NamedRenderer> compatibleRenderers1 = ENGINE_WITH_NAMED_RENDERERS.getCompatibleRenderers(Number.class);
+		assertEquals(2, compatibleRenderers1.size());
+		
+		Collection<NamedRenderer> compatibleRenderers3 = ENGINE_WITH_NAMED_RENDERERS.getCompatibleRenderers(Boolean.class);
+		assertEquals(0, compatibleRenderers3.size());
+		
+	}
+	@Test
+	public void namedRenderer() throws Exception {
+		fail("TODO - need to implement proper parsing of format name and parameters");
 	}
 
 	@Test

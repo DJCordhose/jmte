@@ -1,14 +1,9 @@
 package com.floreysoft.jmte;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
-public class NamedStringRenderer implements NamedRenderer<String> {
+public class NamedStringRenderer implements NamedRenderer {
 
-	@Override
-	public String convert(Object o) {
+	String convert(Object o) {
 		if (o instanceof String) {
 			return (String) o;
 		}
@@ -21,7 +16,11 @@ public class NamedStringRenderer implements NamedRenderer<String> {
 	}
 
 	@Override
-	public String render(String o, String parameters) {
+	public String render(Object value, String parameters) {
+		String o = convert(value);
+		if (o == null) {
+			return null;
+		}
 		if (parameters.equalsIgnoreCase("uppercase")) {
 			return o.toUpperCase();
 		}
@@ -30,9 +29,8 @@ public class NamedStringRenderer implements NamedRenderer<String> {
 	}
 
 	@Override
-	public RenderFormatInfo formatInfo() {
-		// TODO Auto-generated method stub
-		return null;
+	public RenderFormatInfo getFormatInfo() {
+		return new OptionRenderFormatInfo(new String[] {"uppercase", ""});
 	}
 
 	@Override
@@ -41,8 +39,8 @@ public class NamedStringRenderer implements NamedRenderer<String> {
 	}
 
 	@Override
-	public Set<Class> getSupportedClasses() {
+	public Class[] getSupportedClasses() {
 		Class[] clazzes = { String.class, Integer.class };
-		return new HashSet(Arrays.asList(clazzes));
+		return clazzes;
 	}
 }

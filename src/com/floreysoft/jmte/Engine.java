@@ -3,6 +3,7 @@ package com.floreysoft.jmte;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -246,8 +247,8 @@ public final class Engine {
 	private final Map<Class<?>, Renderer<?>> renderers = new HashMap<Class<?>, Renderer<?>>();
 	final Map<Class<?>, Renderer<?>> resolvedRendererCache = new HashMap<Class<?>, Renderer<?>>();
 
-	private final Map<String, NamedRenderer<?>> namedRenderers = new HashMap<String, NamedRenderer<?>>();
-	private final Map<Class<?>, Collection<NamedRenderer>> namedRenderersForClass = new HashMap<Class<?>, Collection<NamedRenderer>>();
+	private final Map<String, NamedRenderer> namedRenderers = new HashMap<String, NamedRenderer>();
+	private final Map<Class<?>, Set<NamedRenderer>> namedRenderersForClass = new HashMap<Class<?>, Set<NamedRenderer>>();
 
 	private final List<ProcessListener> listeners = new ArrayList<ProcessListener>();
 
@@ -448,32 +449,40 @@ public final class Engine {
 		return this;
 	}
 
-	public Engine registerNamedRenderer(NamedRenderer<?> renderer) {
+	public Engine registerNamedRenderer(NamedRenderer renderer) {
 		namedRenderers.put(renderer.getName(), renderer);
-		Set<Class> supportedClasses = renderer.getSupportedClasses();
+		Set<Class> supportedClasses = Util.asSet(renderer.getSupportedClasses());
 		for (Class clazz : supportedClasses) {
-			addSupportedClass(renderer, clazz);
+			Class classInHierarchy = clazz;
+			while (classInHierarchy != null) {
+				addSupportedRenderer(classInHierarchy, renderer);
+				classInHierarchy = classInHierarchy.getSuperclass();
+			}
 		}
 		return this;
 	}
 
-	private void addSupportedClass(NamedRenderer<?> renderer, Class clazz) {
-		getCompatibleRenderers(clazz);
+	private void addSupportedRenderer(Class clazz, NamedRenderer renderer) {
+		Collection<NamedRenderer> compatibleRenderers = getCompatibleRenderers(clazz);
+		compatibleRenderers.add(renderer);
 	}
-	
+
 	public Collection<NamedRenderer> getCompatibleRenderers(Class inputType) {
-		Collection<NamedRenderer> collection = namedRenderersForClass
-				.get(inputType);
+		Set<NamedRenderer> collection = namedRenderersForClass.get(inputType);
 		if (collection == null) {
-			collection = new ArrayList<NamedRenderer>();
+			collection = new HashSet<NamedRenderer>();
 			namedRenderersForClass.put(inputType, collection);
 		}
 		return collection;
 	}
 
-	@SuppressWarnings("unchecked")
-	public NamedRenderer<Object> resolveNamedRenderer(String rendererName) {
-		return (NamedRenderer<Object>) namedRenderers.get(rendererName);
+	public Collection<NamedRenderer> getAllNamedRenderers() {
+		Collection<NamedRenderer> values = namedRenderers.values();
+		return values;
+	}
+
+	public NamedRenderer resolveNamedRenderer(String rendererName) {
+		return namedRenderers.get(rendererName);
 	}
 
 	public <C> Engine registerRenderer(Class<C> clazz, Renderer<C> renderer) {
