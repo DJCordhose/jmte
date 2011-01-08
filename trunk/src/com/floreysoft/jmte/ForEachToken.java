@@ -4,14 +4,14 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
+import java.util.concurrent.Callable;
 
 public class ForEachToken extends ExpressionToken {
 	public static final String FOREACH = "foreach";
-	
+
 	private String varName;
 	private String separator;
-	
+
 	private transient Iterator<Object> iterator;
 	private transient boolean last;
 	private transient boolean first;
@@ -26,37 +26,46 @@ public class ForEachToken extends ExpressionToken {
 	@Override
 	public String getText() {
 		if (text == null) {
-			text = FOREACH + " " + getExpression() + " " + varName + (separator == null ? "" : " " + separator);
+			text = FOREACH + " " + getExpression() + " " + varName
+					+ (separator == null ? "" : " " + separator);
 		}
 		return text;
 	}
-	
+
 	@Override
 	@SuppressWarnings("unchecked")
-	public Object evaluate(Engine engine, Map<String, Object> model, ErrorHandler errorHandler) {
-		
+	public Object evaluate(Engine engine, Map<String, Object> model,
+			ErrorHandler errorHandler) {
+
 		final Iterable<Object> iterable;
-		final Object value = traverse(getSegments(), model, errorHandler);
+		Object value = traverse(getSegments(), model, errorHandler);
 		if (value == null) {
 			iterable = Collections.emptyList();
-		} else if (value instanceof Map) {
-			iterable = ((Map) value).entrySet();
-		} else if (value instanceof Iterable) {
-			iterable = ((Iterable) value);
 		} else {
-			List<Object> arrayAsList = Util.arrayAsList(value);
-			if (arrayAsList != null) {
-				iterable = arrayAsList;
+			if (value instanceof Callable) {
+				try {
+					value = ((Callable) value).call();
+				} catch (Exception e) {
+				}
+			}
+			if (value instanceof Map) {
+				iterable = ((Map) value).entrySet();
+			} else if (value instanceof Iterable) {
+				iterable = ((Iterable) value);
 			} else {
-				// we have a single value here and simply wrap it in a List
-				iterable = Collections.singletonList(value);
+				List<Object> arrayAsList = Util.arrayAsList(value);
+				if (arrayAsList != null) {
+					iterable = arrayAsList;
+				} else {
+					// we have a single value here and simply wrap it in a List
+					iterable = Collections.singletonList(value);
+				}
 			}
 		}
-		
+
 		return iterable;
 	}
 
-	
 	public Iterator<Object> iterator() {
 		return getIterator();
 	}
