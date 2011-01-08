@@ -1,6 +1,7 @@
 package com.floreysoft.jmte;
 
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 public class StringToken extends ExpressionToken {
 	// ${<h1>,address(NIX),</h1>;long(full)}
@@ -43,10 +44,17 @@ public class StringToken extends ExpressionToken {
 			ErrorHandler errorHandler) {
 
 		final String renderedResult;
-		final Object value = traverse(getSegments(), model, errorHandler);
+		Object value = traverse(getSegments(), model, errorHandler);
 		if (value == null || value.equals("")) {
 			renderedResult = getDefaultValue();
 		} else {
+			if (value instanceof Callable) {
+				try {
+					value = ((Callable) value).call();
+				} catch (Exception e) {
+				}
+			}
+
 			String namedRendererResult = null;
 			if (rendererName != null && !rendererName.equals("")) {
 				NamedRenderer rendererForName = engine
