@@ -6,14 +6,20 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Mini parser for mini DSL stuff. Use it when you do not want 
+ * Mini parser for mini DSL stuff. Use it when you do not want
  * <ul>
  * <li>a full parser, as it would be overkill
- * <li>to code by hand it in an ad-hoc way, as you have done this wrong too many times (just think about escaping and quoting)
- * <li>built-in regexp , as it is too slow and you actually do not quite up to it (true for me)
+ * <li>to code by hand it in an ad-hoc way, as you have done this wrong too many
+ * times (just think about escaping and quoting)
+ * <li>built-in regexp , as it is too slow and you actually do not quite up to
+ * it (true for me)
  * </ul>
  * 
- * <p>This is a fast, simple parser that takes input and a single, global hierarchy of operators and spits out "AST" implemented as nested Lists.</p>
+ * <p>
+ * This is a fast, simple parser that takes input and a single, global hierarchy
+ * of operators and spits out "AST" implemented as nested Lists.
+ * </p>
+ * 
  * <pre>
  * String input = "string(maxLength=10, trim, uppercase)";
  * String[] operators = { "()", ",", "=" }; // in order of precedence, can be pair of start/end or single char separator
@@ -31,35 +37,77 @@ import java.util.List;
  * </ul>
  * 
  */
-public class NestedParser {
-	MiniParser miniParser = MiniParser.rawOutputInstance();
-	MiniParser innerMiniParser = MiniParser.trimmedInstance();
+public final class NestedParser {
+	
+	private final static MiniParser MINI_PARSER = MiniParser.rawOutputInstance();
+	private final static MiniParser INNER_MINI_PARSER = MiniParser.trimmedInstance();
+
+	public static List<String> greedyScan(final String input, final String splitStart,
+			final String splitEnd) {
+		if (input == null) {
+			return null;
+		}
+		return MINI_PARSER.scan(input, splitStart, splitEnd, true);
+	}
+
+	public static List<String> split(final String input, final char separator,
+			final int maxSegments) {
+		if (input == null) {
+			return null;
+		}
+		return MINI_PARSER.split(input, separator, maxSegments);
+	}
+
+	public static String access(final List<? extends Object> ast,
+			final int index) {
+		return access(ast, index, null);
+
+	}
+
+	public static String access(final List<? extends Object> ast,
+			final int index, final String defaultValue) {
+		if (ast == null) {
+			return defaultValue;
+		}
+
+		if (index < ast.size()) {
+			Object object = ast.get(index);
+			if (object instanceof String) {
+				return (String) object;
+			} else {
+				throw new IllegalArgumentException(
+						"You can only access scalar strings");
+			}
+		}
+		return defaultValue;
+	}
 
 	// TODO create a version that allows for multi character operators
 	public List<Object> parse(final String input, final List<String> operators) {
 		final List<Object> result = new ArrayList<Object>();
 		if (operators.size() != 0) {
 			final boolean innerLoop = operators.size() == 1;
-			final MiniParser currentParser = innerLoop ? innerMiniParser
-					: miniParser;
+			final MiniParser currentParser = innerLoop ? INNER_MINI_PARSER
+					: MINI_PARSER;
 			final String operator = operators.get(0);
 			final List<String> segments;
 			if (operator.length() == 1) {
 				segments = currentParser.split(input, operator.charAt(0));
 			} else if (operator.length() == 2) {
-				
-				List<String> allSegments = currentParser.scan(input, String.valueOf(operator
-						.charAt(0)), String.valueOf(operator.charAt(1)), true);
-				if (allSegments.size() >  0) {
+
+				List<String> allSegments = currentParser.scan(input, String
+						.valueOf(operator.charAt(0)), String.valueOf(operator
+						.charAt(1)), true);
+				if (allSegments.size() > 0) {
 					// the first part is not processed any further
 					result.add(allSegments.get(0));
 				}
-				if (allSegments.size() >  1) {
+				if (allSegments.size() > 1) {
 					segments = allSegments.subList(1, allSegments.size());
 				} else {
 					segments = Collections.emptyList();
 				}
-				
+
 			} else {
 				throw new IllegalArgumentException(
 						"Operators must either be start/end pairs or single characters");
@@ -82,8 +130,8 @@ public class NestedParser {
 		return result;
 	}
 
-	public List<Object> parse(final String input, final String[] strings) {
-		return parse(input, Arrays.asList(strings));
+	public List<Object> parse(final String input, final String[] operators) {
+		return parse(input, Arrays.asList(operators));
 	}
 
 }

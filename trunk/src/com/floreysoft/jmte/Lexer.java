@@ -1,5 +1,6 @@
 package com.floreysoft.jmte;
 
+import static com.floreysoft.jmte.NestedParser.*;
 import java.util.List;
 
 public class Lexer {
@@ -25,7 +26,7 @@ public class Lexer {
 
 		if (split.size() == 0) {
 			// empty expression like ${}
-			return new StringToken("", null, null);
+			return new StringToken();
 		}
 
 		// be sure to use the raw input as we might have to preserve
@@ -39,7 +40,7 @@ public class Lexer {
 			// ${
 			// } which might be used for silent line breaks
 			if (objectExpression.equals("")) {
-				return new StringToken("", null, null);
+				return new StringToken();
 			}
 			final String cmd = objectExpression;
 			if (cmd.equalsIgnoreCase(ElseToken.ELSE)) {
@@ -49,43 +50,48 @@ public class Lexer {
 				return new EndToken();
 			}
 
+			// ${<h1>,address(NIX),</h1>;long(full)}
+			String variableName = null; // address
+			String defaultValue = null; // NIX
+			String prefix = null; // <h1>
+			String suffix = null; // </h1>
+			String rendererName = null; // long
+			String parameters = null; // full
+
+			// <h1>,address(NIX),</h1>
 			final String complexVariable = strings.get(0);
-			final String format = strings.size() == 2 ? strings.get(1) : null;
-
-			final List<String> wrappedStrings = Util.MINI_PARSER.split(
-					complexVariable, ',', 3);
-			final String completeDefaultString = (wrappedStrings.size() == 3 ? wrappedStrings
-					.get(1)
-					: complexVariable).trim();
-			final List<String> defaultStrings = Util.MINI_PARSER.scan(
-					completeDefaultString, "(", ")");
-
-			final String variable = defaultStrings.get(0);
-
-			// separate renderer name from parameters and pass them individually
-			String rendererName = null;
-			String parameters = null;
-			if (format != null) {
-				List<String> scannedFormat = Util.MINI_PARSER.scan(format, "(", ")", true);
-				rendererName = scannedFormat.size() != 0 ? scannedFormat.get(0) : null;
-				parameters = scannedFormat.size() > 1 ? scannedFormat.get(1) : null;
-			}
-			final StringToken stringToken = new StringToken(variable, rendererName, parameters);
-			final DefaultStringToken defaultStringToken = defaultStrings.size() == 2 ? new DefaultStringToken(
-					stringToken, defaultStrings.get(1))
+			final List<String> wrappedStrings = split(complexVariable, ',', 3);
+			// <h1>
+			prefix = wrappedStrings.size() == 3 ? access(wrappedStrings, 0)
 					: null;
-			final WrappedDefaultStringToken wrappedDefaultStringToken = wrappedStrings
-					.size() == 3 ? new WrappedDefaultStringToken(wrappedStrings
-					.get(0), wrappedStrings.get(2),
-					defaultStringToken != null ? defaultStringToken
-							: stringToken) : null;
-			if (wrappedDefaultStringToken != null) {
-				return wrappedDefaultStringToken;
-			} else if (defaultStringToken != null) {
-				return defaultStringToken;
-			} else {
-				return stringToken;
-			}
+			// </h1>
+			suffix = wrappedStrings.size() == 3 ? access(wrappedStrings, 2)
+					: null;
+
+			// address(NIX)
+			final String completeDefaultString = (wrappedStrings.size() == 3 ? access(
+					wrappedStrings, 1)
+					: complexVariable).trim();
+			final List<String> defaultStrings = greedyScan(
+					completeDefaultString, "(", ")");
+			// address
+			variableName = access(defaultStrings, 0);
+			// NIX
+			defaultValue = access(defaultStrings, 1);
+
+			// long(full)
+			final String format = access(strings, 1);
+			final List<String> scannedFormat = greedyScan(format, "(", ")");
+			// long
+			rendererName = access(scannedFormat, 0);
+			// full
+			parameters = access(scannedFormat, 1);
+
+			final StringToken stringToken = new StringToken(untrimmedInput,
+					variableName, defaultValue, prefix, suffix, rendererName,
+					parameters);
+			return stringToken;
+
 		}
 
 		// LENGTH 2..n
