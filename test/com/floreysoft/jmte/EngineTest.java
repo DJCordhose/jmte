@@ -852,19 +852,19 @@ public final class EngineTest {
 	@Test
 	public void wrapShortcutFormat() throws Exception {
 		String full = ENGINE_WITH_CUSTOM_RENDERERS.transform(
-				"<h1>${if address}${address;long}${else}NIX${end}</h1>",
+				"<h1>${if address}${address;long(full)}${else}NIX${end}</h1>",
 				DEFAULT_MODEL);
 		String shortCut = ENGINE_WITH_CUSTOM_RENDERERS.transform(
-				"${<h1>,address(NIX),</h1>;long}", DEFAULT_MODEL);
+				"${<h1>,address(NIX),</h1>;long(full)}", DEFAULT_MODEL);
 		assertEquals(full, shortCut);
 	}
 
 	@Test
 	public void defaultShortcutFormat() throws Exception {
 		String full = ENGINE_WITH_CUSTOM_RENDERERS.transform(
-				"${if address}${address;long}${else}NIX${end}", DEFAULT_MODEL);
+				"${if address}${address;long(full)}${else}NIX${end}", DEFAULT_MODEL);
 		String shortCut = ENGINE_WITH_CUSTOM_RENDERERS.transform(
-				"${address(NIX);long}", DEFAULT_MODEL);
+				"${address(NIX);long(full)}", DEFAULT_MODEL);
 		assertEquals(full, shortCut);
 	}
 

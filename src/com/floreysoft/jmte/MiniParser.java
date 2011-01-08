@@ -9,7 +9,7 @@ import java.util.List;
  * @author olli
  * 
  */
-final class MiniParser {
+public final class MiniParser {
 
 	public final static char DEFAULT_ESCAPE_CHAR = '\\';
 	public final static char DEFAULT_QUOTE_CHAR = '"';

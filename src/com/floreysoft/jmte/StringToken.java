@@ -1,33 +1,40 @@
 package com.floreysoft.jmte;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 public class StringToken extends ExpressionToken {
-	private final String namedRenderer;
-	private final String namedRendererParameters;
+	// ${<h1>,address(NIX),</h1>;long(full)}
+	private final String defaultValue; // NIX
+	private final String prefix; // <h1>
+	private final String suffix; // </h1>
+	private final String rendererName; // long
+	private final String parameters; // full
 
-	public StringToken(String expression, String namedRenderer,
-			String namedRendererParameters) {
-		super(expression);
-		this.namedRenderer = namedRenderer;
-		this.namedRendererParameters = namedRendererParameters;
+	public StringToken() {
+		this("", "", null, null, null, null, null);
 	}
 
-	public StringToken(StringToken stringToken) {
-		super(stringToken);
-		this.namedRenderer = stringToken.namedRenderer;
-		this.namedRendererParameters = stringToken.namedRendererParameters;
+	public StringToken(String text, String variableName, String defaultValue,
+			String prefix, String suffix, String rendererName, String parameters) {
+		super(variableName);
+		this.defaultValue = defaultValue;
+		this.prefix = prefix;
+		this.suffix = suffix;
+		this.rendererName = rendererName;
+		this.parameters = parameters;
+		setText(text);
 	}
 
-	@Override
-	public String getText() {
-		if (text == null) {
-			text = getExpression();
-		}
-		return text;
+	public String getPrefix() {
+		return prefix != null ? prefix : "";
+	}
+
+	public String getSuffix() {
+		return suffix != null ? suffix : "";
+	}
+
+	public String getDefaultValue() {
+		return defaultValue != null ? defaultValue : "";
 	}
 
 	@SuppressWarnings("unchecked")
@@ -37,16 +44,16 @@ public class StringToken extends ExpressionToken {
 
 		final String renderedResult;
 		final Object value = traverse(getSegments(), model, errorHandler);
-		if (value == null) {
-			renderedResult = "";
+		if (value == null || value.equals("")) {
+			renderedResult = getDefaultValue();
 		} else {
 			String namedRendererResult = null;
-			if (namedRenderer != null && !namedRenderer.equals("")) {
+			if (rendererName != null && !rendererName.equals("")) {
 				NamedRenderer rendererForName = engine
-						.resolveNamedRenderer(namedRenderer);
+						.resolveNamedRenderer(rendererName);
 				if (rendererForName != null) {
 					namedRendererResult = rendererForName.render(value,
-							namedRendererParameters);
+							parameters);
 				}
 			}
 			if (namedRendererResult != null) {
@@ -62,6 +69,6 @@ public class StringToken extends ExpressionToken {
 			}
 		}
 
-		return renderedResult;
+		return getPrefix() + renderedResult + getSuffix();
 	}
 }
