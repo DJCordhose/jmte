@@ -9,8 +9,8 @@ import java.util.concurrent.Callable;
 public class ForEachToken extends ExpressionToken {
 	public static final String FOREACH = "foreach";
 
-	private String varName;
-	private String separator;
+	private final String varName;
+	private final String separator;
 
 	private transient Iterator<Object> iterator;
 	private transient boolean last;

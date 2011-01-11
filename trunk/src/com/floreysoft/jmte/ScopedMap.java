@@ -9,13 +9,13 @@ import java.util.Stack;
 class ScopedMap implements Map<String, Object> {
 	private final Map<String, Object> rawModel;
 	private final Stack<Map<String, Object>> scope = new Stack<Map<String, Object>>();
-	
+
 	public void clear() {
 		throw new UnsupportedOperationException();
 	}
 
 	public boolean containsKey(Object key) {
-		throw new UnsupportedOperationException();
+		return get(key) != null;
 	}
 
 	public boolean containsValue(Object value) {
@@ -74,6 +74,10 @@ class ScopedMap implements Map<String, Object> {
 
 	public Map<String, Object> getRawModel() {
 		return rawModel;
+	}
+
+	public boolean isLocal(String key) {
+		return containsKey(key) && !rawModel.containsKey(key);
 	}
 
 	public void enterScope() {
