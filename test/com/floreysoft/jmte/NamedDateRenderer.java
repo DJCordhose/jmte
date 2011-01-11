@@ -36,7 +36,7 @@ public class NamedDateRenderer implements NamedRenderer {
 	}
 
 	@Override
-	public Class[] getSupportedClasses() {
+	public Class<?>[] getSupportedClasses() {
 		return new Class[] { Date.class, String.class, Integer.class,
 				Long.class };
 	}

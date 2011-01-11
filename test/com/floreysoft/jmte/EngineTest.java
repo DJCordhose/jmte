@@ -464,7 +464,7 @@ public final class EngineTest {
 			public Boolean call() throws Exception {
 				return false;
 			}
-			
+
 		});
 		String output = new Engine().transform("${if !falseCallable}YES${end}",
 				model);
@@ -862,7 +862,8 @@ public final class EngineTest {
 	@Test
 	public void defaultShortcutFormat() throws Exception {
 		String full = ENGINE_WITH_CUSTOM_RENDERERS.transform(
-				"${if address}${address;long(full)}${else}NIX${end}", DEFAULT_MODEL);
+				"${if address}${address;long(full)}${else}NIX${end}",
+				DEFAULT_MODEL);
 		String shortCut = ENGINE_WITH_CUSTOM_RENDERERS.transform(
 				"${address(NIX);long(full)}", DEFAULT_MODEL);
 		assertEquals(full, shortCut);
@@ -914,6 +915,15 @@ public final class EngineTest {
 		assertEquals(
 				"\"1970.01.01 01:00:00 MEZ\" and \"01.01.1970 01:00:00 +0100\" and Render=propertyValue1 and String=Fillbert(this is the format(no matter what I type; - this is part of the format))",
 				output);
+	}
+
+	@Test
+	public void allVariables() throws Exception {
+		Set<String> output = new Engine()
+				.getUsedVariables("${foreach strings string}${if string='String2'}${string}${adresse}${end}${end}${if date}${date}${end}");
+		// string is a local variable and should not be included here
+		assertArrayEquals(new String[] { "adresse", "date", "strings" }, output
+				.toArray());
 	}
 
 	// sandbox just for quick testing

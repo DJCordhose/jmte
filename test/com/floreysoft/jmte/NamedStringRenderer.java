@@ -38,8 +38,8 @@ public class NamedStringRenderer implements NamedRenderer {
 	}
 
 	@Override
-	public Class[] getSupportedClasses() {
-		Class[] clazzes = { String.class, Integer.class };
+	public Class<?>[] getSupportedClasses() {
+		Class<?>[] clazzes = { String.class, Integer.class };
 		return clazzes;
 	}
 }

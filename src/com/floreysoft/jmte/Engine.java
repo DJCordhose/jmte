@@ -2,6 +2,7 @@ package com.floreysoft.jmte;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import com.floreysoft.jmte.ProcessListener.Action;
 
@@ -274,6 +276,52 @@ public final class Engine {
 		return this;
 	}
 
+	public Set<String> getUsedVariables(String template) {
+		final Set<String> usedVariables = new TreeSet<String>();
+
+		final List<ProcessListener> oldListeners = this.listeners;
+		this.listeners.clear();
+
+		final List<StartEndPair> scan = scan(template);
+		final ScopedMap scopedMap = new ScopedMap(Collections.EMPTY_MAP);
+		addProcessListener(new ProcessListener() {
+
+			@Override
+			public void log(Token token, Action action) {
+				if (token instanceof ExpressionToken) {
+					String variable = ((ExpressionToken) token).getExpression();
+					// do not include local variables defined by foreach
+					if (!isLocal(variable)) {
+						usedVariables.add(variable);
+					}
+				}
+			}
+
+			// a variable is local if any enclosing foreach has it as a step
+			// variable
+			private boolean isLocal(String variable) {
+				for (Token token : scopes) {
+					if (token instanceof EmptyForEachToken) {
+						String foreachVarName = ((EmptyForEachToken) token)
+								.getVarName();
+						if (foreachVarName.equals(variable)) {
+							return true;
+						}
+					}
+				}
+				return false;
+
+			}
+
+		});
+
+		transformPure(sourceName, template, scan, scopedMap);
+
+		this.listeners.addAll(oldListeners);
+
+		return usedVariables;
+	}
+
 	/**
 	 * Transforms a template into an expanded output using the given model.
 	 * 
@@ -321,7 +369,8 @@ public final class Engine {
 						errorHandler);
 				feToken.setIterator(iterable.iterator());
 				if (!feToken.iterator().hasNext()) {
-					token = new EmptyForEachToken(feToken.getText());
+					token = new EmptyForEachToken(feToken.getExpression(),
+							feToken.getVarName(), feToken.getText());
 					notifyListeners(token, ProcessListener.Action.EMPTY_FOREACH);
 				} else {
 					model.enterScope();
@@ -451,7 +500,8 @@ public final class Engine {
 
 	public Engine registerNamedRenderer(NamedRenderer renderer) {
 		namedRenderers.put(renderer.getName(), renderer);
-		Set<Class<?>> supportedClasses = Util.asSet(renderer.getSupportedClasses());
+		Set<Class<?>> supportedClasses = Util.asSet(renderer
+				.getSupportedClasses());
 		for (Class<?> clazz : supportedClasses) {
 			Class<?> classInHierarchy = clazz;
 			while (classInHierarchy != null) {
@@ -461,13 +511,16 @@ public final class Engine {
 		}
 		return this;
 	}
+
 	public Engine deregisterNamedRenderer(NamedRenderer renderer) {
 		namedRenderers.remove(renderer.getName());
-		Set<Class<?>> supportedClasses = Util.asSet(renderer.getSupportedClasses());
+		Set<Class<?>> supportedClasses = Util.asSet(renderer
+				.getSupportedClasses());
 		for (Class<?> clazz : supportedClasses) {
 			Class<?> classInHierarchy = clazz;
 			while (classInHierarchy != null) {
-				Set<NamedRenderer> renderers = namedRenderersForClass.get(classInHierarchy);
+				Set<NamedRenderer> renderers = namedRenderersForClass
+						.get(classInHierarchy);
 				renderers.remove(renderer);
 				classInHierarchy = classInHierarchy.getSuperclass();
 			}
