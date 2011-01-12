@@ -5,20 +5,25 @@ public interface ProcessListener {
 		/**
 		 * Expression being executed
 		 */
-		EVAL, 
+		EVAL,
 		/**
-		 * Expression being skipped or condition given for skipping an expression
+		 * Expression being skipped or condition given for skipping an
+		 * expression
 		 */
-		SKIP, 
+		SKIP,
 		/**
 		 * Foreach loop over empty iterable
 		 */
-		EMPTY_FOREACH, 
+		EMPTY_FOREACH,
 		/**
 		 * Iteration over a loop
 		 */
-		ITERATE_FOREACH;
+		ITERATE_FOREACH,
+		/**
+		 * Start of an if expression
+		 */
+		IF;
 	}
-	
+
 	void log(Token token, Action action);
 }

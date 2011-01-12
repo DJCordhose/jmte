@@ -920,9 +920,9 @@ public final class EngineTest {
 	@Test
 	public void allVariables() throws Exception {
 		Set<String> output = new Engine()
-				.getUsedVariables("${foreach strings string}${if string='String2'}${string}${adresse}${end}${end}${if date}${date}${end}");
+				.getUsedVariables("${foreach strings string}${if string='String2'}${string}${adresse}${end}${end}${if !int}${date}${end}");
 		// string is a local variable and should not be included here
-		assertArrayEquals(new String[] { "adresse", "date", "strings" }, output
+		assertArrayEquals(new String[] { "adresse", "date", "int", "strings" }, output
 				.toArray());
 	}
 

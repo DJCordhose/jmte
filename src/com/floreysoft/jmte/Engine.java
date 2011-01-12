@@ -386,6 +386,7 @@ public final class Engine {
 				push(token);
 			} else if (token instanceof IfToken) {
 				push(token);
+				notifyListeners(token, ProcessListener.Action.IF);
 			} else if (token instanceof ElseToken) {
 				Token poppedToken = pop();
 				if (!(poppedToken instanceof IfToken)) {

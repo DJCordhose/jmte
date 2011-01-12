@@ -34,7 +34,8 @@ public final class MiniParser {
 	}
 
 	public static MiniParser rawOutputInstance() {
-		return new MiniParser(DEFAULT_ESCAPE_CHAR, DEFAULT_QUOTE_CHAR, false, false, true);
+		return new MiniParser(DEFAULT_ESCAPE_CHAR, DEFAULT_QUOTE_CHAR, false,
+				false, true);
 	}
 
 	private final char escapeChar;
@@ -47,7 +48,8 @@ public final class MiniParser {
 	private transient boolean quoted = false;
 
 	public MiniParser(final char escapeChar, final char quoteChar,
-			final boolean ignoreCase, final boolean trim, final boolean rawOutput) {
+			final boolean ignoreCase, final boolean trim,
+			final boolean rawOutput) {
 		this.escapeChar = escapeChar;
 		this.quoteChar = quoteChar;
 		this.ignoreCase = ignoreCase;
@@ -239,25 +241,53 @@ public final class MiniParser {
 
 	// the heart of it all
 	private void append(StringBuilder buffer, char c) {
-		if (c == escapeChar) {
-			if (escaped || rawOutput) {
-				buffer.append(c);
-			}
-			escaped = !escaped;
-		} else if (c == quoteChar) {
-			if (escaped) {
-				buffer.append(c);
-				escaped = false;
-			} else {
-				quoted = !quoted;
-				if (rawOutput) {
-					buffer.append(c);
-				}
-			}
-		} else {
+
+		// version manually simplified
+		final boolean shouldAppend = rawOutput || escaped
+				|| (c != quoteChar && c != escapeChar);
+		final boolean newEscaped = c == escapeChar && !escaped;
+		final boolean newQuoted = (c == quoteChar && !escaped) ? !quoted
+				: quoted;
+
+		// side-effect free version directly extracted from if
+		
+		// final boolean shouldAppend = (c == escapeChar && (escaped ||
+		// rawOutput))
+		// || (c == quoteChar && (escaped || rawOutput))
+		// || !(c == quoteChar || c == escapeChar);
+		// final boolean newEscaped = c == escapeChar ? !escaped
+		// : (c == quoteChar ? false : false);
+		// final boolean newQuoted = c == escapeChar ? quoted
+		// : (c == quoteChar ? (!escaped ? !quoted : quoted) : quoted);
+
+		if (shouldAppend) {
 			buffer.append(c);
-			escaped = false;
 		}
+
+		escaped = newEscaped;
+		quoted = newQuoted;
+
+		// original version
+		
+		// if (c == escapeChar) {
+		// if (escaped || rawOutput) {
+		// buffer.append(c);
+		// }
+		// escaped = !escaped;
+		// } else if (c == quoteChar) {
+		// if (escaped) {
+		// buffer.append(c);
+		// escaped = false;
+		// } else {
+		// quoted = !quoted;
+		// if (rawOutput) {
+		// buffer.append(c);
+		// }
+		// }
+		// } else {
+		// buffer.append(c);
+		// escaped = false;
+		// }
 	}
 
 	private boolean isEscaped() {
