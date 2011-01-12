@@ -1,3 +1,5 @@
+Dell Latitude E5510, i5 M520@2.4GHz, 4,00 GB, Windows 7 Professional, 32 bit, JDK 1.6.0_20
+
 JMTE 1.0
 ========
                              benchmark      ns logarithmic runtime

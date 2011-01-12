@@ -48,7 +48,9 @@ public class ForEachToken extends ExpressionToken {
 				} catch (Exception e) {
 				}
 			}
-			if (value instanceof Map) {
+			if (value == null) {
+				iterable = Collections.emptyList();
+			} else if (value instanceof Map) {
 				iterable = ((Map) value).entrySet();
 			} else if (value instanceof Iterable) {
 				iterable = ((Iterable) value);

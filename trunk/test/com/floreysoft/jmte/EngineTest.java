@@ -922,8 +922,40 @@ public final class EngineTest {
 		Set<String> output = new Engine()
 				.getUsedVariables("${foreach strings string}${if string='String2'}${string}${adresse}${end}${end}${if !int}${date}${end}");
 		// string is a local variable and should not be included here
-		assertArrayEquals(new String[] { "adresse", "date", "int", "strings" }, output
-				.toArray());
+		assertArrayEquals(new String[] { "adresse", "date", "int", "strings" },
+				output.toArray());
+	}
+
+	@Test
+	public void callableExpression() throws Exception {
+		Callable<Date> date = new Callable<Date>() {
+
+			@Override
+			public Date call() throws Exception {
+				return new Date(0);
+			}
+		};
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put("date", date);
+		String output = ENGINE_WITH_NAMED_RENDERERS.transform(
+				"${date;date(yyyy.MM.dd HH:mm:ss z)}", model);
+		assertEquals("1970.01.01 01:00:00 MEZ", output);
+	}
+
+	@Test
+	public void callableForeach() throws Exception {
+		Callable<List<String>> foreach = new Callable<List<String>>() {
+
+			@Override
+			public List<String> call() throws Exception {
+				return Arrays.asList(new String[] {"i1", "i2", "i3"});
+			}
+		};
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put("foreach", foreach);
+		String output = new Engine().transform(
+				"${foreach foreach item , }${item}${end}", model);
+		assertEquals("i1, i2, i3", output);
 	}
 
 	// sandbox just for quick testing
