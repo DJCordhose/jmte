@@ -57,7 +57,9 @@ JMTE 1.0
                                Foreach 15493,3 =============================
                               Renderer 17295,8 =============================
 
-07.01.2011, paying a performance penalty for the generally applied renderer architecture which now allows to override all rendering
+07.01.2011, paying a performance penalty for the generally
+applied renderer architecture which now allows to override
+all rendering
 ==========================================================
 
                              benchmark      ns logarithmic runtime
@@ -71,4 +73,23 @@ JMTE 1.0
  NativeForeachNoStringBuilderReference   548,5 ===============
                                Foreach 15812,1 ==============================
                               Renderer 14676,3 =============================
+                              
+12.01.2011, factored out Template interface to make
+execution configurable - preparing compilation
+also switched to javac (used to be internal
+Eclipse compiler for performance measurement)
+(svn xxx)
+==========================================================
+
+                             benchmark      ns logarithmic runtime
+                StringBuilderReference   493,3 ==============
+                 StringConcatReference   491,7 ==============
+                       PrintfReference  2896,3 =====================
+                            Expression  7300,4 =========================
+                     NativeIfReference    22,3 =
+                                    If  9531,2 ==========================
+                NativeForeachReference   334,6 ============
+ NativeForeachNoStringBuilderReference   511,2 ==============
+                               Foreach 17084,6 =============================
+                              Renderer 20125,9 =============================
                               

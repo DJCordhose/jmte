@@ -241,10 +241,9 @@ public final class Engine {
 	private String exprStartToken = "${";
 	private String exprEndToken = "}";
 	private double expansionSizeFactor = 1.2;
-	private Lexer lexer = new Lexer();
 	private ErrorHandler errorHandler = new DefaultErrorHandler();
 	private Locale locale = new Locale("en");
-	private String sourceName = null;
+	String sourceName = null;
 
 	private final Map<Class<?>, Renderer<?>> renderers = new HashMap<Class<?>, Renderer<?>>();
 	private final Map<Class<?>, Renderer<?>> resolvedRendererCache = new HashMap<Class<?>, Renderer<?>>();
@@ -252,9 +251,7 @@ public final class Engine {
 	private final Map<String, NamedRenderer> namedRenderers = new HashMap<String, NamedRenderer>();
 	private final Map<Class<?>, Set<NamedRenderer>> namedRenderersForClass = new HashMap<Class<?>, Set<NamedRenderer>>();
 
-	private final List<ProcessListener> listeners = new ArrayList<ProcessListener>();
-
-	private transient LinkedList<Token> scopes = new LinkedList<Token>();
+	final List<ProcessListener> listeners = new ArrayList<ProcessListener>();
 
 	/**
 	 * Creates a new engine having <code>${</code> and <code>}</code> as start
@@ -276,52 +273,6 @@ public final class Engine {
 		return this;
 	}
 
-	public Set<String> getUsedVariables(String template) {
-		final Set<String> usedVariables = new TreeSet<String>();
-
-		final List<ProcessListener> oldListeners = this.listeners;
-		this.listeners.clear();
-
-		final List<StartEndPair> scan = scan(template);
-		final ScopedMap scopedMap = new ScopedMap(Collections.EMPTY_MAP);
-		addProcessListener(new ProcessListener() {
-
-			@Override
-			public void log(Token token, Action action) {
-				if (token instanceof ExpressionToken) {
-					String variable = ((ExpressionToken) token).getExpression();
-					// do not include local variables defined by foreach
-					if (!isLocal(variable)) {
-						usedVariables.add(variable);
-					}
-				}
-			}
-
-			// a variable is local if any enclosing foreach has it as a step
-			// variable
-			private boolean isLocal(String variable) {
-				for (Token token : scopes) {
-					if (token instanceof EmptyForEachToken) {
-						String foreachVarName = ((EmptyForEachToken) token)
-								.getVarName();
-						if (foreachVarName.equals(variable)) {
-							return true;
-						}
-					}
-				}
-				return false;
-
-			}
-
-		});
-
-		transformPure(sourceName, template, scan, scopedMap);
-
-		this.listeners.addAll(oldListeners);
-
-		return usedVariables;
-	}
-
 	/**
 	 * Transforms a template into an expanded output using the given model.
 	 * 
@@ -332,159 +283,9 @@ public final class Engine {
 	 * @return the expanded output
 	 */
 	public String transform(String template, Map<String, Object> model) {
-		List<StartEndPair> scan = scan(template);
-		ScopedMap scopedMap = new ScopedMap(model);
-		String transformed = transformPure(sourceName, template, scan,
-				scopedMap);
-		String unescaped = Util.NO_QUOTE_MINI_PARSER.unescape(transformed);
-		return unescaped;
-	}
-
-	@SuppressWarnings("unchecked")
-	private String transformPure(String sourceName, String input,
-			List<StartEndPair> scan, ScopedMap model) {
-		final TokenStream tokenStream = new TokenStream(sourceName, input,
-				scan, lexer, getExprStartToken(), getExprEndToken());
-		final StringBuilder output = new StringBuilder(
-				(int) (input.length() * getExpansionSizeFactor()));
-		Token token;
-		while ((token = tokenStream.nextToken()) != null) {
-			boolean skipMode = isSkipMode(model);
-			if (token instanceof PlainTextToken) {
-				if (!skipMode) {
-					output.append(token.getText());
-				}
-			} else if (token instanceof StringToken) {
-				if (!skipMode) {
-					String expanded = (String) token.evaluate(this, model,
-							errorHandler);
-					output.append(expanded);
-					notifyListeners(token, ProcessListener.Action.EVAL);
-				} else {
-					notifyListeners(token, ProcessListener.Action.SKIP);
-				}
-			} else if (token instanceof ForEachToken) {
-				ForEachToken feToken = (ForEachToken) token;
-				Iterable iterable = (Iterable) feToken.evaluate(this, model,
-						errorHandler);
-				feToken.setIterator(iterable.iterator());
-				if (!feToken.iterator().hasNext()) {
-					token = new EmptyForEachToken(feToken.getExpression(),
-							feToken.getVarName(), feToken.getText());
-					notifyListeners(token, ProcessListener.Action.EMPTY_FOREACH);
-				} else {
-					model.enterScope();
-					Object value = feToken.iterator().next();
-					model.put(feToken.getVarName(), value);
-					feToken.setFirst(true);
-					feToken.setIndex(0);
-					feToken.setLast(!feToken.iterator().hasNext());
-					addSpecialVariables(feToken, model);
-					notifyListeners(token,
-							ProcessListener.Action.ITERATE_FOREACH);
-				}
-				push(token);
-			} else if (token instanceof IfToken) {
-				push(token);
-				notifyListeners(token, ProcessListener.Action.IF);
-			} else if (token instanceof ElseToken) {
-				Token poppedToken = pop();
-				if (!(poppedToken instanceof IfToken)) {
-					getErrorHandler().error("else-out-of-scope", token,
-							Engine.toModel("surroundingToken", poppedToken));
-				} else {
-					ElseToken elseToken = (ElseToken) token;
-					elseToken.setIfToken((IfToken) poppedToken);
-					push(token);
-				}
-			} else if (token instanceof EndToken) {
-				Token poppedToken = pop();
-				if (poppedToken == null) {
-					getErrorHandler().error("unmatched-end", token, null);
-				} else if (poppedToken instanceof ForEachToken) {
-					ForEachToken feToken = (ForEachToken) poppedToken;
-					if (feToken.iterator().hasNext()) {
-						// for each iteration we need to rewind to the beginning
-						// of the for loop
-						tokenStream.rewind(feToken);
-						Object value = feToken.iterator().next();
-						model.put(feToken.getVarName(), value);
-						push(feToken);
-						if (!skipMode && feToken.getSeparator() != null) {
-							output.append(feToken.getSeparator());
-						}
-						feToken.setFirst(false);
-						feToken.setLast(!feToken.iterator().hasNext());
-						feToken.setIndex(feToken.getIndex() + 1);
-						addSpecialVariables(feToken, model);
-						notifyListeners(token,
-								ProcessListener.Action.ITERATE_FOREACH);
-					} else {
-						model.exitScope();
-					}
-				}
-			}
-		}
-		return output.toString();
-	}
-
-	private void addSpecialVariables(ForEachToken feToken,
-			Map<String, Object> model) {
-		String suffix = feToken.getVarName();
-		model.put(FIRST_PREFIX + suffix, feToken.isFirst());
-		model.put(LAST_PREFIX + suffix, feToken.isLast());
-		model.put(EVEN_PREFIX + suffix, feToken.getIndex() % 2 == 0);
-		model.put(ODD_PREFIX + suffix, feToken.getIndex() % 2 == 1);
-	}
-
-	private void push(Token token) {
-		scopes.add(token);
-	}
-
-	private Token pop() {
-		if (scopes.isEmpty()) {
-			return null;
-		} else {
-			Token token = scopes.removeLast();
-			return token;
-		}
-	}
-
-	private Token peek() {
-		if (scopes.isEmpty()) {
-			return null;
-		} else {
-			return scopes.getLast();
-		}
-	}
-
-	// if anywhere in the stack trace there is a negative condition, all the
-	// inner parts must be skipped
-	private boolean isSkipMode(Map<String, Object> model) {
-		for (Token token : scopes) {
-			if (token instanceof IfToken || token instanceof ElseToken
-					|| token instanceof EmptyForEachToken) {
-				boolean condition = (Boolean) token.evaluate(this, model,
-						errorHandler);
-				if (!condition) {
-					notifyListeners(token, ProcessListener.Action.SKIP);
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * Scans the input and spits out begin/end pairs telling you where
-	 * expressions can be found.
-	 * 
-	 * @param input
-	 *            the input
-	 * @return the begin/end pairs telling you where expressions can be found
-	 */
-	List<StartEndPair> scan(String input) {
-		return Util.scan(input, getExprStartToken(), getExprEndToken(), true);
+		InterpretedTemplate templateImpl = new InterpretedTemplate(template, this);
+		String output = templateImpl.transform(model);
+		return output;
 	}
 
 	/**
@@ -603,7 +404,7 @@ public final class Engine {
 		return this;
 	}
 
-	private void notifyListeners(Token token, Action action) {
+	void notifyListeners(Token token, Action action) {
 		for (ProcessListener processListener : listeners) {
 			processListener.log(token, action);
 		}
@@ -655,5 +456,14 @@ public final class Engine {
 
 	public Locale getLocale() {
 		return locale;
+	}
+
+	public Set<String> getUsedVariables(String template) {
+		Template templateImpl = getTemplate(template);
+		return templateImpl.getUsedVariables();
+	}
+
+	private Template getTemplate(String template) {
+		return new InterpretedTemplate(template, this);
 	}
 }
