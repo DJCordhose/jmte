@@ -143,14 +143,14 @@ public final class EngineTest {
 	@Test
 	public void unterminatedScan() throws Exception {
 		String line = "${no end";
-		List<StartEndPair> scan = new Engine().scan(line);
+		List<StartEndPair> scan = new InterpretedTemplate(line, new Engine()).scan();
 		assertEquals(0, scan.size());
 	}
 
 	@Test
 	public void extract() throws Exception {
 		String line = "${if adresse}Sie wohnen an ${adresse}";
-		List<StartEndPair> scan = new Engine().scan(line);
+		List<StartEndPair> scan = new InterpretedTemplate(line, new Engine()).scan();
 		assertEquals(2, scan.size());
 
 		assertEquals(2, scan.get(0).start);
