@@ -55,24 +55,28 @@ public class StringToken extends ExpressionToken {
 				}
 			}
 
-			String namedRendererResult = null;
-			if (rendererName != null && !rendererName.equals("")) {
-				NamedRenderer rendererForName = engine
-						.resolveNamedRenderer(rendererName);
-				if (rendererForName != null) {
-					namedRendererResult = rendererForName.render(value,
-							parameters);
-				}
-			}
-			if (namedRendererResult != null) {
-				renderedResult = namedRendererResult;
+			if (value == null || value.equals("")) {
+				renderedResult = getDefaultValue();
 			} else {
-				Renderer<Object> rendererForClass = engine
-						.resolveRendererForClass(value.getClass());
-				if (rendererForClass != null) {
-					renderedResult = rendererForClass.render(value);
+				String namedRendererResult = null;
+				if (rendererName != null && !rendererName.equals("")) {
+					NamedRenderer rendererForName = engine
+							.resolveNamedRenderer(rendererName);
+					if (rendererForName != null) {
+						namedRendererResult = rendererForName.render(value,
+								parameters);
+					}
+				}
+				if (namedRendererResult != null) {
+					renderedResult = namedRendererResult;
 				} else {
-					renderedResult = value.toString();
+					Renderer<Object> rendererForClass = engine
+							.resolveRendererForClass(value.getClass());
+					if (rendererForClass != null) {
+						renderedResult = rendererForClass.render(value);
+					} else {
+						renderedResult = value.toString();
+					}
 				}
 			}
 		}

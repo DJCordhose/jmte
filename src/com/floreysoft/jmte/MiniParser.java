@@ -243,14 +243,14 @@ public final class MiniParser {
 	private void append(StringBuilder buffer, char c) {
 
 		// version manually simplified
-		final boolean shouldAppend = rawOutput || escaped
-				|| (c != quoteChar && c != escapeChar);
-		final boolean newEscaped = c == escapeChar && !escaped;
-		final boolean newQuoted = (c == quoteChar && !escaped) ? !quoted
-				: quoted;
+		// final boolean shouldAppend = rawOutput || escaped
+		// || (c != quoteChar && c != escapeChar);
+		// final boolean newEscaped = c == escapeChar && !escaped;
+		// final boolean newQuoted = (c == quoteChar && !escaped) ? !quoted
+		// : quoted;
 
 		// side-effect free version directly extracted from if
-		
+
 		// final boolean shouldAppend = (c == escapeChar && (escaped ||
 		// rawOutput))
 		// || (c == quoteChar && (escaped || rawOutput))
@@ -260,34 +260,36 @@ public final class MiniParser {
 		// final boolean newQuoted = c == escapeChar ? quoted
 		// : (c == quoteChar ? (!escaped ? !quoted : quoted) : quoted);
 
-		if (shouldAppend) {
-			buffer.append(c);
-		}
-
-		escaped = newEscaped;
-		quoted = newQuoted;
+		// if (shouldAppend) {
+		// buffer.append(c);
+		// }
+		//
+		// escaped = newEscaped;
+		// quoted = newQuoted;
 
 		// original version
-		
-		// if (c == escapeChar) {
-		// if (escaped || rawOutput) {
-		// buffer.append(c);
-		// }
-		// escaped = !escaped;
-		// } else if (c == quoteChar) {
-		// if (escaped) {
-		// buffer.append(c);
-		// escaped = false;
-		// } else {
-		// quoted = !quoted;
-		// if (rawOutput) {
-		// buffer.append(c);
-		// }
-		// }
-		// } else {
-		// buffer.append(c);
-		// escaped = false;
-		// }
+		// XXX needed to revert to this original version as micro benchmark
+		// tests
+		// showed a slow down of more than 100%
+		if (c == escapeChar) {
+			if (escaped || rawOutput) {
+				buffer.append(c);
+			}
+			escaped = !escaped;
+		} else if (c == quoteChar) {
+			if (escaped) {
+				buffer.append(c);
+				escaped = false;
+			} else {
+				quoted = !quoted;
+				if (rawOutput) {
+					buffer.append(c);
+				}
+			}
+		} else {
+			buffer.append(c);
+			escaped = false;
+		}
 	}
 
 	private boolean isEscaped() {
