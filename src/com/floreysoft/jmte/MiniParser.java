@@ -4,6 +4,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Parser for embedded mini languages.
+ * 
+ * <p>
+ * <ul>
+ * <li>Solves Demarcation: Where does an embedded language begin and where does
+ * it end
+ * <ul>
+ * <li>Escaping
+ * <li>Quotation
+ * <li>Graceful reaction to and recovery from invalid input
+ * </ul>
+ * </li>
+ * <li>Lays ground for common patterns of mini langauge processing
+ * <ul>
+ * <li>all kinds of nested brackets
+ * <li>segmentation of data
+ * <li>not loosing context
+ * <li>context sensitive parsing aka lexer modes/states
+ * </ul>
+ * </li>
+ * </ul>
+ * </p>
+ * 
  * Not thread safe.
  * 
  * @author olli

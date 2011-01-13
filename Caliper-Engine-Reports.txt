@@ -78,7 +78,7 @@ all rendering
 execution configurable - preparing compilation
 also switched to javac (used to be internal
 Eclipse compiler for performance measurement)
-(svn xxx)
+(svn rev 94)
 ==========================================================
 
                              benchmark      ns logarithmic runtime

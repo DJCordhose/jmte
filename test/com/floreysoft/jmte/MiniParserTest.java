@@ -18,7 +18,6 @@ import java.util.Map;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.floreysoft.jmte.Engine.StartEndPair;
 
 public final class MiniParserTest {
 	static final String WS_SPLIT_STRING = " a  \t\n  \r b c";

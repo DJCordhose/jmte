@@ -2,15 +2,12 @@ package com.floreysoft.jmte;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 import com.floreysoft.jmte.ProcessListener.Action;
 
@@ -46,35 +43,10 @@ import com.floreysoft.jmte.ProcessListener.Action;
  * where <code>input</code> contains the template and <code>model</code> the
  * model. <br>
  * 
- * @see Lexer
  * @see ErrorHandler
  * @see Tool
  */
 public final class Engine {
-	public static final String ODD_PREFIX = "odd_";
-	public static final String EVEN_PREFIX = "even_";
-	public static final String LAST_PREFIX = "last_";
-	public static final String FIRST_PREFIX = "first_";
-
-	/**
-	 * Pairs of begin/end.
-	 * 
-	 */
-	static class StartEndPair {
-		public final int start;
-		public final int end;
-
-		public StartEndPair(int start, int end) {
-			this.start = start;
-			this.end = end;
-		}
-
-		@Override
-		public String toString() {
-			return "" + start + "-" + end;
-		}
-	}
-
 	/**
 	 * Replacement for {@link java.lang.String.format}. All arguments will be
 	 * put into the model having their index starting from 1 as their name.

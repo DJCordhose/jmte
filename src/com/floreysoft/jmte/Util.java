@@ -30,7 +30,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import com.floreysoft.jmte.Engine.StartEndPair;
 
 /**
  * Assorted static utility methods.

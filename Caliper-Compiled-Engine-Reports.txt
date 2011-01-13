@@ -1,0 +1,13 @@
+Dell Latitude E5510, i5 M520@2.4GHz, 4,00 GB, Windows 7 Professional, 32 bit, JDK 1.6.0_20
+
+13.01.2011 (svn rev xxx)
+========================
+                          benchmark    us logarithmic runtime
+          SimpleExpressionReference  6,44 ================
+         ComplexExpressionReference  6,93 =================
+  PrototypeCompiledSimpleExpression  3,66 ========
+ PrototypeCompiledComplexExpression  3,69 ========
+                                 If  9,75 ======================
+      PrototypeCompiledIfExpression  2,17 =
+                            Foreach 16,63 ==============================
+ PrototypeCompiledForeachExpression  7,98 ===================

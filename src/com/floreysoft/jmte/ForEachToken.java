@@ -20,7 +20,7 @@ public class ForEachToken extends ExpressionToken {
 	public ForEachToken(String expression, String varName, String separator) {
 		super(expression);
 		this.varName = varName;
-		this.separator = separator;
+		this.separator = separator != null ? separator : "";
 	}
 
 	@Override

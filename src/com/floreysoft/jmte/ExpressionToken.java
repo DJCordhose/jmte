@@ -5,8 +5,8 @@ import java.util.Map;
 
 public abstract class ExpressionToken extends AbstractToken {
 
-	public final static String segmentsToString(List<String> segments, int start,
-			int end) {
+	public final static String segmentsToString(List<String> segments,
+			int start, int end) {
 		if (start >= segments.size() || end > segments.size()) {
 			throw new IllegalArgumentException("Range is not inside segments");
 		}
@@ -32,9 +32,9 @@ public abstract class ExpressionToken extends AbstractToken {
 		this.setExpression(expression);
 	}
 
-	public ExpressionToken(ExpressionToken expressionToken) {
-		super(expressionToken);
-		this.setExpression(expressionToken.expression);
+	protected ExpressionToken(List<String> segments, String expression) {
+		this.segments = segments;
+		this.expression = expression;
 	}
 
 	public boolean isComposed() {
