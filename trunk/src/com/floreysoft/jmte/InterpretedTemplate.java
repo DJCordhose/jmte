@@ -7,21 +7,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.floreysoft.jmte.Engine.StartEndPair;
+public class InterpretedTemplate extends AbstractTemplate implements Template {
 
-public class InterpretedTemplate implements Template {
-
-	private final String template;
-	private final Engine engine;
-	private transient Lexer lexer = new Lexer();
 	private transient LinkedList<Token> scopes = new LinkedList<Token>();
 
 	public InterpretedTemplate(String template, Engine engine) {
-		this.template = template;
-		this.engine = engine;
+		super(template, engine);
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public Set<String> getUsedVariables() {
 		final Set<String> usedVariables = new TreeSet<String>();
 
@@ -151,7 +146,7 @@ public class InterpretedTemplate implements Template {
 						Object value = feToken.iterator().next();
 						model.put(feToken.getVarName(), value);
 						push(feToken);
-						if (!skipMode && feToken.getSeparator() != null) {
+						if (!skipMode) {
 							output.append(feToken.getSeparator());
 						}
 						feToken.setFirst(false);
@@ -167,15 +162,6 @@ public class InterpretedTemplate implements Template {
 			}
 		}
 		return output.toString();
-	}
-
-	private void addSpecialVariables(ForEachToken feToken,
-			Map<String, Object> model) {
-		String suffix = feToken.getVarName();
-		model.put(Engine.FIRST_PREFIX + suffix, feToken.isFirst());
-		model.put(Engine.LAST_PREFIX + suffix, feToken.isLast());
-		model.put(Engine.EVEN_PREFIX + suffix, feToken.getIndex() % 2 == 0);
-		model.put(Engine.ODD_PREFIX + suffix, feToken.getIndex() % 2 == 1);
 	}
 
 	private void push(Token token) {
@@ -215,18 +201,4 @@ public class InterpretedTemplate implements Template {
 		}
 		return false;
 	}
-
-	/**
-	 * Scans the input and spits out begin/end pairs telling you where
-	 * expressions can be found.
-	 * 
-	 * @param input
-	 *            the input
-	 * @return the begin/end pairs telling you where expressions can be found
-	 */
-	List<StartEndPair> scan() {
-		return Util.scan(template, engine.getExprStartToken(), engine
-				.getExprEndToken(), true);
-	}
-
 }

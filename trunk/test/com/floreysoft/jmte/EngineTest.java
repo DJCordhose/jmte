@@ -1,6 +1,9 @@
 package com.floreysoft.jmte;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -19,8 +22,9 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 
 import org.junit.Test;
+import org.objectweb.asm.ClassWriter;
 
-import com.floreysoft.jmte.Engine.StartEndPair;
+import static org.objectweb.asm.Opcodes.*;
 
 @SuppressWarnings("unchecked")
 public final class EngineTest {
@@ -143,14 +147,16 @@ public final class EngineTest {
 	@Test
 	public void unterminatedScan() throws Exception {
 		String line = "${no end";
-		List<StartEndPair> scan = new InterpretedTemplate(line, new Engine()).scan();
+		List<StartEndPair> scan = new InterpretedTemplate(line, new Engine())
+				.scan();
 		assertEquals(0, scan.size());
 	}
 
 	@Test
 	public void extract() throws Exception {
 		String line = "${if adresse}Sie wohnen an ${adresse}";
-		List<StartEndPair> scan = new InterpretedTemplate(line, new Engine()).scan();
+		List<StartEndPair> scan = new InterpretedTemplate(line, new Engine())
+				.scan();
 		assertEquals(2, scan.size());
 
 		assertEquals(2, scan.get(0).start);
@@ -822,7 +828,7 @@ public final class EngineTest {
 		assertEquals("arg2", output);
 	}
 
-	private final static Engine ENGINE_WITH_CUSTOM_RENDERERS = new Engine()
+	final static Engine ENGINE_WITH_CUSTOM_RENDERERS = new Engine()
 			.registerRenderer(Object.class, new Renderer<Object>() {
 
 				@Override
@@ -948,7 +954,7 @@ public final class EngineTest {
 
 			@Override
 			public List<String> call() throws Exception {
-				return Arrays.asList(new String[] {"i1", "i2", "i3"});
+				return Arrays.asList(new String[] { "i1", "i2", "i3" });
 			}
 		};
 		Map<String, Object> model = new HashMap<String, Object>();
@@ -958,7 +964,50 @@ public final class EngineTest {
 		assertEquals("i1, i2, i3", output);
 	}
 
-	// sandbox just for quick testing
-	public static void main(String[] args) {
+	@Test
+	public void compiledSimpleSample() throws Exception {
+		String output = new SampleSimpleExpressionCompiledTemplate(
+				"${address}", new Engine()).transform(DEFAULT_MODEL);
+		assertEquals(DEFAULT_MODEL.get("address"), output);
 	}
+
+	@Test
+	public void compiledComplexSample() throws Exception {
+		String input = "${<h1>,address(NIX),</h1>;long(full)}";
+		String interpretedOutput = ENGINE_WITH_CUSTOM_RENDERERS.transform(
+				input, DEFAULT_MODEL);
+		String compiledOutput = new SampleComplexExpressionCompiledTemplate(
+				input, ENGINE_WITH_CUSTOM_RENDERERS).transform(DEFAULT_MODEL);
+		assertEquals(interpretedOutput, compiledOutput);
+	}
+
+	@Test
+	public void compiledIfSample() throws Exception {
+		String input = "${if empty}${address}${else}NIX${end}";
+		String interpretedOutput = new Engine().transform(input, DEFAULT_MODEL);
+		String compiledOutput = new SampleIfEmptyFalseExpressionCompiledTemplate(
+				input, new Engine()).transform(DEFAULT_MODEL);
+		assertEquals(interpretedOutput, compiledOutput);
+	}
+
+	@Test
+	public void compiledForeachSample() throws Exception {
+		String input = "${ foreach list item \n}${item.property1}${end}";
+		String interpretedOutput = new Engine().transform(input, DEFAULT_MODEL);
+		String compiledOutput = new SampleNewlineForeachSeparatorCompiledTemplate(
+				input, new Engine()).transform(DEFAULT_MODEL);
+		assertEquals(interpretedOutput, compiledOutput);
+	}
+
+	public static void main(String[] args) {
+		ClassWriter cw = new ClassWriter(0);
+		cw.visit(V1_6, ACC_PUBLIC, "Test", null, "java/lang/Object", null);
+		// cw.visitMethod(ACC_PUBLIC, "doIt", desc, signature, exceptions)
+		byte[] byteArray = cw.toByteArray();
+
+		Class<?> myClass = AbstractCompiledTemplate
+				.loadClass("Test", byteArray);
+		System.out.println(myClass);
+	}
+
 }

@@ -1,5 +1,6 @@
 package com.floreysoft.jmte;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
@@ -24,6 +25,19 @@ public class StringToken extends ExpressionToken {
 		this.rendererName = rendererName;
 		this.parameters = parameters;
 		setText(text);
+	}
+
+	public StringToken(String variableName) {
+		this(variableName, variableName, null, null, null, null, null);
+	}
+
+	protected StringToken(List<String> segments, String variableName) {
+		super(segments, variableName);
+		this.defaultValue = null;
+		this.prefix = null;
+		this.suffix = null;
+		this.rendererName = null;
+		this.parameters = null;
 	}
 
 	public String getPrefix() {

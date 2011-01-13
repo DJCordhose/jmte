@@ -65,7 +65,7 @@ public class IfToken extends ExpressionToken {
 				condition = list == null || !list.isEmpty();
 			}
 		}
-		Object evaluated = negated ? !condition : condition;
+		boolean evaluated = negated ? !condition : condition;
 
 		return evaluated;
 	}

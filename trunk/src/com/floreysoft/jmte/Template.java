@@ -4,6 +4,11 @@ import java.util.Map;
 import java.util.Set;
 
 public interface Template {
+	public static final String ODD_PREFIX = "odd_";
+	public static final String EVEN_PREFIX = "even_";
+	public static final String LAST_PREFIX = "last_";
+	public static final String FIRST_PREFIX = "first_";
+
 	/**
 	 * Transforms a template into an expanded output using the given model.
 	 * 

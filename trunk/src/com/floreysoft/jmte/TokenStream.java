@@ -3,7 +3,6 @@ package com.floreysoft.jmte;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.floreysoft.jmte.Engine.StartEndPair;
 
 public class TokenStream {
 	private final String sourceName;
