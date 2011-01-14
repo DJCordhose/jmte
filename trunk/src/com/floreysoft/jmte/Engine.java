@@ -261,7 +261,8 @@ public final class Engine {
 	 * @return the expanded output
 	 */
 	public String transform(String template, Map<String, Object> model) {
-		InterpretedTemplate templateImpl = new InterpretedTemplate(template, this);
+		InterpretedTemplate templateImpl = new InterpretedTemplate(template,
+				this);
 		String output = templateImpl.transform(model);
 		return output;
 	}
@@ -439,6 +440,18 @@ public final class Engine {
 	public Set<String> getUsedVariables(String template) {
 		Template templateImpl = getTemplate(template);
 		return templateImpl.getUsedVariables();
+	}
+
+	/**
+	 * Scans the input and spits out begin/end pairs telling you where
+	 * expressions can be found.
+	 * 
+	 * @param input
+	 *            the input
+	 * @return the begin/end pairs telling you where expressions can be found
+	 */
+	protected List<StartEndPair> scan(String input) {
+		return Util.scan(input, getExprStartToken(), getExprEndToken(), true);
 	}
 
 	private Template getTemplate(String template) {

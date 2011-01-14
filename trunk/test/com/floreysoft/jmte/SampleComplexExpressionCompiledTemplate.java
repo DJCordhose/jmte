@@ -1,16 +1,14 @@
 package com.floreysoft.jmte;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 // ${<h1>,address(NIX),</h1>;long(full)}
 public class SampleComplexExpressionCompiledTemplate extends
 		AbstractCompiledTemplate {
 
-	public SampleComplexExpressionCompiledTemplate(String template,
-			Engine engine) {
-		super(template, engine);
+	public SampleComplexExpressionCompiledTemplate(Engine engine) {
+		super(engine);
 	}
 
 	@Override
@@ -25,7 +23,7 @@ public class SampleComplexExpressionCompiledTemplate extends
 
 		StringToken stringToken = new StringToken("address", "address", "NIX",
 				"<h1>", "</h1>", "long", "full");
-		return stringToken.evaluate(engine, model, engine.getErrorHandler())
+		return stringToken.evaluate(getEngine(), model, getEngine().getErrorHandler())
 				.toString();
 
 	}

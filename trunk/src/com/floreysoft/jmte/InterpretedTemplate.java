@@ -11,9 +11,13 @@ import java.util.TreeSet;
 public class InterpretedTemplate extends AbstractTemplate implements Template {
 
 	private transient LinkedList<Token> scopes = new LinkedList<Token>();
+	protected final String template;
+	protected final Engine engine;
+	protected transient Lexer lexer = new Lexer();
 
 	public InterpretedTemplate(String template, Engine engine) {
-		super(template, engine);
+		this.template = template;
+		this.engine = engine;
 	}
 
 	@Override
@@ -24,7 +28,7 @@ public class InterpretedTemplate extends AbstractTemplate implements Template {
 		final List<ProcessListener> oldListeners = engine.listeners;
 		engine.listeners.clear();
 
-		final List<StartEndPair> scan = scan();
+		final List<StartEndPair> scan = engine.scan(template);
 		final ScopedMap scopedMap = new ScopedMap(Collections.EMPTY_MAP);
 		engine.addProcessListener(new ProcessListener() {
 
@@ -66,7 +70,7 @@ public class InterpretedTemplate extends AbstractTemplate implements Template {
 
 	@Override
 	public String transform(Map<String, Object> model) {
-		List<StartEndPair> scan = scan();
+		List<StartEndPair> scan = engine.scan(template);
 		ScopedMap scopedMap = new ScopedMap(model);
 		String transformed = transformPure(engine.sourceName, scan, scopedMap);
 		String unescaped = Util.NO_QUOTE_MINI_PARSER.unescape(transformed);
@@ -77,6 +81,8 @@ public class InterpretedTemplate extends AbstractTemplate implements Template {
 	@SuppressWarnings("unchecked")
 	private String transformPure(String sourceName, List<StartEndPair> scan,
 			ScopedMap model) {
+		scopes.clear();
+
 		final TokenStream tokenStream = new TokenStream(sourceName, template,
 				scan, lexer, engine.getExprStartToken(), engine
 						.getExprEndToken());
@@ -175,14 +181,6 @@ public class InterpretedTemplate extends AbstractTemplate implements Template {
 		} else {
 			Token token = scopes.removeLast();
 			return token;
-		}
-	}
-
-	private Token peek() {
-		if (scopes.isEmpty()) {
-			return null;
-		} else {
-			return scopes.getLast();
 		}
 	}
 

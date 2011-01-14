@@ -80,4 +80,11 @@ public class TokenStream {
 		initTokens();
 		this.currentTokenIndex = tokenToRewindTo.getTokenIndex() + 1;
 	}
+	
+	public List<Token> getAllTokens() {
+		initTokens();
+		return this.tokens;
+	}
+
+	
 }

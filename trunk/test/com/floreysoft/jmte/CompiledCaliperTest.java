@@ -31,15 +31,15 @@ public class CompiledCaliperTest {
 		public void timePrototypeCompiledSimpleExpression(int reps)
 				throws Exception {
 			for (int i = 0; i < reps; i++) {
-				new SampleSimpleExpressionCompiledTemplate("${address}",
-						new Engine()).transform(EngineTest.DEFAULT_MODEL);
+				new SampleSimpleExpressionCompiledTemplate(new Engine())
+						.transform(EngineTest.DEFAULT_MODEL);
 			}
 		}
 
 		public void timePrototypeCompiledComplexExpression(int reps)
 				throws Exception {
 			for (int i = 0; i < reps; i++) {
-				new SampleSimpleExpressionCompiledTemplate(null, new Engine())
+				new SampleSimpleExpressionCompiledTemplate(new Engine())
 						.transform(EngineTest.DEFAULT_MODEL);
 			}
 		}
@@ -53,8 +53,8 @@ public class CompiledCaliperTest {
 		public void timePrototypeCompiledIfExpression(int reps)
 				throws Exception {
 			for (int i = 0; i < reps; i++) {
-				new SampleIfEmptyFalseExpressionCompiledTemplate(null,
-						new Engine()).transform(EngineTest.DEFAULT_MODEL);
+				new SampleIfEmptyFalseExpressionCompiledTemplate(new Engine())
+						.transform(EngineTest.DEFAULT_MODEL);
 			}
 		}
 
@@ -67,8 +67,8 @@ public class CompiledCaliperTest {
 		public void timePrototypeCompiledForeachExpression(int reps)
 				throws Exception {
 			for (int i = 0; i < reps; i++) {
-				new SampleNewlineForeachSeparatorCompiledTemplate(null,
-						new Engine()).transform(EngineTest.DEFAULT_MODEL);
+				new SampleNewlineForeachSeparatorCompiledTemplate(new Engine())
+						.transform(EngineTest.DEFAULT_MODEL);
 			}
 		}
 

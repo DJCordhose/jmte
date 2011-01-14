@@ -10,9 +10,8 @@ import java.util.Set;
 public class SampleNewlineForeachSeparatorCompiledTemplate extends
 		AbstractCompiledTemplate {
 
-	public SampleNewlineForeachSeparatorCompiledTemplate(String template,
-			Engine engine) {
-		super(template, engine);
+	public SampleNewlineForeachSeparatorCompiledTemplate(Engine engine) {
+		super(engine);
 	}
 
 	@Override
@@ -27,36 +26,40 @@ public class SampleNewlineForeachSeparatorCompiledTemplate extends
 	protected String transformCompiled(ScopedMap model) {
 		StringBuilder buffer = new StringBuilder();
 		ForEachToken feToken = new ForEachToken("list", "item", "\n");
-		Iterable iterable = (Iterable) feToken.evaluate(engine, model, engine
+		Iterable iterable = (Iterable) feToken.evaluate(getEngine(), model, getEngine()
 				.getErrorHandler());
 		feToken.setIterator(iterable.iterator());
 
-		Iterator<Object> iterator = feToken.iterator();
-		boolean first = true;
-		while (iterator.hasNext()) {
-			Object value = iterator.next();
-			model.put(feToken.getVarName(), value);
-			feToken.setFirst(first);
-			feToken.setLast(!iterator.hasNext());
-			feToken.setIndex(feToken.getIndex() + 1);
-			addSpecialVariables(feToken, model);
-			engine.notifyListeners(feToken,
-					ProcessListener.Action.ITERATE_FOREACH);
+		model.enterScope();
+		try {
+			Iterator<Object> iterator = feToken.iterator();
+			boolean first = true;
+			while (iterator.hasNext()) {
+				Object value = iterator.next();
+				model.put(feToken.getVarName(), value);
+				feToken.setFirst(first);
+				feToken.setLast(!iterator.hasNext());
+				feToken.setIndex(feToken.getIndex() + 1);
+				addSpecialVariables(feToken, model);
+				getEngine().notifyListeners(feToken,
+						ProcessListener.Action.ITERATE_FOREACH);
 
-			StringToken stringToken = new StringToken(Arrays
-					.asList(new String[] { "item", "property1" }),
-					"item.property1");
-			Object evaluated = stringToken.evaluate(engine, model, engine
-					.getErrorHandler());
-			buffer.append(evaluated.toString());
+				StringToken stringToken = new StringToken(Arrays
+						.asList(new String[] { "item", "property1" }),
+						"item.property1");
+				Object evaluated = stringToken.evaluate(getEngine(), model, getEngine()
+						.getErrorHandler());
+				buffer.append(evaluated.toString());
 
-			first = false;
-			if (!feToken.isLast()) {
-				buffer.append(feToken.getSeparator());
+				first = false;
+				if (!feToken.isLast()) {
+					buffer.append(feToken.getSeparator());
+				}
 			}
+		} finally {
+			model.exitScope();
 		}
 		return buffer.toString();
-
 	}
 
 }
