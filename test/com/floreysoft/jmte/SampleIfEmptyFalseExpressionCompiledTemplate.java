@@ -8,9 +8,8 @@ import java.util.Set;
 public class SampleIfEmptyFalseExpressionCompiledTemplate extends
 		AbstractCompiledTemplate {
 
-	public SampleIfEmptyFalseExpressionCompiledTemplate(String template,
-			Engine engine) {
-		super(template, engine);
+	public SampleIfEmptyFalseExpressionCompiledTemplate(Engine engine) {
+		super(engine);
 	}
 
 	@Override
@@ -24,7 +23,7 @@ public class SampleIfEmptyFalseExpressionCompiledTemplate extends
 	protected String transformCompiled(ScopedMap model) {
 		IfToken ifToken = new IfToken("empty", false);
 
-		if ((Boolean) ifToken.evaluate(engine, model, engine.getErrorHandler())) {
+		if ((Boolean) ifToken.evaluate(getEngine(), model, getEngine().getErrorHandler())) {
 			StringToken stringToken = new StringToken("address", "address",
 					null, null, null, null, null);
 			return stringToken.toString();

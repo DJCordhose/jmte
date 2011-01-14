@@ -152,16 +152,14 @@ public final class EngineTest {
 	@Test
 	public void unterminatedScan() throws Exception {
 		String line = "${no end";
-		List<StartEndPair> scan = new InterpretedTemplate(line, new Engine())
-				.scan();
+		List<StartEndPair> scan = new Engine().scan(line);
 		assertEquals(0, scan.size());
 	}
 
 	@Test
 	public void extract() throws Exception {
 		String line = "${if adresse}Sie wohnen an ${adresse}";
-		List<StartEndPair> scan = new InterpretedTemplate(line, new Engine())
-				.scan();
+		List<StartEndPair> scan = new Engine().scan(line);
 		assertEquals(2, scan.size());
 
 		assertEquals(2, scan.get(0).start);
@@ -971,8 +969,8 @@ public final class EngineTest {
 
 	@Test
 	public void compiledSimpleSample() throws Exception {
-		String output = new SampleSimpleExpressionCompiledTemplate(
-				"${address}", new Engine()).transform(DEFAULT_MODEL);
+		String output = new SampleSimpleExpressionCompiledTemplate(new Engine())
+				.transform(DEFAULT_MODEL);
 		assertEquals(DEFAULT_MODEL.get("address"), output);
 	}
 
@@ -982,7 +980,7 @@ public final class EngineTest {
 		String interpretedOutput = ENGINE_WITH_CUSTOM_RENDERERS.transform(
 				input, DEFAULT_MODEL);
 		String compiledOutput = new SampleComplexExpressionCompiledTemplate(
-				input, ENGINE_WITH_CUSTOM_RENDERERS).transform(DEFAULT_MODEL);
+				ENGINE_WITH_CUSTOM_RENDERERS).transform(DEFAULT_MODEL);
 		assertEquals(interpretedOutput, compiledOutput);
 	}
 
@@ -991,7 +989,7 @@ public final class EngineTest {
 		String input = "${if empty}${address}${else}NIX${end}";
 		String interpretedOutput = new Engine().transform(input, DEFAULT_MODEL);
 		String compiledOutput = new SampleIfEmptyFalseExpressionCompiledTemplate(
-				input, new Engine()).transform(DEFAULT_MODEL);
+				new Engine()).transform(DEFAULT_MODEL);
 		assertEquals(interpretedOutput, compiledOutput);
 	}
 
@@ -1000,19 +998,14 @@ public final class EngineTest {
 		String input = "${ foreach list item \n}${item.property1}${end}";
 		String interpretedOutput = new Engine().transform(input, DEFAULT_MODEL);
 		String compiledOutput = new SampleNewlineForeachSeparatorCompiledTemplate(
-				input, new Engine()).transform(DEFAULT_MODEL);
+				new Engine()).transform(DEFAULT_MODEL);
 		assertEquals(interpretedOutput, compiledOutput);
 	}
 
 	public static void main(String[] args) {
-		ClassWriter cw = new ClassWriter(0);
-		cw.visit(V1_6, ACC_PUBLIC, "Test", null, "java/lang/Object", null);
-		// cw.visitMethod(ACC_PUBLIC, "doIt", desc, signature, exceptions)
-		byte[] byteArray = cw.toByteArray();
-
-		Class<?> myClass = Compiler
-				.loadClass("Test", byteArray);
-		System.out.println(myClass);
+		Template template = new Compiler("", new Engine()).compile();
+		String compiledOutput = template.transform(DEFAULT_MODEL);
+		System.out.println(compiledOutput);
 	}
 
 }

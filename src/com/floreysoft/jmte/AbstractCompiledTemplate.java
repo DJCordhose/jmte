@@ -8,11 +8,15 @@ import java.util.Set;
 public abstract class AbstractCompiledTemplate extends AbstractTemplate implements
 		Template {
 	protected final Set<String> usedVariables = new HashSet<String>();
-	
-	public AbstractCompiledTemplate(String template, Engine engine) {
-		super(template, engine);
+	private Engine engine;
+
+	public AbstractCompiledTemplate() {
 	}
-	
+
+	public AbstractCompiledTemplate(Engine engine) {
+		this.engine = engine;
+	}
+
 	@Override
 	public Set<String> getUsedVariables() {
 		return usedVariables;
@@ -29,4 +33,12 @@ public abstract class AbstractCompiledTemplate extends AbstractTemplate implemen
 
 	protected abstract String transformCompiled(ScopedMap scopedMap);
 
+	public void setEngine(Engine engine) {
+		this.engine = engine;
+	}
+
+	public Engine getEngine() {
+		return engine;
+	}
+	
 }
