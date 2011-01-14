@@ -1,4 +1,4 @@
-package com.floreysoft.jmte;
+package com.floreysoft.jmte.util;
 
 import java.util.ArrayList;
 import java.util.List;

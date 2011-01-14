@@ -30,6 +30,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import com.floreysoft.jmte.util.MiniParser;
+
+
 
 /**
  * Assorted static utility methods.

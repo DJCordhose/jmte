@@ -18,6 +18,9 @@ import java.util.Map;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.floreysoft.jmte.util.MiniParser;
+import com.floreysoft.jmte.util.NestedParser;
+
 
 public final class MiniParserTest {
 	static final String WS_SPLIT_STRING = " a  \t\n  \r b c";

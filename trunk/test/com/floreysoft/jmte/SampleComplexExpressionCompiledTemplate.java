@@ -21,7 +21,7 @@ public class SampleComplexExpressionCompiledTemplate extends
 	}
 
 	@Override
-	public String transform(Map<String, Object> model) {
+	protected String transformCompiled(ScopedMap model) {
 
 		StringToken stringToken = new StringToken("address", "address", "NIX",
 				"<h1>", "</h1>", "long", "full");

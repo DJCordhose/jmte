@@ -8,6 +8,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Map;
 import java.util.Properties;
 
+
 /**
  * <p>Main class used as a command line tool. You pass at least two arguments</p>
  * <ul>

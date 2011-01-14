@@ -1,4 +1,5 @@
-package com.floreysoft.jmte;
+package com.floreysoft.jmte.renderer;
+
 
 
 public interface NamedRenderer {

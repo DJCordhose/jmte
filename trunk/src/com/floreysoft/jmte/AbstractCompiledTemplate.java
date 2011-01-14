@@ -1,29 +1,32 @@
 package com.floreysoft.jmte;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+
 public abstract class AbstractCompiledTemplate extends AbstractTemplate implements
 		Template {
-	@SuppressWarnings("unchecked")
-	public static <T> Class<T> loadClass(String name, byte[] b, Class<T> type) {
-		return MY_CLASS_LOADER.defineClass(name, b);
-	}
-
-	public static Class<?> loadClass(String name, byte[] b) {
-		return MY_CLASS_LOADER.defineClass(name, b);
-	}
-
-	@SuppressWarnings("unchecked")
-	private static class MyClassLoader extends ClassLoader {
-		public Class defineClass(String name, byte[] b) {
-			return defineClass(name, b, 0, b.length);
-		}
-	};
-
-	private static MyClassLoader MY_CLASS_LOADER = new MyClassLoader();
-
+	protected final Set<String> usedVariables = new HashSet<String>();
+	
 	public AbstractCompiledTemplate(String template, Engine engine) {
 		super(template, engine);
 	}
+	
+	@Override
+	public Set<String> getUsedVariables() {
+		return usedVariables;
+	}
+
+	@Override
+	public String transform(Map<String, Object> model) {
+		ScopedMap scopedMap = new ScopedMap(model);
+		String transformed = transformCompiled(scopedMap);
+		String unescaped = Util.NO_QUOTE_MINI_PARSER.unescape(transformed);
+		return unescaped;
+
+	}
+
+	protected abstract String transformCompiled(ScopedMap scopedMap);
+
 }
