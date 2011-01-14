@@ -10,6 +10,12 @@ import java.util.Map;
 import java.util.Set;
 
 import com.floreysoft.jmte.ProcessListener.Action;
+import com.floreysoft.jmte.renderer.DefaultCollectionRenderer;
+import com.floreysoft.jmte.renderer.DefaultIterableRenderer;
+import com.floreysoft.jmte.renderer.DefaultMapRenderer;
+import com.floreysoft.jmte.renderer.DefaultObjectRenderer;
+import com.floreysoft.jmte.renderer.NamedRenderer;
+import com.floreysoft.jmte.renderer.Renderer;
 
 /**
  * <p>

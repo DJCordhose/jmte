@@ -1,5 +1,9 @@
 package com.floreysoft.jmte;
 
+import com.floreysoft.jmte.renderer.NamedRenderer;
+import com.floreysoft.jmte.renderer.OptionRenderFormatInfo;
+import com.floreysoft.jmte.renderer.RenderFormatInfo;
+
 public class NamedStringRenderer implements NamedRenderer {
 
 	String convert(Object o) {

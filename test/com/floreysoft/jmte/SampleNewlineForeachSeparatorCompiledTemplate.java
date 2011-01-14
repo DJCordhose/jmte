@@ -24,7 +24,7 @@ public class SampleNewlineForeachSeparatorCompiledTemplate extends
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public String transform(Map<String, Object> model) {
+	protected String transformCompiled(ScopedMap model) {
 		StringBuilder buffer = new StringBuilder();
 		ForEachToken feToken = new ForEachToken("list", "item", "\n");
 		Iterable iterable = (Iterable) feToken.evaluate(engine, model, engine

@@ -5,6 +5,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import com.floreysoft.jmte.renderer.NamedRenderer;
+import com.floreysoft.jmte.renderer.RenderFormatInfo;
+
 public class NamedDateRenderer implements NamedRenderer {
 
 	private static final String DEFAULT_PATTERN = "dd.MM.yyyy HH:mm:ss Z";

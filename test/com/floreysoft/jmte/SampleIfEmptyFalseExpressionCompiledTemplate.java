@@ -21,7 +21,7 @@ public class SampleIfEmptyFalseExpressionCompiledTemplate extends
 	}
 
 	@Override
-	public String transform(Map<String, Object> model) {
+	protected String transformCompiled(ScopedMap model) {
 		IfToken ifToken = new IfToken("empty", false);
 
 		if ((Boolean) ifToken.evaluate(engine, model, engine.getErrorHandler())) {

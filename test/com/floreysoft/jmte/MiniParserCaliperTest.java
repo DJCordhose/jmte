@@ -1,5 +1,6 @@
 package com.floreysoft.jmte;
 
+import com.floreysoft.jmte.util.MiniParser;
 import com.google.caliper.SimpleBenchmark;
 
 public class MiniParserCaliperTest {

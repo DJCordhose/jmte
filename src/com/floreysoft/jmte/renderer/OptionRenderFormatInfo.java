@@ -1,4 +1,4 @@
-package com.floreysoft.jmte;
+package com.floreysoft.jmte.renderer;
 
 public class OptionRenderFormatInfo implements RenderFormatInfo {
 

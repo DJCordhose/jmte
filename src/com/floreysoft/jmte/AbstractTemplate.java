@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 
+
 public abstract class AbstractTemplate implements Template {
 
 	protected final String template;

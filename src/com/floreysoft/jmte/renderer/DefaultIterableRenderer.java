@@ -1,6 +1,7 @@
-package com.floreysoft.jmte;
+package com.floreysoft.jmte.renderer;
 
 import java.util.Iterator;
+
 
 @SuppressWarnings("unchecked")
 public class DefaultIterableRenderer implements Renderer<Iterable> {

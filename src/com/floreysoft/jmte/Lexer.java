@@ -1,7 +1,9 @@
 package com.floreysoft.jmte;
 
-import static com.floreysoft.jmte.NestedParser.*;
+import static com.floreysoft.jmte.util.NestedParser.*;
+
 import java.util.List;
+
 
 public class Lexer {
 

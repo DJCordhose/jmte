@@ -24,6 +24,11 @@ import java.util.concurrent.Callable;
 import org.junit.Test;
 import org.objectweb.asm.ClassWriter;
 
+import com.floreysoft.jmte.renderer.NamedRenderer;
+import com.floreysoft.jmte.renderer.OptionRenderFormatInfo;
+import com.floreysoft.jmte.renderer.RenderFormatInfo;
+import com.floreysoft.jmte.renderer.Renderer;
+
 import static org.objectweb.asm.Opcodes.*;
 
 @SuppressWarnings("unchecked")
@@ -1005,7 +1010,7 @@ public final class EngineTest {
 		// cw.visitMethod(ACC_PUBLIC, "doIt", desc, signature, exceptions)
 		byte[] byteArray = cw.toByteArray();
 
-		Class<?> myClass = AbstractCompiledTemplate
+		Class<?> myClass = Compiler
 				.loadClass("Test", byteArray);
 		System.out.println(myClass);
 	}

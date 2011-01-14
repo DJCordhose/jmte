@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+
 public class InterpretedTemplate extends AbstractTemplate implements Template {
 
 	private transient LinkedList<Token> scopes = new LinkedList<Token>();

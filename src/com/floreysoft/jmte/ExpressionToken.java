@@ -3,6 +3,7 @@ package com.floreysoft.jmte;
 import java.util.List;
 import java.util.Map;
 
+
 public abstract class ExpressionToken extends AbstractToken {
 
 	public final static String segmentsToString(List<String> segments,
