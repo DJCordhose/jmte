@@ -11,20 +11,20 @@ public class CompiledCaliperTest {
 	 * 
 	 */
 	public static class PortfolioBenchmark extends SimpleBenchmark {
-		EngineTest engineTest = new EngineTest();
+		InterpretedEngineTest engineTest = new InterpretedEngineTest();
 
 		public void timeSimpleExpressionReference(int reps) throws Exception {
 			for (int i = 0; i < reps; i++) {
-				new Engine().transform("${address}", EngineTest.DEFAULT_MODEL);
+				new Engine().transform("${address}", InterpretedEngineTest.DEFAULT_MODEL);
 				;
 			}
 		}
 
 		public void timeComplexExpressionReference(int reps) throws Exception {
 			for (int i = 0; i < reps; i++) {
-				EngineTest.ENGINE_WITH_CUSTOM_RENDERERS.transform(
+				engineTest.ENGINE_WITH_CUSTOM_RENDERERS.transform(
 						"${<h1>,address(NIX),</h1>;long(full)}",
-						EngineTest.DEFAULT_MODEL);
+						InterpretedEngineTest.DEFAULT_MODEL);
 			}
 		}
 
@@ -32,7 +32,7 @@ public class CompiledCaliperTest {
 				throws Exception {
 			for (int i = 0; i < reps; i++) {
 				new SampleSimpleExpressionCompiledTemplate(new Engine())
-						.transform(EngineTest.DEFAULT_MODEL);
+						.transform(InterpretedEngineTest.DEFAULT_MODEL);
 			}
 		}
 
@@ -40,7 +40,7 @@ public class CompiledCaliperTest {
 				throws Exception {
 			for (int i = 0; i < reps; i++) {
 				new SampleSimpleExpressionCompiledTemplate(new Engine())
-						.transform(EngineTest.DEFAULT_MODEL);
+						.transform(InterpretedEngineTest.DEFAULT_MODEL);
 			}
 		}
 
@@ -54,7 +54,7 @@ public class CompiledCaliperTest {
 				throws Exception {
 			for (int i = 0; i < reps; i++) {
 				new SampleIfEmptyFalseExpressionCompiledTemplate(new Engine())
-						.transform(EngineTest.DEFAULT_MODEL);
+						.transform(InterpretedEngineTest.DEFAULT_MODEL);
 			}
 		}
 
@@ -68,7 +68,7 @@ public class CompiledCaliperTest {
 				throws Exception {
 			for (int i = 0; i < reps; i++) {
 				new SampleNewlineForeachSeparatorCompiledTemplate(new Engine())
-						.transform(EngineTest.DEFAULT_MODEL);
+						.transform(InterpretedEngineTest.DEFAULT_MODEL);
 			}
 		}
 
