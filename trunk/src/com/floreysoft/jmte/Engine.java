@@ -222,6 +222,10 @@ public final class Engine {
 	private ErrorHandler errorHandler = new DefaultErrorHandler();
 	private Locale locale = new Locale("en");
 	String sourceName = null;
+	private boolean useCompilation = false;
+
+	// TODO: Should we rather use a cache instead of keeping them all?
+	private final Map<String, Template> compiledTemplates = new HashMap<String, Template>();
 
 	private final Map<Class<?>, Renderer<?>> renderers = new HashMap<Class<?>, Renderer<?>>();
 	private final Map<Class<?>, Renderer<?>> resolvedRendererCache = new HashMap<Class<?>, Renderer<?>>();
@@ -261,8 +265,7 @@ public final class Engine {
 	 * @return the expanded output
 	 */
 	public String transform(String template, Map<String, Object> model) {
-		InterpretedTemplate templateImpl = new InterpretedTemplate(template,
-				this);
+		Template templateImpl = getTemplate(template);
 		String output = templateImpl.transform(model);
 		return output;
 	}
@@ -442,6 +445,15 @@ public final class Engine {
 		return templateImpl.getUsedVariables();
 	}
 
+	public boolean isUseCompilation() {
+		return useCompilation;
+	}
+
+	public Engine setUseCompilation(boolean useCompilation) {
+		this.useCompilation = useCompilation;
+		return this;
+	}
+
 	/**
 	 * Scans the input and spits out begin/end pairs telling you where
 	 * expressions can be found.
@@ -455,6 +467,16 @@ public final class Engine {
 	}
 
 	private Template getTemplate(String template) {
-		return new InterpretedTemplate(template, this);
+		if (useCompilation) {
+			Template templateImpl = compiledTemplates.get(template);
+			if (templateImpl == null) {
+				templateImpl = new Compiler(template, this).compile();
+				compiledTemplates.put(template, templateImpl);
+			}
+			return templateImpl;
+		} else {
+			return new InterpretedTemplate(template, this);
+
+		}
 	}
 }
