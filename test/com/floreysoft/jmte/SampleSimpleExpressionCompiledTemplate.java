@@ -12,6 +12,7 @@ public class SampleSimpleExpressionCompiledTemplate extends AbstractCompiledTemp
 		usedVariables.add("address");
 	}
 
+	
 	@Override
 	protected String transformCompiled(ScopedMap model) {
 		StringToken stringToken = new StringToken("address", "address", null, null, null, null,
