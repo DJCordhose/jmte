@@ -1,15 +1,12 @@
 package com.floreysoft.jmte;
 
-import static org.objectweb.asm.Opcodes.ACC_PROTECTED;
+import static org.objectweb.asm.Opcodes.*;
 import static org.objectweb.asm.Opcodes.ACC_PUBLIC;
 import static org.objectweb.asm.Opcodes.ACC_SUPER;
-import static org.objectweb.asm.Opcodes.ACONST_NULL;
 import static org.objectweb.asm.Opcodes.ALOAD;
 import static org.objectweb.asm.Opcodes.ARETURN;
 import static org.objectweb.asm.Opcodes.ASTORE;
 import static org.objectweb.asm.Opcodes.DUP;
-import static org.objectweb.asm.Opcodes.GETFIELD;
-import static org.objectweb.asm.Opcodes.INVOKEINTERFACE;
 import static org.objectweb.asm.Opcodes.INVOKESPECIAL;
 import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 import static org.objectweb.asm.Opcodes.NEW;
@@ -19,8 +16,10 @@ import static org.objectweb.asm.Opcodes.V1_6;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
@@ -37,9 +36,8 @@ import com.floreysoft.jmte.util.UniqueNameGenerator;
  * @see http://asm.ow2.org/
  * @see http
  *      ://java.sun.com/docs/books/jvms/second_edition/html/ClassFile.doc.html
- * @see http 
- *      ://java.sun.com/docs/books/jvms/second_edition/html/Instructions.doc.
- *      html
+ * @see http ://java.sun.com/docs/books/jvms/second_edition/html/Instructions
+ *      .doc.html
  */
 public class Compiler {
 
@@ -63,19 +61,25 @@ public class Compiler {
 
 	private final static String COMPILED_TEMPLATE_NAME_PREFIX = "com/floreysoft/jmte/compiledTemplates/Template";
 
+	// must be globally unique
 	private final static UniqueNameGenerator<String, String> uniqueNameGenerator = new UniqueNameGenerator<String, String>(
-			COMPILED_TEMPLATE_NAME_PREFIX, 0);
+			COMPILED_TEMPLATE_NAME_PREFIX);
 
 	protected final String template;
 	protected final Engine engine;
 	protected final Lexer lexer = new Lexer();
 	protected final LinkedList<Token> scopes = new LinkedList<Token>();
+	protected final Set<String> usedVariables = new HashSet<String>();
 	protected transient ClassVisitor classVisitor;
 	protected transient ClassWriter classWriter;
 	protected final String superClassName = "com/floreysoft/jmte/AbstractCompiledTemplate";
 	protected transient String className;
 	protected transient String typeDescriptor;
 	protected transient StringWriter writer;
+	protected transient MethodVisitor mv;
+
+	protected transient Label startLabel = new Label();
+	protected transient Label endLabel = new Label();
 
 	public Compiler(String template, Engine engine) {
 		this.template = template;
@@ -83,6 +87,7 @@ public class Compiler {
 	}
 
 	private void initCompilation() {
+		usedVariables.clear();
 		scopes.clear();
 		className = uniqueNameGenerator.nextUniqueName();
 		typeDescriptor = "L" + className + ";";
@@ -94,7 +99,8 @@ public class Compiler {
 
 	public Template compile() {
 		initCompilation();
-		writeHeader();
+
+		openCompilation();
 
 		List<StartEndPair> scan = engine.scan(template);
 		final TokenStream tokenStream = new TokenStream(engine.sourceName,
@@ -104,10 +110,20 @@ public class Compiler {
 		for (Token token : allTokens) {
 			if (token instanceof PlainTextToken) {
 			} else if (token instanceof StringToken) {
+				StringToken stringToken = (StringToken) token;
+				String variableName = stringToken.getExpression();
+				usedVariables.add(variableName);
+				// FIXME
+				appendStringToken(stringToken);
 			} else if (token instanceof ForEachToken) {
 				ForEachToken feToken = (ForEachToken) token;
+				String variableName = feToken.getVarName();
+				usedVariables.add(variableName);
 				push(feToken);
 			} else if (token instanceof IfToken) {
+				IfToken ifToken = (IfToken) token;
+				String variableName = ifToken.getExpression();
+				usedVariables.add(variableName);
 				push(token);
 			} else if (token instanceof ElseToken) {
 				Token poppedToken = pop();
@@ -132,7 +148,10 @@ public class Compiler {
 			}
 		}
 
-		classVisitor.visitEnd();
+		closeCompilation();
+		
+		classWriter.visitEnd();
+
 		// FIXME: Only for debugging
 		System.out.println(writer.toString());
 		byte[] byteArray = classWriter.toByteArray();
@@ -141,6 +160,7 @@ public class Compiler {
 			AbstractCompiledTemplate compiledTemplate = (AbstractCompiledTemplate) myClass
 					.newInstance();
 			compiledTemplate.setEngine(engine);
+			compiledTemplate.usedVariables.addAll(this.usedVariables);
 			return compiledTemplate;
 
 		} catch (InstantiationException e) {
@@ -163,122 +183,132 @@ public class Compiler {
 		}
 	}
 
-	private void writeHeader() {
+	private void createCtor() {
+		// ctor no args
+		// public SampleSimpleExpressionCompiledTemplate()
+		MethodVisitor mv = classVisitor.visitMethod(ACC_PUBLIC, "<init>",
+				"()V", null, null);
+		mv.visitCode();
+		Label l0 = new Label();
+		mv.visitLabel(l0);
+		mv.visitVarInsn(ALOAD, 0);
+		mv.visitMethodInsn(INVOKESPECIAL, superClassName, "<init>", "()V");
+		Label l1 = new Label();
+		mv.visitLabel(l1);
+		mv.visitInsn(RETURN);
+		Label l2 = new Label();
+		mv.visitLabel(l2);
+		mv.visitLocalVariable("this", typeDescriptor, null, l0, l2, 0);
+		mv.visitMaxs(1, 1);
+		mv.visitEnd();
 
-		MethodVisitor mv;
+	}
+
+	private void closeCompilation() {
+		returnStringBuilder();
+
+		mv.visitLabel(endLabel);
+		
+		mv
+				.visitLocalVariable(
+						"this",
+						"Lcom/floreysoft/jmte/SampleComplexExpressionCompiledTemplate;",
+						null, startLabel, endLabel, 0);
+		mv.visitLocalVariable("model", "Lcom/floreysoft/jmte/ScopedMap;", null,
+				startLabel, endLabel, 1);
+		mv.visitLocalVariable("buffer", "Ljava/lang/StringBuilder;", null,
+				startLabel, endLabel, 2);
+
+		
+		// TODO this needs to be adapted dynamically
+		mv.visitMaxs(10, 3);
+
+		mv.visitEnd();
+	}
+
+	// StringBuilder buffer = new StringBuilder();
+	private void createStringBuilder() {
+		mv.visitTypeInsn(NEW, "java/lang/StringBuilder");
+		mv.visitInsn(DUP);
+		mv.visitMethodInsn(INVOKESPECIAL, "java/lang/StringBuilder", "<init>",
+				"()V");
+		mv.visitVarInsn(ASTORE, 2);
+	}
+
+	// return buffer.toString();
+
+	private void returnStringBuilder() {
+		mv.visitVarInsn(ALOAD, 2);
+		mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder",
+				"toString", "()Ljava/lang/String;");
+		mv.visitInsn(ARETURN);
+	}
+
+	private void appendStringToken(StringToken stringToken) {
+		mv.visitVarInsn(ALOAD, 2);
+		mv.visitTypeInsn(NEW, "com/floreysoft/jmte/StringToken");
+		mv.visitInsn(DUP);
+		pushConstant(stringToken.getExpression());
+		pushConstant(stringToken.getExpression());
+		pushConstant(stringToken.getDefaultValue());
+		pushConstant(stringToken.getPrefix());
+		pushConstant(stringToken.getSuffix());
+		pushConstant(stringToken.getRendererName());
+		pushConstant(stringToken.getParameters());
+		mv
+				.visitMethodInsn(
+						INVOKESPECIAL,
+						"com/floreysoft/jmte/StringToken",
+						"<init>",
+						"(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
+		mv.visitVarInsn(ALOAD, 0);
+		mv.visitMethodInsn(INVOKEVIRTUAL,
+				className,
+				"getEngine", "()Lcom/floreysoft/jmte/Engine;");
+		mv.visitVarInsn(ALOAD, 1);
+		mv.visitVarInsn(ALOAD, 0);
+		mv.visitMethodInsn(INVOKEVIRTUAL,
+				className,
+				"getEngine", "()Lcom/floreysoft/jmte/Engine;");
+		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/Engine",
+				"getErrorHandler", "()Lcom/floreysoft/jmte/ErrorHandler;");
+		mv
+				.visitMethodInsn(
+						INVOKEVIRTUAL,
+						"com/floreysoft/jmte/StringToken",
+						"evaluate",
+						"(Lcom/floreysoft/jmte/Engine;Ljava/util/Map;Lcom/floreysoft/jmte/ErrorHandler;)Ljava/lang/Object;");
+		mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Object", "toString",
+				"()Ljava/lang/String;");
+		mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append",
+				"(Ljava/lang/String;)Ljava/lang/StringBuilder;");
+		mv.visitInsn(POP);
+
+	}
+
+	private void pushConstant(String parameter) {
+		if (parameter != null) {
+			mv.visitLdcInsn(parameter);
+		} else {
+			mv.visitInsn(ACONST_NULL);
+		}
+	}
+
+	private void openCompilation() {
 
 		classVisitor.visit(V1_6, ACC_PUBLIC + ACC_SUPER, className, null,
 				superClassName, null);
-		{
-			mv = classVisitor.visitMethod(ACC_PUBLIC, "<init>", "()V", null,
-					null);
-			mv.visitCode();
-			Label l0 = new Label();
-			mv.visitLabel(l0);
-			mv.visitVarInsn(ALOAD, 0);
-			mv.visitMethodInsn(INVOKESPECIAL, superClassName, "<init>", "()V");
-			Label l1 = new Label();
-			mv.visitLabel(l1);
-			mv.visitInsn(RETURN);
-			Label l2 = new Label();
-			mv.visitLabel(l2);
-			mv.visitLocalVariable("this", typeDescriptor, null, l0, l2, 0);
-			mv.visitMaxs(1, 1);
-			mv.visitEnd();
-		}
 
-		{
-			mv = classVisitor.visitMethod(ACC_PUBLIC, "<init>",
-					"(Lcom/floreysoft/jmte/Engine;)V", null, null);
-			mv.visitCode();
-			Label l0 = new Label();
-			mv.visitLabel(l0);
-			mv.visitVarInsn(ALOAD, 0);
-			mv.visitVarInsn(ALOAD, 1);
-			mv.visitMethodInsn(INVOKESPECIAL, superClassName, "<init>",
-					"(Lcom/floreysoft/jmte/Engine;)V");
-			Label l1 = new Label();
-			mv.visitLabel(l1);
-			mv.visitVarInsn(ALOAD, 0);
-			mv.visitFieldInsn(GETFIELD, className, "usedVariables",
-					"Ljava/util/Set;");
-			mv.visitLdcInsn("address");
-			mv.visitMethodInsn(INVOKEINTERFACE, "java/util/Set", "add",
-					"(Ljava/lang/Object;)Z");
-			mv.visitInsn(POP);
-			Label l2 = new Label();
-			mv.visitLabel(l2);
-			mv.visitInsn(RETURN);
-			Label l3 = new Label();
-			mv.visitLabel(l3);
-			mv.visitLocalVariable("this", typeDescriptor, null, l0, l3, 0);
-			mv.visitLocalVariable("engine", "Lcom/floreysoft/jmte/Engine;",
-					null, l0, l3, 1);
-			mv.visitMaxs(2, 2);
-			mv.visitEnd();
-		}
-		{
-			mv = classVisitor.visitMethod(ACC_PROTECTED, "transformCompiled",
-					"(Lcom/floreysoft/jmte/ScopedMap;)Ljava/lang/String;",
-					null, null);
-			mv.visitCode();
-			Label l0 = new Label();
-			mv.visitLabel(l0);
-			mv.visitTypeInsn(NEW, "com/floreysoft/jmte/StringToken");
-			mv.visitInsn(DUP);
-			mv.visitLdcInsn("address");
-			mv.visitLdcInsn("address");
-			mv.visitInsn(ACONST_NULL);
-			mv.visitInsn(ACONST_NULL);
-			mv.visitInsn(ACONST_NULL);
-			mv.visitInsn(ACONST_NULL);
-			Label l1 = new Label();
-			mv.visitLabel(l1);
-			mv.visitInsn(ACONST_NULL);
-			Label l2 = new Label();
-			mv.visitLabel(l2);
-			mv
-					.visitMethodInsn(
-							INVOKESPECIAL,
-							"com/floreysoft/jmte/StringToken",
-							"<init>",
-							"(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
-			mv.visitVarInsn(ASTORE, 2);
-			Label l3 = new Label();
-			mv.visitLabel(l3);
-			mv.visitVarInsn(ALOAD, 2);
-			mv.visitVarInsn(ALOAD, 0);
-			mv.visitMethodInsn(INVOKEVIRTUAL, className, "getEngine",
-					"()Lcom/floreysoft/jmte/Engine;");
-			mv.visitVarInsn(ALOAD, 1);
-			mv.visitVarInsn(ALOAD, 0);
-			mv.visitMethodInsn(INVOKEVIRTUAL, className, "getEngine",
-					"()Lcom/floreysoft/jmte/Engine;");
-			mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/Engine",
-					"getErrorHandler", "()Lcom/floreysoft/jmte/ErrorHandler;");
-			mv
-					.visitMethodInsn(
-							INVOKEVIRTUAL,
-							"com/floreysoft/jmte/StringToken",
-							"evaluate",
-							"(Lcom/floreysoft/jmte/Engine;Ljava/util/Map;Lcom/floreysoft/jmte/ErrorHandler;)Ljava/lang/Object;");
-			Label l4 = new Label();
-			mv.visitLabel(l4);
-			mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Object", "toString",
-					"()Ljava/lang/String;");
-			Label l5 = new Label();
-			mv.visitLabel(l5);
-			mv.visitInsn(ARETURN);
-			Label l6 = new Label();
-			mv.visitLabel(l6);
-			mv.visitLocalVariable("this", typeDescriptor, null, l0, l6, 0);
-			mv.visitLocalVariable("model", "Lcom/floreysoft/jmte/ScopedMap;",
-					null, l0, l6, 1);
-			mv.visitLocalVariable("stringToken",
-					"Lcom/floreysoft/jmte/StringToken;", null, l3, l6, 2);
-			mv.visitMaxs(9, 3);
-			mv.visitEnd();
-		}
+		createCtor();
+
+		mv = classVisitor.visitMethod(ACC_PROTECTED, "transformCompiled",
+				"(Lcom/floreysoft/jmte/ScopedMap;)Ljava/lang/String;", null,
+				null);
+		
+		mv.visitLabel(startLabel);
+
+		mv.visitCode();
+		createStringBuilder();
 	}
 
 }

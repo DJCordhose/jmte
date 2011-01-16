@@ -12,9 +12,12 @@ public final class CompiledEngineTest extends AbstractEngineTest {
 
 	@Test
 	public void compiledSimpleSample() throws Exception {
-		String output = new SampleSimpleExpressionCompiledTemplate(newEngine())
+		String input = "${address}";
+		String interpretedOutput = newEngine().transform(
+				input, DEFAULT_MODEL);
+		String compiledOutput = new SampleSimpleExpressionCompiledTemplate(newEngine())
 				.transform(DEFAULT_MODEL);
-		assertEquals(DEFAULT_MODEL.get("address"), output);
+		assertEquals(interpretedOutput, compiledOutput);
 	}
 
 	@Test

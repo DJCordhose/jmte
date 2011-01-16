@@ -100,4 +100,12 @@ public class StringToken extends ExpressionToken {
 
 		return getPrefix() + renderedResult + getSuffix();
 	}
+
+	public String getRendererName() {
+		return rendererName;
+	}
+
+	public String getParameters() {
+		return parameters;
+	}
 }
