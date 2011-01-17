@@ -81,6 +81,8 @@ public class Compiler {
 	protected transient Label startLabel = new Label();
 	protected transient Label endLabel = new Label();
 
+	protected transient TokenStream tokenStream;
+
 	public Compiler(String template, Engine engine) {
 		this.template = template;
 		this.engine = engine;
@@ -103,17 +105,18 @@ public class Compiler {
 		openCompilation();
 
 		List<StartEndPair> scan = engine.scan(template);
-		final TokenStream tokenStream = new TokenStream(engine.sourceName,
-				template, scan, lexer, engine.getExprStartToken(), engine
-						.getExprEndToken());
+		tokenStream = new TokenStream(engine.sourceName, template, scan, lexer,
+				engine.getExprStartToken(), engine.getExprEndToken());
 		List<Token> allTokens = tokenStream.getAllTokens();
 		for (Token token : allTokens) {
 			if (token instanceof PlainTextToken) {
+				PlainTextToken plainTextToken = (PlainTextToken) token;
+				String text = plainTextToken.getText();
+				appendText(text);
 			} else if (token instanceof StringToken) {
 				StringToken stringToken = (StringToken) token;
 				String variableName = stringToken.getExpression();
 				usedVariables.add(variableName);
-				// FIXME
 				appendStringToken(stringToken);
 			} else if (token instanceof ForEachToken) {
 				ForEachToken feToken = (ForEachToken) token;
@@ -149,7 +152,7 @@ public class Compiler {
 		}
 
 		closeCompilation();
-		
+
 		classWriter.visitEnd();
 
 		// FIXME: Only for debugging
@@ -208,7 +211,7 @@ public class Compiler {
 		returnStringBuilder();
 
 		mv.visitLabel(endLabel);
-		
+
 		mv
 				.visitLocalVariable(
 						"this",
@@ -219,7 +222,6 @@ public class Compiler {
 		mv.visitLocalVariable("buffer", "Ljava/lang/StringBuilder;", null,
 				startLabel, endLabel, 2);
 
-		
 		// TODO this needs to be adapted dynamically
 		mv.visitMaxs(10, 3);
 
@@ -262,14 +264,12 @@ public class Compiler {
 						"<init>",
 						"(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
 		mv.visitVarInsn(ALOAD, 0);
-		mv.visitMethodInsn(INVOKEVIRTUAL,
-				className,
-				"getEngine", "()Lcom/floreysoft/jmte/Engine;");
+		mv.visitMethodInsn(INVOKEVIRTUAL, className, "getEngine",
+				"()Lcom/floreysoft/jmte/Engine;");
 		mv.visitVarInsn(ALOAD, 1);
 		mv.visitVarInsn(ALOAD, 0);
-		mv.visitMethodInsn(INVOKEVIRTUAL,
-				className,
-				"getEngine", "()Lcom/floreysoft/jmte/Engine;");
+		mv.visitMethodInsn(INVOKEVIRTUAL, className, "getEngine",
+				"()Lcom/floreysoft/jmte/Engine;");
 		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/Engine",
 				"getErrorHandler", "()Lcom/floreysoft/jmte/ErrorHandler;");
 		mv
@@ -284,6 +284,14 @@ public class Compiler {
 				"(Ljava/lang/String;)Ljava/lang/StringBuilder;");
 		mv.visitInsn(POP);
 
+	}
+
+	private void appendText(String text) {
+		mv.visitVarInsn(ALOAD, 2);
+		pushConstant(text);
+		mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append",
+				"(Ljava/lang/String;)Ljava/lang/StringBuilder;");
+		mv.visitInsn(POP);
 	}
 
 	private void pushConstant(String parameter) {
@@ -304,11 +312,10 @@ public class Compiler {
 		mv = classVisitor.visitMethod(ACC_PROTECTED, "transformCompiled",
 				"(Lcom/floreysoft/jmte/ScopedMap;)Ljava/lang/String;", null,
 				null);
-		
+
 		mv.visitLabel(startLabel);
 
 		mv.visitCode();
 		createStringBuilder();
 	}
-
 }
