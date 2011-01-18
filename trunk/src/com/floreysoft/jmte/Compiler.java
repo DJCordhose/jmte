@@ -68,7 +68,6 @@ public class Compiler {
 	protected final String template;
 	protected final Engine engine;
 	protected final Lexer lexer = new Lexer();
-	protected final LinkedList<Token> scopes = new LinkedList<Token>();
 	protected final Set<String> usedVariables = new HashSet<String>();
 	protected transient ClassVisitor classVisitor;
 	protected transient ClassWriter classWriter;
@@ -90,13 +89,83 @@ public class Compiler {
 
 	private void initCompilation() {
 		usedVariables.clear();
-		scopes.clear();
 		className = uniqueNameGenerator.nextUniqueName();
 		typeDescriptor = "L" + className + ";";
 		classWriter = new ClassWriter(0);
 		writer = new StringWriter();
 		classVisitor = new TraceClassVisitor(classWriter, new PrintWriter(
 				writer));
+	}
+
+	private void foreach() {
+		ForEachToken feToken = (ForEachToken) tokenStream.currentToken();
+		tokenStream.consume();
+		codeGenerateForeachStart(feToken);
+		String variableName = feToken.getVarName();
+		usedVariables.add(variableName);
+		Token contentToken;
+		while ((contentToken = tokenStream.currentToken())!= null && !(contentToken instanceof EndToken)) {
+			content();
+		}
+		if (contentToken == null) {
+			engine.getErrorHandler().error("missing-end", feToken);
+		} else {
+			tokenStream.consume();
+			codeGenerateForeachEnd();
+		}
+	}
+
+	private void condition() {
+		IfToken ifToken = (IfToken) tokenStream.currentToken();
+		tokenStream.consume();
+		codeGenerateIfStart(ifToken);
+		String variableName = ifToken.getExpression();
+		usedVariables.add(variableName);
+		Token contentToken;
+		while ((contentToken = tokenStream.currentToken()) != null && !(contentToken instanceof EndToken)
+				&& !(contentToken instanceof ElseToken)) {
+			content();
+		}
+
+		if (contentToken instanceof ElseToken) {
+			tokenStream.consume();
+			while ((contentToken = tokenStream.currentToken()) != null && !(contentToken instanceof EndToken)) {
+				content();
+			}
+		}
+		if (contentToken == null) {
+			engine.getErrorHandler().error("missing-end", ifToken);
+		} else {
+			tokenStream.consume();
+			codeGenerateIfEnd();
+		}
+	}
+
+	private void content() {
+		Token token = tokenStream.currentToken();
+		if (token instanceof PlainTextToken) {
+			PlainTextToken plainTextToken = (PlainTextToken) token;
+			tokenStream.consume();
+			String text = plainTextToken.getText();
+			codeGenerateText(text);
+		} else if (token instanceof StringToken) {
+			StringToken stringToken = (StringToken) token;
+			tokenStream.consume();
+			String variableName = stringToken.getExpression();
+			usedVariables.add(variableName);
+			codeGenerateStringToken(stringToken);
+		} else if (token instanceof ForEachToken) {
+			foreach();
+		} else if (token instanceof IfToken) {
+			condition();
+		} else if (token instanceof ElseToken) {
+			tokenStream.consume();
+			engine.getErrorHandler().error("else-out-of-scope", token);
+		} else if (token instanceof EndToken) {
+			tokenStream.consume();
+			engine.getErrorHandler().error("unmatched-end", token, null);
+		}
+
 	}
 
 	public Template compile() {
@@ -107,48 +176,9 @@ public class Compiler {
 		List<StartEndPair> scan = engine.scan(template);
 		tokenStream = new TokenStream(engine.sourceName, template, scan, lexer,
 				engine.getExprStartToken(), engine.getExprEndToken());
-		List<Token> allTokens = tokenStream.getAllTokens();
-		for (Token token : allTokens) {
-			if (token instanceof PlainTextToken) {
-				PlainTextToken plainTextToken = (PlainTextToken) token;
-				String text = plainTextToken.getText();
-				appendText(text);
-			} else if (token instanceof StringToken) {
-				StringToken stringToken = (StringToken) token;
-				String variableName = stringToken.getExpression();
-				usedVariables.add(variableName);
-				appendStringToken(stringToken);
-			} else if (token instanceof ForEachToken) {
-				ForEachToken feToken = (ForEachToken) token;
-				String variableName = feToken.getVarName();
-				usedVariables.add(variableName);
-				push(feToken);
-			} else if (token instanceof IfToken) {
-				IfToken ifToken = (IfToken) token;
-				String variableName = ifToken.getExpression();
-				usedVariables.add(variableName);
-				push(token);
-			} else if (token instanceof ElseToken) {
-				Token poppedToken = pop();
-				if (!(poppedToken instanceof IfToken)) {
-					engine.getErrorHandler().error("else-out-of-scope", token,
-							Engine.toModel("surroundingToken", poppedToken));
-				} else {
-					ElseToken elseToken = (ElseToken) token;
-					elseToken.setIfToken((IfToken) poppedToken);
-					push(elseToken);
-				}
-			} else if (token instanceof EndToken) {
-				Token poppedToken = pop();
-				if (poppedToken == null) {
-					engine.getErrorHandler()
-							.error("unmatched-end", token, null);
-				} else if (poppedToken instanceof ForEachToken) {
-					// END OF FOREACH
-				} else {
-					// END OF IF OR ELSE
-				}
-			}
+
+		while (tokenStream.nextToken() != null) {
+			content();
 		}
 
 		closeCompilation();
@@ -170,19 +200,6 @@ public class Compiler {
 			throw new RuntimeException("Internal error " + e);
 		} catch (IllegalAccessException e) {
 			throw new RuntimeException("Internal error " + e);
-		}
-	}
-
-	private void push(Token token) {
-		scopes.add(token);
-	}
-
-	private Token pop() {
-		if (scopes.isEmpty()) {
-			return null;
-		} else {
-			Token token = scopes.removeLast();
-			return token;
 		}
 	}
 
@@ -246,7 +263,32 @@ public class Compiler {
 		mv.visitInsn(ARETURN);
 	}
 
-	private void appendStringToken(StringToken stringToken) {
+	private void pushConstant(String parameter) {
+		if (parameter != null) {
+			mv.visitLdcInsn(parameter);
+		} else {
+			mv.visitInsn(ACONST_NULL);
+		}
+	}
+
+	private void openCompilation() {
+
+		classVisitor.visit(V1_6, ACC_PUBLIC + ACC_SUPER, className, null,
+				superClassName, null);
+
+		createCtor();
+
+		mv = classVisitor.visitMethod(ACC_PROTECTED, "transformCompiled",
+				"(Lcom/floreysoft/jmte/ScopedMap;)Ljava/lang/String;", null,
+				null);
+
+		mv.visitLabel(startLabel);
+
+		mv.visitCode();
+		createStringBuilder();
+	}
+
+	private void codeGenerateStringToken(StringToken stringToken) {
 		mv.visitVarInsn(ALOAD, 2);
 		mv.visitTypeInsn(NEW, "com/floreysoft/jmte/StringToken");
 		mv.visitInsn(DUP);
@@ -286,7 +328,7 @@ public class Compiler {
 
 	}
 
-	private void appendText(String text) {
+	private void codeGenerateText(String text) {
 		mv.visitVarInsn(ALOAD, 2);
 		pushConstant(text);
 		mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append",
@@ -294,28 +336,24 @@ public class Compiler {
 		mv.visitInsn(POP);
 	}
 
-	private void pushConstant(String parameter) {
-		if (parameter != null) {
-			mv.visitLdcInsn(parameter);
-		} else {
-			mv.visitInsn(ACONST_NULL);
-		}
+	private void codeGenerateIfEnd() {
+		// TODO Auto-generated method stub
+
 	}
 
-	private void openCompilation() {
+	private void codeGenerateIfStart(IfToken ifToken) {
+		// TODO Auto-generated method stub
 
-		classVisitor.visit(V1_6, ACC_PUBLIC + ACC_SUPER, className, null,
-				superClassName, null);
-
-		createCtor();
-
-		mv = classVisitor.visitMethod(ACC_PROTECTED, "transformCompiled",
-				"(Lcom/floreysoft/jmte/ScopedMap;)Ljava/lang/String;", null,
-				null);
-
-		mv.visitLabel(startLabel);
-
-		mv.visitCode();
-		createStringBuilder();
 	}
+
+	private void codeGenerateForeachEnd() {
+		// TODO Auto-generated method stub
+
+	}
+
+	private void codeGenerateForeachStart(ForEachToken feToken) {
+		// TODO Auto-generated method stub
+
+	}
+
 }
