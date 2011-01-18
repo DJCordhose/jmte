@@ -14,7 +14,8 @@ public class TokenStream {
 
 	private transient List<Token> tokens = null;
 	private transient int currentTokenIndex = -1;
-
+	private transient Token currentToken = null;
+	
 	public TokenStream(String sourceName, String input,
 			List<StartEndPair> scan, Lexer lexer, String splitStart,
 			String splitEnd) {
@@ -70,10 +71,19 @@ public class TokenStream {
 	public Token nextToken() {
 		initTokens();
 		if (currentTokenIndex < tokens.size()) {
-			return tokens.get(currentTokenIndex++);
+			currentToken = tokens.get(currentTokenIndex++);
 		} else {
-			return null;
+			currentToken = null;
 		}
+		return currentToken;
+	}
+	
+	public void consume() {
+		nextToken();
+	}
+	
+	public Token currentToken() {
+		return currentToken;
 	}
 
 	public void rewind(Token tokenToRewindTo) {
