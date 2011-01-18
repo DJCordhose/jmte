@@ -34,10 +34,8 @@ import com.floreysoft.jmte.util.UniqueNameGenerator;
  * @author olli
  * 
  * @see http://asm.ow2.org/
- * @see http
- *      ://java.sun.com/docs/books/jvms/second_edition/html/ClassFile.doc.html
- * @see http ://java.sun.com/docs/books/jvms/second_edition/html/Instructions
- *      .doc.html
+ * @see http://java.sun.com/docs/books/jvms/second_edition/html/ClassFile.doc.html
+ * @see http://java.sun.com/docs/books/jvms/second_edition/html/Instructions.doc.html
  */
 public class Compiler {
 
