@@ -1,23 +1,10 @@
 package com.floreysoft.jmte;
 
 import static org.objectweb.asm.Opcodes.*;
-import static org.objectweb.asm.Opcodes.ACC_PUBLIC;
-import static org.objectweb.asm.Opcodes.ACC_SUPER;
-import static org.objectweb.asm.Opcodes.ALOAD;
-import static org.objectweb.asm.Opcodes.ARETURN;
-import static org.objectweb.asm.Opcodes.ASTORE;
-import static org.objectweb.asm.Opcodes.DUP;
-import static org.objectweb.asm.Opcodes.INVOKESPECIAL;
-import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
-import static org.objectweb.asm.Opcodes.NEW;
-import static org.objectweb.asm.Opcodes.POP;
-import static org.objectweb.asm.Opcodes.RETURN;
-import static org.objectweb.asm.Opcodes.V1_6;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -91,10 +78,13 @@ public class Compiler {
 		usedVariables.clear();
 		className = uniqueNameGenerator.nextUniqueName();
 		typeDescriptor = "L" + className + ";";
-		classWriter = new ClassWriter(0);
+		classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
 		writer = new StringWriter();
-		classVisitor = new CheckClassAdapter(new TraceClassVisitor(classWriter,
-				new PrintWriter(writer)));
+		classVisitor = new TraceClassVisitor(classWriter,
+				new PrintWriter(writer));
+		// CheckClassAdapter needs tree stuff
+//		classVisitor = new CheckClassAdapter(new TraceClassVisitor(classWriter,
+//				new PrintWriter(writer)));
 	}
 
 	private void foreach() {
@@ -179,15 +169,16 @@ public class Compiler {
 		List<StartEndPair> scan = engine.scan(template);
 		tokenStream = new TokenStream(engine.sourceName, template, scan, lexer,
 				engine.getExprStartToken(), engine.getExprEndToken());
-
-		while (tokenStream.nextToken() != null) {
+		tokenStream.nextToken();
+		while (tokenStream.currentToken() != null) {
 			content();
 		}
 
 		closeCompilation();
 
 		classWriter.visitEnd();
-
+		classVisitor.visitEnd();
+		
 		// FIXME: Only for debugging
 		System.out.println(writer.toString());
 		byte[] byteArray = classWriter.toByteArray();
@@ -222,6 +213,7 @@ public class Compiler {
 		Label l2 = new Label();
 		mv.visitLabel(l2);
 		mv.visitLocalVariable("this", typeDescriptor, null, l0, l2, 0);
+		// we can pass whatever we like as we have set ClassWriter.COMPUTE_FRAMES to ClassWriter
 		mv.visitMaxs(1, 1);
 		mv.visitEnd();
 
@@ -241,10 +233,8 @@ public class Compiler {
 				startLabel, endLabel, 1);
 		mv.visitLocalVariable("buffer", "Ljava/lang/StringBuilder;", null,
 				startLabel, endLabel, 2);
-
-		// TODO this needs to be adapted dynamically
-		mv.visitMaxs(10, 3);
-
+		// we can pass whatever we like as we have set ClassWriter.COMPUTE_FRAMES to ClassWriter
+		mv.visitMaxs(1, 1);
 		mv.visitEnd();
 	}
 
@@ -346,6 +336,8 @@ public class Compiler {
 
 	private void codeGenerateIfStart(IfToken ifToken) {
 
+		// FIXME
+		if (true) return;
 		// IfToken ifToken = new IfToken("empty", false);
 		mv.visitTypeInsn(NEW, "com/floreysoft/jmte/IfToken");
 		mv.visitInsn(DUP);
