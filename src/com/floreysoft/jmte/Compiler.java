@@ -25,6 +25,7 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.util.CheckClassAdapter;
 import org.objectweb.asm.util.TraceClassVisitor;
 
 import com.floreysoft.jmte.util.UniqueNameGenerator;
@@ -36,6 +37,7 @@ import com.floreysoft.jmte.util.UniqueNameGenerator;
  * @see http://asm.ow2.org/
  * @see http://java.sun.com/docs/books/jvms/second_edition/html/ClassFile.doc.html
  * @see http://java.sun.com/docs/books/jvms/second_edition/html/Instructions.doc.html
+>>>>>>> .r103
  */
 public class Compiler {
 
@@ -91,8 +93,8 @@ public class Compiler {
 		typeDescriptor = "L" + className + ";";
 		classWriter = new ClassWriter(0);
 		writer = new StringWriter();
-		classVisitor = new TraceClassVisitor(classWriter, new PrintWriter(
-				writer));
+		classVisitor = new CheckClassAdapter(new TraceClassVisitor(classWriter,
+				new PrintWriter(writer)));
 	}
 
 	private void foreach() {
@@ -102,7 +104,8 @@ public class Compiler {
 		String variableName = feToken.getVarName();
 		usedVariables.add(variableName);
 		Token contentToken;
-		while ((contentToken = tokenStream.currentToken())!= null && !(contentToken instanceof EndToken)) {
+		while ((contentToken = tokenStream.currentToken()) != null
+				&& !(contentToken instanceof EndToken)) {
 			content();
 		}
 		if (contentToken == null) {
@@ -120,14 +123,16 @@ public class Compiler {
 		String variableName = ifToken.getExpression();
 		usedVariables.add(variableName);
 		Token contentToken;
-		while ((contentToken = tokenStream.currentToken()) != null && !(contentToken instanceof EndToken)
+		while ((contentToken = tokenStream.currentToken()) != null
+				&& !(contentToken instanceof EndToken)
 				&& !(contentToken instanceof ElseToken)) {
 			content();
 		}
 
 		if (contentToken instanceof ElseToken) {
 			tokenStream.consume();
-			while ((contentToken = tokenStream.currentToken()) != null && !(contentToken instanceof EndToken)) {
+			while ((contentToken = tokenStream.currentToken()) != null
+					&& !(contentToken instanceof EndToken)) {
 				content();
 			}
 		}
@@ -340,7 +345,51 @@ public class Compiler {
 	}
 
 	private void codeGenerateIfStart(IfToken ifToken) {
-		// TODO Auto-generated method stub
+
+		// IfToken ifToken = new IfToken("empty", false);
+		mv.visitTypeInsn(NEW, "com/floreysoft/jmte/IfToken");
+		mv.visitInsn(DUP);
+		mv.visitLdcInsn(ifToken.getExpression());
+		mv.visitInsn(
+
+		// ifToken.isNegated()
+
+				ICONST_0
+
+				);
+		mv.visitMethodInsn(INVOKESPECIAL, "com/floreysoft/jmte/IfToken",
+				"<init>", "(Ljava/lang/String;Z)V");
+		mv.visitVarInsn(ASTORE, 3);
+
+		// Boolean condition = (Boolean) ifToken.evaluate(getEngine(), model,
+		// getEngine().getErrorHandler());
+		mv.visitVarInsn(ALOAD, 3);
+		mv.visitVarInsn(ALOAD, 0);
+		mv
+				.visitMethodInsn(
+						INVOKEVIRTUAL,
+						"com/floreysoft/jmte/SampleIfEmptyFalseExpressionCompiledTemplate",
+						"getEngine", "()Lcom/floreysoft/jmte/Engine;");
+		mv.visitVarInsn(ALOAD, 1);
+		mv.visitVarInsn(ALOAD, 0);
+		mv
+				.visitMethodInsn(
+						INVOKEVIRTUAL,
+						"com/floreysoft/jmte/SampleIfEmptyFalseExpressionCompiledTemplate",
+						"getEngine", "()Lcom/floreysoft/jmte/Engine;");
+		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/Engine",
+				"getErrorHandler", "()Lcom/floreysoft/jmte/ErrorHandler;");
+		mv
+				.visitMethodInsn(
+						INVOKEVIRTUAL,
+						"com/floreysoft/jmte/IfToken",
+						"evaluate",
+						"(Lcom/floreysoft/jmte/Engine;Ljava/util/Map;Lcom/floreysoft/jmte/ErrorHandler;)Ljava/lang/Object;");
+		mv.visitTypeInsn(CHECKCAST, "java/lang/Boolean");
+		mv.visitVarInsn(ASTORE, 4);
+		mv.visitVarInsn(ALOAD, 4);
+		mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Boolean", "booleanValue",
+				"()Z");
 
 	}
 

@@ -98,7 +98,11 @@ public class StringToken extends ExpressionToken {
 			}
 		}
 
-		return getPrefix() + renderedResult + getSuffix();
+		if (renderedResult == null || renderedResult.equals("")) {
+			return renderedResult;
+		} else {
+			return getPrefix() + renderedResult + getSuffix();
+		}
 	}
 
 	public String getRendererName() {

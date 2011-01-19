@@ -370,6 +370,13 @@ public abstract class AbstractEngineTest {
 	}
 
 	@Test
+	public void wrapShortcutEmpty() throws Exception {
+		String shortCut = newEngine().transform("${<h1>,noAddress,</h1>}",
+				DEFAULT_MODEL);
+		assertEquals("", shortCut);
+	}
+
+	@Test
 	public void wrapNoPre() throws Exception {
 		String shortCut = newEngine().transform("${,address,</h1>}",
 				DEFAULT_MODEL);
