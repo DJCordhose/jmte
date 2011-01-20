@@ -1,7 +1,10 @@
 package com.floreysoft.jmte;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
-
+import java.util.Map;
+import java.util.concurrent.Callable;
 
 public abstract class ExpressionToken extends AbstractToken {
 
@@ -95,6 +98,25 @@ public abstract class ExpressionToken extends AbstractToken {
 		this.segments = segments;
 		this.expression = segmentsToString(segments, 0, segments.size());
 		this.text = null;
+	}
+
+	@Override
+	public abstract Object evaluate(TemplateContext context);
+
+	@SuppressWarnings("unchecked")
+	protected Object evaluatePlain(TemplateContext context) {
+		Object value = traverse(getSegments(), context.model, context.engine
+				.getErrorHandler());
+		// if value implements both, we use the more specialized implementation
+		if (value instanceof TemplateExpression) {
+			value = ((TemplateExpression) value).eval(context);
+		} else if (value instanceof Callable) {
+			try {
+				value = ((Callable) value).call();
+			} catch (Exception e) {
+			}
+		}
+		return value;
 	}
 
 }
