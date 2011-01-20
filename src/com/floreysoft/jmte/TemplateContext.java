@@ -11,15 +11,13 @@ public class TemplateContext {
 	protected final List<Token> scopes;
 	protected final String template;
 	protected final Engine engine;
-	protected final List<StartEndPair> scan;
 	protected final String sourceName;
 
-	public TemplateContext(String template, List<StartEndPair> scan,
-			String sourceName, ScopedMap model, Engine engine) {
+	public TemplateContext(String template, String sourceName, ScopedMap model,
+			Engine engine) {
 		this.model = model;
 		this.template = template;
 		this.engine = engine;
-		this.scan = scan;
 		this.scopes = new LinkedList<Token>();
 		this.sourceName = sourceName;
 	}
@@ -42,10 +40,6 @@ public class TemplateContext {
 
 	public Lexer getLexer() {
 		return lexer;
-	}
-
-	public List<StartEndPair> getScan() {
-		return scan;
 	}
 
 	public String getSourceName() {
@@ -93,8 +87,7 @@ public class TemplateContext {
 		for (Token token : scopes) {
 			if (token instanceof IfToken || token instanceof ElseToken
 					|| token instanceof EmptyForEachToken) {
-				boolean condition = (Boolean) token.evaluate(engine, model,
-						engine.getErrorHandler());
+				boolean condition = (Boolean) token.evaluate(this);
 				if (!condition) {
 					engine.notifyListeners(token, ProcessListener.Action.SKIP);
 					return true;

@@ -26,10 +26,8 @@ public class IfCmpToken extends IfToken {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public Object evaluate(Engine engine, Map<String, Object> model,
-			ErrorHandler errorHandler) {
-
-		Object value = traverse(getSegments(), model, errorHandler);
+	public Object evaluate(TemplateContext context) {
+		Object value = traverse(getSegments(), context.model, context.engine.getErrorHandler());
 		if (value instanceof Callable) {
 			try {
 				value = ((Callable) value).call();

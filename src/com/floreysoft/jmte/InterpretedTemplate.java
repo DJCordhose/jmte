@@ -1,7 +1,6 @@
 package com.floreysoft.jmte;
 
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -30,7 +29,7 @@ public class InterpretedTemplate extends AbstractTemplate implements Template {
 		final List<StartEndPair> scan = engine.scan(template);
 		final ScopedMap scopedMap = new ScopedMap(Collections.EMPTY_MAP);
 
-		final TemplateContext context = new TemplateContext(template, scan,
+		final TemplateContext context = new TemplateContext(template,
 				sourceName, scopedMap, engine);
 
 		engine.addProcessListener(new ProcessListener() {
@@ -64,7 +63,7 @@ public class InterpretedTemplate extends AbstractTemplate implements Template {
 
 		});
 
-		transformPure(context);
+		transformPure(context, scan);
 
 		engine.listeners.addAll(oldListeners);
 
@@ -74,19 +73,20 @@ public class InterpretedTemplate extends AbstractTemplate implements Template {
 	@Override
 	public String transform(Map<String, Object> model) {
 		List<StartEndPair> scan = engine.scan(template);
-		TemplateContext context = new TemplateContext(template, scan,
-				sourceName, new ScopedMap(model), engine);
-		String transformed = transformPure(context);
+		TemplateContext context = new TemplateContext(template, sourceName,
+				new ScopedMap(model), engine);
+		String transformed = transformPure(context, scan);
 		String unescaped = Util.NO_QUOTE_MINI_PARSER.unescape(transformed);
 		return unescaped;
 
 	}
 
 	@SuppressWarnings("unchecked")
-	protected String transformPure(TemplateContext context) {
+	protected String transformPure(TemplateContext context,
+			List<StartEndPair> scan) {
 
 		final TokenStream tokenStream = new TokenStream(context.sourceName,
-				context.template, context.scan, context.lexer, context.engine
+				context.template, scan, context.lexer, context.engine
 						.getExprStartToken(), context.engine.getExprEndToken());
 		final StringBuilder output = new StringBuilder((int) (context.template
 				.length() * context.engine.getExpansionSizeFactor()));
@@ -99,17 +99,17 @@ public class InterpretedTemplate extends AbstractTemplate implements Template {
 				}
 			} else if (token instanceof StringToken) {
 				if (!skipMode) {
-					String expanded = (String) token.evaluate(context.engine, context.model,
-							context.engine.getErrorHandler());
+					String expanded = (String) token.evaluate(context);
 					output.append(expanded);
-					context.engine.notifyListeners(token, ProcessListener.Action.EVAL);
+					context.engine.notifyListeners(token,
+							ProcessListener.Action.EVAL);
 				} else {
-					context.engine.notifyListeners(token, ProcessListener.Action.SKIP);
+					context.engine.notifyListeners(token,
+							ProcessListener.Action.SKIP);
 				}
 			} else if (token instanceof ForEachToken) {
 				ForEachToken feToken = (ForEachToken) token;
-				Iterable iterable = (Iterable) feToken.evaluate(context.engine, context.model,
-						context.engine.getErrorHandler());
+				Iterable iterable = (Iterable) feToken.evaluate(context);
 				feToken.setIterator(iterable.iterator());
 				if (!feToken.iterator().hasNext()) {
 					token = new EmptyForEachToken(feToken.getExpression(),
@@ -130,11 +130,13 @@ public class InterpretedTemplate extends AbstractTemplate implements Template {
 				context.push(token);
 			} else if (token instanceof IfToken) {
 				context.push(token);
-				context.engine.notifyListeners(token, ProcessListener.Action.IF);
+				context.engine
+						.notifyListeners(token, ProcessListener.Action.IF);
 			} else if (token instanceof ElseToken) {
 				Token poppedToken = context.pop();
 				if (!(poppedToken instanceof IfToken)) {
-					context.engine.getErrorHandler().error("else-out-of-scope", token,
+					context.engine.getErrorHandler().error("else-out-of-scope",
+							token,
 							Engine.toModel("surroundingToken", poppedToken));
 				} else {
 					ElseToken elseToken = (ElseToken) token;
@@ -144,8 +146,8 @@ public class InterpretedTemplate extends AbstractTemplate implements Template {
 			} else if (token instanceof EndToken) {
 				Token poppedToken = context.pop();
 				if (poppedToken == null) {
-					context.engine.getErrorHandler()
-							.error("unmatched-end", token, null);
+					context.engine.getErrorHandler().error("unmatched-end",
+							token, null);
 				} else if (poppedToken instanceof ForEachToken) {
 					ForEachToken feToken = (ForEachToken) poppedToken;
 					if (feToken.iterator().hasNext()) {

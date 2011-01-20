@@ -23,32 +23,30 @@ public class SampleNewlineForeachSeparatorCompiledTemplate extends
 
 	@Override
 	@SuppressWarnings("unchecked")
-	protected String transformCompiled(ScopedMap model) {
+	protected String transformCompiled(TemplateContext context) {
 		StringBuilder buffer = new StringBuilder();
 		ForEachToken feToken = new ForEachToken("list", "item", "\n");
-		Iterable iterable = (Iterable) feToken.evaluate(getEngine(), model, getEngine()
-				.getErrorHandler());
+		Iterable iterable = (Iterable) feToken.evaluate(context);
 		feToken.setIterator(iterable.iterator());
 
-		model.enterScope();
+		context.model.enterScope();
 		try {
 			Iterator<Object> iterator = feToken.iterator();
 			boolean first = true;
 			while (iterator.hasNext()) {
 				Object value = iterator.next();
-				model.put(feToken.getVarName(), value);
+				context.model.put(feToken.getVarName(), value);
 				feToken.setFirst(first);
 				feToken.setLast(!iterator.hasNext());
 				feToken.setIndex(feToken.getIndex() + 1);
-				addSpecialVariables(feToken, model);
+				addSpecialVariables(feToken, context.model);
 				getEngine().notifyListeners(feToken,
 						ProcessListener.Action.ITERATE_FOREACH);
 
 				StringToken stringToken = new StringToken(Arrays
 						.asList(new String[] { "item", "property1" }),
 						"item.property1");
-				Object evaluated = stringToken.evaluate(getEngine(), model, getEngine()
-						.getErrorHandler());
+				Object evaluated = stringToken.evaluate(context);
 				buffer.append(evaluated.toString());
 
 				first = false;
@@ -57,7 +55,7 @@ public class SampleNewlineForeachSeparatorCompiledTemplate extends
 				}
 			}
 		} finally {
-			model.exitScope();
+			context.model.exitScope();
 		}
 		return buffer.toString();
 	}

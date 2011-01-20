@@ -1,7 +1,6 @@
 package com.floreysoft.jmte;
 
 import java.util.List;
-import java.util.Map;
 
 
 public abstract class ExpressionToken extends AbstractToken {
@@ -45,9 +44,6 @@ public abstract class ExpressionToken extends AbstractToken {
 	public boolean isEmpty() {
 		return getSegments().size() == 0;
 	}
-
-	public abstract Object evaluate(Engine engine, Map<String, Object> model,
-			ErrorHandler errorHandler);
 
 	public List<String> getSegments() {
 		return segments;

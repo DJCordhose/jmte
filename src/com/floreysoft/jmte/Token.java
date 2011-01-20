@@ -21,7 +21,7 @@ public interface Token {
 
 	public String getSourceName();
 	
-	public Object evaluate(Engine engine, Map<String, Object> model, ErrorHandler errorHandler);
+	public Object evaluate(TemplateContext context);
 	
 	public int getTokenIndex();
 }

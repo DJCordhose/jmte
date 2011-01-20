@@ -57,11 +57,10 @@ public class StringToken extends ExpressionToken {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Object evaluate(Engine engine, Map<String, Object> model,
-			ErrorHandler errorHandler) {
+	public Object evaluate(TemplateContext context) {
+		Object value = traverse(getSegments(), context.model, context.engine.getErrorHandler());
 
 		final String renderedResult;
-		Object value = traverse(getSegments(), model, errorHandler);
 		if (value == null || value.equals("")) {
 			renderedResult = getDefaultValue();
 		} else {
@@ -77,7 +76,7 @@ public class StringToken extends ExpressionToken {
 			} else {
 				String namedRendererResult = null;
 				if (rendererName != null && !rendererName.equals("")) {
-					NamedRenderer rendererForName = engine
+					NamedRenderer rendererForName = context.engine
 							.resolveNamedRenderer(rendererName);
 					if (rendererForName != null) {
 						namedRendererResult = rendererForName.render(value,
@@ -87,7 +86,7 @@ public class StringToken extends ExpressionToken {
 				if (namedRendererResult != null) {
 					renderedResult = namedRendererResult;
 				} else {
-					Renderer<Object> rendererForClass = engine
+					Renderer<Object> rendererForClass = context.engine
 							.resolveRendererForClass(value.getClass());
 					if (rendererForClass != null) {
 						renderedResult = rendererForClass.render(value);
