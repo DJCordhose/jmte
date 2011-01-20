@@ -8,7 +8,7 @@ import java.util.Stack;
 
 class ScopedMap implements Map<String, Object> {
 	private final Map<String, Object> rawModel;
-	private final Stack<Map<String, Object>> scope = new Stack<Map<String, Object>>();
+	private final Stack<Map<String, Object>> scopes = new Stack<Map<String, Object>>();
 
 	public void clear() {
 		throw new UnsupportedOperationException();
@@ -27,8 +27,8 @@ class ScopedMap implements Map<String, Object> {
 	}
 
 	public Object get(Object key) {
-		for (int i = scope.size() - 1; i >= 0; i--) {
-			Map<String, Object> map = scope.get(i);
+		for (int i = scopes.size() - 1; i >= 0; i--) {
+			Map<String, Object> map = scopes.get(i);
 			Object value = map.get(key);
 			if (value != null) {
 				return value;
@@ -81,19 +81,19 @@ class ScopedMap implements Map<String, Object> {
 	}
 
 	public void enterScope() {
-		scope.push(createScope());
+		scopes.push(createScope());
 	}
 
 	public void exitScope() {
-		if (scope.size() == 0) {
+		if (scopes.size() == 0) {
 			throw new IllegalStateException("There is no state to exit");
 		}
-		scope.pop();
+		scopes.pop();
 	}
 
 	protected Map<String, Object> getCurrentScope() {
-		if (scope.size() > 0) {
-			return scope.peek();
+		if (scopes.size() > 0) {
+			return scopes.peek();
 		} else {
 			return rawModel;
 		}
@@ -104,4 +104,9 @@ class ScopedMap implements Map<String, Object> {
 		return new HashMap<String, Object>();
 	}
 
+	@Override
+	public String toString() {
+		return rawModel.toString() + scopes.toString();
+	}
+	
 }

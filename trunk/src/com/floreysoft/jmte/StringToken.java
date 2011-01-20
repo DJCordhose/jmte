@@ -58,41 +58,30 @@ public class StringToken extends ExpressionToken {
 	@SuppressWarnings("unchecked")
 	@Override
 	public Object evaluate(TemplateContext context) {
-		Object value = traverse(getSegments(), context.model, context.engine.getErrorHandler());
+		final Object value = evaluatePlain(context);
 
 		final String renderedResult;
 		if (value == null || value.equals("")) {
 			renderedResult = getDefaultValue();
 		} else {
-			if (value instanceof Callable) {
-				try {
-					value = ((Callable) value).call();
-				} catch (Exception e) {
+			String namedRendererResult = null;
+			if (rendererName != null && !rendererName.equals("")) {
+				NamedRenderer rendererForName = context.engine
+						.resolveNamedRenderer(rendererName);
+				if (rendererForName != null) {
+					namedRendererResult = rendererForName.render(value,
+							parameters);
 				}
 			}
-
-			if (value == null || value.equals("")) {
-				renderedResult = getDefaultValue();
+			if (namedRendererResult != null) {
+				renderedResult = namedRendererResult;
 			} else {
-				String namedRendererResult = null;
-				if (rendererName != null && !rendererName.equals("")) {
-					NamedRenderer rendererForName = context.engine
-							.resolveNamedRenderer(rendererName);
-					if (rendererForName != null) {
-						namedRendererResult = rendererForName.render(value,
-								parameters);
-					}
-				}
-				if (namedRendererResult != null) {
-					renderedResult = namedRendererResult;
+				Renderer<Object> rendererForClass = context.engine
+						.resolveRendererForClass(value.getClass());
+				if (rendererForClass != null) {
+					renderedResult = rendererForClass.render(value);
 				} else {
-					Renderer<Object> rendererForClass = context.engine
-							.resolveRendererForClass(value.getClass());
-					if (rendererForClass != null) {
-						renderedResult = rendererForClass.render(value);
-					} else {
-						renderedResult = value.toString();
-					}
+					renderedResult = value.toString();
 				}
 			}
 		}

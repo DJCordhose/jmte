@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-
 public class ForEachToken extends ExpressionToken {
 	public static final String FOREACH = "foreach";
 
@@ -36,32 +35,22 @@ public class ForEachToken extends ExpressionToken {
 	@Override
 	@SuppressWarnings("unchecked")
 	public Object evaluate(TemplateContext context) {
-		Object value = traverse(getSegments(), context.model, context.engine.getErrorHandler());
+		Object value = evaluatePlain(context);
 
 		final Iterable<Object> iterable;
 		if (value == null) {
 			iterable = Collections.emptyList();
+		} else if (value instanceof Map) {
+			iterable = ((Map) value).entrySet();
+		} else if (value instanceof Iterable) {
+			iterable = ((Iterable) value);
 		} else {
-			if (value instanceof Callable) {
-				try {
-					value = ((Callable) value).call();
-				} catch (Exception e) {
-				}
-			}
-			if (value == null) {
-				iterable = Collections.emptyList();
-			} else if (value instanceof Map) {
-				iterable = ((Map) value).entrySet();
-			} else if (value instanceof Iterable) {
-				iterable = ((Iterable) value);
+			List<Object> arrayAsList = Util.arrayAsList(value);
+			if (arrayAsList != null) {
+				iterable = arrayAsList;
 			} else {
-				List<Object> arrayAsList = Util.arrayAsList(value);
-				if (arrayAsList != null) {
-					iterable = arrayAsList;
-				} else {
-					// we have a single value here and simply wrap it in a List
-					iterable = Collections.singletonList(value);
-				}
+				// we have a single value here and simply wrap it in a List
+				iterable = Collections.singletonList(value);
 			}
 		}
 

@@ -837,7 +837,6 @@ public abstract class AbstractEngineTest {
 	}
 
 	@Test
-	@Ignore
 	public void expression() throws Exception {
 		TemplateExpression<Boolean> oddExpression = new TemplateExpression<Boolean>() {
 
@@ -858,7 +857,7 @@ public abstract class AbstractEngineTest {
 				"${foreach list item}${item}\n" + "${if last_item}last${end}"
 						+ "${if first_item}first${end}"
 						+ "${if even_item} even${end}"
-						+ "${if odd} odd${end}${end}", DEFAULT_MODEL);
+						+ "${if oddExpression} odd${end}${end}", model);
 		assertEquals("1.1, 1.2\nfirst even" + "2.1, 2.2\nlast odd", output);
 	}
 
