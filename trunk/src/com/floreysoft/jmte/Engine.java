@@ -221,7 +221,6 @@ public final class Engine {
 	private double expansionSizeFactor = 1.2;
 	private ErrorHandler errorHandler = new DefaultErrorHandler();
 	private Locale locale = new Locale("en");
-	String sourceName = null;
 	private boolean useCompilation = false;
 
 	// TODO: Should we rather use a cache instead of keeping them all?
@@ -250,11 +249,6 @@ public final class Engine {
 		registerRenderer(Iterable.class, new DefaultIterableRenderer());
 	}
 
-	public Engine setSourceName(String sourceName) {
-		this.sourceName = sourceName;
-		return this;
-	}
-
 	/**
 	 * Transforms a template into an expanded output using the given model.
 	 * 
@@ -264,12 +258,17 @@ public final class Engine {
 	 *            the model used to evaluate expressions inside the template
 	 * @return the expanded output
 	 */
-	public String transform(String template, Map<String, Object> model) {
-		Template templateImpl = getTemplate(template);
+	public String transform(String template, String sourceName, Map<String, Object> model) {
+		Template templateImpl = getTemplate(template, sourceName);
 		String output = templateImpl.transform(model);
 		return output;
 	}
 
+	public String transform(String template, Map<String, Object> model) {
+		return transform(template, null, model);
+	}
+
+	
 	/**
 	 * Sets the error handler to be used in this engine
 	 * 
@@ -441,7 +440,7 @@ public final class Engine {
 	}
 
 	public Set<String> getUsedVariables(String template) {
-		Template templateImpl = getTemplate(template);
+		Template templateImpl = getTemplate(template, null);
 		return templateImpl.getUsedVariables();
 	}
 
@@ -466,16 +465,16 @@ public final class Engine {
 		return Util.scan(input, getExprStartToken(), getExprEndToken(), true);
 	}
 
-	private Template getTemplate(String template) {
+	private Template getTemplate(String template, String sourceName) {
 		if (useCompilation) {
 			Template templateImpl = compiledTemplates.get(template);
 			if (templateImpl == null) {
-				templateImpl = new Compiler(template, this).compile();
+				templateImpl = new Compiler(template, sourceName, this).compile();
 				compiledTemplates.put(template, templateImpl);
 			}
 			return templateImpl;
 		} else {
-			return new InterpretedTemplate(template, this);
+			return new InterpretedTemplate(template, sourceName, this);
 
 		}
 	}

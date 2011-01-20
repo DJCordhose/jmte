@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.objectweb.asm.ClassWriter;
 
@@ -820,7 +821,7 @@ public abstract class AbstractEngineTest {
 	}
 
 	@Test
-	public void callableExpression() throws Exception {
+	public void callable() throws Exception {
 		Callable<Date> date = new Callable<Date>() {
 
 			@Override
@@ -833,6 +834,32 @@ public abstract class AbstractEngineTest {
 		String output = ENGINE_WITH_NAMED_RENDERERS.transform(
 				"${date;date(yyyy.MM.dd HH:mm:ss z)}", model);
 		assertEquals("1970.01.01 01:00:00 MEZ", output);
+	}
+
+	@Test
+	@Ignore
+	public void expression() throws Exception {
+		TemplateExpression<Boolean> oddExpression = new TemplateExpression<Boolean>() {
+
+			@Override
+			public Boolean eval(TemplateContext context) {
+				ForEachToken foreach = context.peek(ForEachToken.class);
+				if (foreach != null) {
+					return foreach.getIndex() % 2 == 1;
+				}
+				return false;
+			}
+		};
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.putAll(DEFAULT_MODEL);
+		model.put("oddExpression", oddExpression);
+		
+		String output = newEngine().transform(
+				"${foreach list item}${item}\n" + "${if last_item}last${end}"
+						+ "${if first_item}first${end}"
+						+ "${if even_item} even${end}"
+						+ "${if odd} odd${end}${end}", DEFAULT_MODEL);
+		assertEquals("1.1, 1.2\nfirst even" + "2.1, 2.2\nlast odd", output);
 	}
 
 	@Test

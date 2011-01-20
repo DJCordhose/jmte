@@ -43,8 +43,9 @@ public class TokenStream {
 			}
 			offset = startEndPair.end + splitEnd.length();
 
-			AbstractToken token = lexer.nextToken(sourceName, inputChars,
+			AbstractToken token = lexer.nextToken(inputChars,
 					startEndPair.start, startEndPair.end);
+			token.setSourceName(sourceName);
 			token.setTokenIndex(index++);
 			tokens.add(token);
 		}
