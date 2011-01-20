@@ -7,12 +7,10 @@ import java.util.List;
 
 public class Lexer {
 
-	public AbstractToken nextToken(final String sourceName,
-			final char[] template, final int start, final int end) {
+	public AbstractToken nextToken(final char[] template, final int start, final int end) {
 		String input = new String(template, start, end - start);
 
 		AbstractToken token = innerNextToken(input);
-		token.setSourceName(sourceName);
 		token.setText(template, start, end);
 		token.setLine(template, start, end);
 		token.setColumn(template, start, end);

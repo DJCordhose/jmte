@@ -7,17 +7,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-
 public class InterpretedTemplate extends AbstractTemplate implements Template {
 
-	private transient LinkedList<Token> scopes = new LinkedList<Token>();
 	protected final String template;
 	protected final Engine engine;
-	protected transient Lexer lexer = new Lexer();
+	protected final String sourceName;
 
-	public InterpretedTemplate(String template, Engine engine) {
+	public InterpretedTemplate(String template, String sourceName, Engine engine) {
 		this.template = template;
 		this.engine = engine;
+		this.sourceName = sourceName;
 	}
 
 	@Override
@@ -30,6 +29,10 @@ public class InterpretedTemplate extends AbstractTemplate implements Template {
 
 		final List<StartEndPair> scan = engine.scan(template);
 		final ScopedMap scopedMap = new ScopedMap(Collections.EMPTY_MAP);
+
+		final TemplateContext context = new TemplateContext(template, scan,
+				sourceName, scopedMap, engine);
+
 		engine.addProcessListener(new ProcessListener() {
 
 			@Override
@@ -46,7 +49,7 @@ public class InterpretedTemplate extends AbstractTemplate implements Template {
 			// a variable is local if any enclosing foreach has it as a step
 			// variable
 			private boolean isLocal(String variable) {
-				for (Token token : scopes) {
+				for (Token token : context.scopes) {
 					if (token instanceof EmptyForEachToken) {
 						String foreachVarName = ((EmptyForEachToken) token)
 								.getVarName();
@@ -61,7 +64,7 @@ public class InterpretedTemplate extends AbstractTemplate implements Template {
 
 		});
 
-		transformPure(engine.sourceName, scan, scopedMap);
+		transformPure(context);
 
 		engine.listeners.addAll(oldListeners);
 
@@ -71,78 +74,77 @@ public class InterpretedTemplate extends AbstractTemplate implements Template {
 	@Override
 	public String transform(Map<String, Object> model) {
 		List<StartEndPair> scan = engine.scan(template);
-		ScopedMap scopedMap = new ScopedMap(model);
-		String transformed = transformPure(engine.sourceName, scan, scopedMap);
+		TemplateContext context = new TemplateContext(template, scan,
+				sourceName, new ScopedMap(model), engine);
+		String transformed = transformPure(context);
 		String unescaped = Util.NO_QUOTE_MINI_PARSER.unescape(transformed);
 		return unescaped;
 
 	}
 
 	@SuppressWarnings("unchecked")
-	private String transformPure(String sourceName, List<StartEndPair> scan,
-			ScopedMap model) {
-		scopes.clear();
+	protected String transformPure(TemplateContext context) {
 
-		final TokenStream tokenStream = new TokenStream(sourceName, template,
-				scan, lexer, engine.getExprStartToken(), engine
-						.getExprEndToken());
-		final StringBuilder output = new StringBuilder(
-				(int) (template.length() * engine.getExpansionSizeFactor()));
+		final TokenStream tokenStream = new TokenStream(context.sourceName,
+				context.template, context.scan, context.lexer, context.engine
+						.getExprStartToken(), context.engine.getExprEndToken());
+		final StringBuilder output = new StringBuilder((int) (context.template
+				.length() * context.engine.getExpansionSizeFactor()));
 		Token token;
 		while ((token = tokenStream.nextToken()) != null) {
-			boolean skipMode = isSkipMode(model);
+			boolean skipMode = context.isSkipMode();
 			if (token instanceof PlainTextToken) {
 				if (!skipMode) {
 					output.append(token.getText());
 				}
 			} else if (token instanceof StringToken) {
 				if (!skipMode) {
-					String expanded = (String) token.evaluate(engine, model,
-							engine.getErrorHandler());
+					String expanded = (String) token.evaluate(context.engine, context.model,
+							context.engine.getErrorHandler());
 					output.append(expanded);
-					engine.notifyListeners(token, ProcessListener.Action.EVAL);
+					context.engine.notifyListeners(token, ProcessListener.Action.EVAL);
 				} else {
-					engine.notifyListeners(token, ProcessListener.Action.SKIP);
+					context.engine.notifyListeners(token, ProcessListener.Action.SKIP);
 				}
 			} else if (token instanceof ForEachToken) {
 				ForEachToken feToken = (ForEachToken) token;
-				Iterable iterable = (Iterable) feToken.evaluate(engine, model,
-						engine.getErrorHandler());
+				Iterable iterable = (Iterable) feToken.evaluate(context.engine, context.model,
+						context.engine.getErrorHandler());
 				feToken.setIterator(iterable.iterator());
 				if (!feToken.iterator().hasNext()) {
 					token = new EmptyForEachToken(feToken.getExpression(),
 							feToken.getVarName(), feToken.getText());
-					engine.notifyListeners(token,
+					context.engine.notifyListeners(token,
 							ProcessListener.Action.EMPTY_FOREACH);
 				} else {
-					model.enterScope();
+					context.model.enterScope();
 					Object value = feToken.iterator().next();
-					model.put(feToken.getVarName(), value);
+					context.model.put(feToken.getVarName(), value);
 					feToken.setFirst(true);
 					feToken.setIndex(0);
 					feToken.setLast(!feToken.iterator().hasNext());
-					addSpecialVariables(feToken, model);
-					engine.notifyListeners(token,
+					addSpecialVariables(feToken, context.model);
+					context.engine.notifyListeners(token,
 							ProcessListener.Action.ITERATE_FOREACH);
 				}
-				push(token);
+				context.push(token);
 			} else if (token instanceof IfToken) {
-				push(token);
-				engine.notifyListeners(token, ProcessListener.Action.IF);
+				context.push(token);
+				context.engine.notifyListeners(token, ProcessListener.Action.IF);
 			} else if (token instanceof ElseToken) {
-				Token poppedToken = pop();
+				Token poppedToken = context.pop();
 				if (!(poppedToken instanceof IfToken)) {
-					engine.getErrorHandler().error("else-out-of-scope", token,
+					context.engine.getErrorHandler().error("else-out-of-scope", token,
 							Engine.toModel("surroundingToken", poppedToken));
 				} else {
 					ElseToken elseToken = (ElseToken) token;
 					elseToken.setIfToken((IfToken) poppedToken);
-					push(token);
+					context.push(token);
 				}
 			} else if (token instanceof EndToken) {
-				Token poppedToken = pop();
+				Token poppedToken = context.pop();
 				if (poppedToken == null) {
-					engine.getErrorHandler()
+					context.engine.getErrorHandler()
 							.error("unmatched-end", token, null);
 				} else if (poppedToken instanceof ForEachToken) {
 					ForEachToken feToken = (ForEachToken) poppedToken;
@@ -151,53 +153,23 @@ public class InterpretedTemplate extends AbstractTemplate implements Template {
 						// of the for loop
 						tokenStream.rewind(feToken);
 						Object value = feToken.iterator().next();
-						model.put(feToken.getVarName(), value);
-						push(feToken);
+						context.model.put(feToken.getVarName(), value);
+						context.push(feToken);
 						if (!skipMode) {
 							output.append(feToken.getSeparator());
 						}
 						feToken.setFirst(false);
 						feToken.setLast(!feToken.iterator().hasNext());
 						feToken.setIndex(feToken.getIndex() + 1);
-						addSpecialVariables(feToken, model);
-						engine.notifyListeners(token,
+						addSpecialVariables(feToken, context.model);
+						context.engine.notifyListeners(token,
 								ProcessListener.Action.ITERATE_FOREACH);
 					} else {
-						model.exitScope();
+						context.model.exitScope();
 					}
 				}
 			}
 		}
 		return output.toString();
-	}
-
-	private void push(Token token) {
-		scopes.add(token);
-	}
-
-	private Token pop() {
-		if (scopes.isEmpty()) {
-			return null;
-		} else {
-			Token token = scopes.removeLast();
-			return token;
-		}
-	}
-
-	// if anywhere in the stack trace there is a negative condition, all the
-	// inner parts must be skipped
-	private boolean isSkipMode(Map<String, Object> model) {
-		for (Token token : scopes) {
-			if (token instanceof IfToken || token instanceof ElseToken
-					|| token instanceof EmptyForEachToken) {
-				boolean condition = (Boolean) token.evaluate(engine, model,
-						engine.getErrorHandler());
-				if (!condition) {
-					engine.notifyListeners(token, ProcessListener.Action.SKIP);
-					return true;
-				}
-			}
-		}
-		return false;
 	}
 }

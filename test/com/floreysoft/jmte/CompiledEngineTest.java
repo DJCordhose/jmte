@@ -49,7 +49,7 @@ public final class CompiledEngineTest extends AbstractEngineTest {
 	}
 
 	public static void main(String[] args) {
-		Template template = new Compiler("", new Engine()).compile();
+		Template template = new Compiler("", null, new Engine()).compile();
 		String compiledOutput = template.transform(DEFAULT_MODEL);
 		System.out.println(compiledOutput);
 	}

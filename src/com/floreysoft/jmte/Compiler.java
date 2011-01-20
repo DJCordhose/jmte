@@ -69,9 +69,12 @@ public class Compiler {
 
 	protected transient TokenStream tokenStream;
 
-	public Compiler(String template, Engine engine) {
+	protected final String sourceName;
+
+	public Compiler(String template, String sourceName, Engine engine) {
 		this.template = template;
 		this.engine = engine;
+		this.sourceName = sourceName;
 	}
 
 	private void initCompilation() {
@@ -167,7 +170,7 @@ public class Compiler {
 		openCompilation();
 
 		List<StartEndPair> scan = engine.scan(template);
-		tokenStream = new TokenStream(engine.sourceName, template, scan, lexer,
+		tokenStream = new TokenStream(sourceName, template, scan, lexer,
 				engine.getExprStartToken(), engine.getExprEndToken());
 		tokenStream.nextToken();
 		while (tokenStream.currentToken() != null) {
