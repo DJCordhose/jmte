@@ -20,12 +20,12 @@ public class SampleIfEmptyFalseExpressionCompiledTemplate extends
 	}
 
 	@Override
-	protected String transformCompiled(ScopedMap model) {
+	protected String transformCompiled(TemplateContext context) {
 		StringBuilder buffer = new StringBuilder();
 
 		IfToken ifToken = new IfToken("empty", false);
 
-		Boolean condition = (Boolean) ifToken.evaluate(getEngine(), model, getEngine().getErrorHandler());
+		Boolean condition = (Boolean) ifToken.evaluate(context);
 		
 		if (condition) {
 			StringToken stringToken = new StringToken("address", "address",

@@ -1,6 +1,5 @@
 package com.floreysoft.jmte;
 
-import java.util.Map;
 
 public class ElseToken extends AbstractToken {
 	public static final String ELSE = "else";
@@ -17,8 +16,8 @@ public class ElseToken extends AbstractToken {
 	}
 
 	@Override
-	public Object evaluate(Engine engine, Map<String, Object> model, ErrorHandler errorHandler) {
-		Boolean evaluated = !(Boolean) getIfToken().evaluate(engine, model, errorHandler);
+	public Object evaluate(TemplateContext context) {
+		Boolean evaluated = !(Boolean) getIfToken().evaluate(context);
 		return evaluated;
 	}
 

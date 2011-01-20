@@ -35,11 +35,10 @@ public class ForEachToken extends ExpressionToken {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public Object evaluate(Engine engine, Map<String, Object> model,
-			ErrorHandler errorHandler) {
+	public Object evaluate(TemplateContext context) {
+		Object value = traverse(getSegments(), context.model, context.engine.getErrorHandler());
 
 		final Iterable<Object> iterable;
-		Object value = traverse(getSegments(), model, errorHandler);
 		if (value == null) {
 			iterable = Collections.emptyList();
 		} else {

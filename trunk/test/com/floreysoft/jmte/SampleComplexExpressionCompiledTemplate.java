@@ -19,12 +19,11 @@ public class SampleComplexExpressionCompiledTemplate extends
 	}
 
 	@Override
-	protected String transformCompiled(ScopedMap model) {
+	protected String transformCompiled(TemplateContext context) {
 		StringBuilder buffer = new StringBuilder();
 
 		buffer.append(new StringToken("address", "address", "NIX", "<h1>",
-				"</h1>", "long", "full").evaluate(getEngine(), model,
-				getEngine().getErrorHandler()).toString());
+				"</h1>", "long", "full").evaluate(context).toString());
 
 		return buffer.toString();
 	}

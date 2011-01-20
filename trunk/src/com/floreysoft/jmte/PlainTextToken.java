@@ -1,6 +1,5 @@
 package com.floreysoft.jmte;
 
-import java.util.Map;
 
 public class PlainTextToken extends AbstractToken {
 	
@@ -9,8 +8,7 @@ public class PlainTextToken extends AbstractToken {
 	}
 
 	@Override
-	public Object evaluate(Engine engine, Map<String, Object> model,
-			ErrorHandler errorHandler) {
+	public Object evaluate(TemplateContext context) {
 		return getText();
 	}
 }

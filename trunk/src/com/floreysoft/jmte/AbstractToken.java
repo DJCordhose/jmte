@@ -101,9 +101,6 @@ public abstract class AbstractToken implements Token {
 		return sourceName;
 	}
 
-	public abstract Object evaluate(Engine engine, Map<String, Object> model,
-			ErrorHandler errorHandler);
-
 	protected Object traverse(List<String> segments, Map<String, Object> model,
 			ErrorHandler errorHandler) {
 		if (segments.size() == 0) {

@@ -1,6 +1,5 @@
 package com.floreysoft.jmte;
 
-import java.util.Map;
 
 public class EmptyForEachToken extends ExpressionToken {
 
@@ -13,8 +12,7 @@ public class EmptyForEachToken extends ExpressionToken {
 	}
 
 	@Override
-	public Object evaluate(Engine engine, Map<String, Object> model,
-			ErrorHandler errorHandler) {
+	public Object evaluate(TemplateContext context) {
 		return false;
 	}
 

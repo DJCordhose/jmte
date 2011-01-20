@@ -31,11 +31,10 @@ public class IfToken extends ExpressionToken {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public Object evaluate(Engine engine, Map<String, Object> model,
-			ErrorHandler errorHandler) {
+	public Object evaluate(TemplateContext context) {
+		Object value = traverse(getSegments(), context.model, context.engine.getErrorHandler());
 
 		final boolean condition;
-		Object value = traverse(getSegments(), model, errorHandler);
 		if (value == null) {
 			condition = false;
 		} else {
