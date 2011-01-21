@@ -19,7 +19,14 @@ public class ForEachToken extends ExpressionToken {
 		super(expression);
 		this.varName = varName;
 		this.separator = separator != null ? separator : "";
-		this.index = 0;
+		this.index = -1;
+	}
+
+	protected ForEachToken(List<String> segments, String varName, String separator) {
+		super(segments, varName);
+		this.varName = varName;
+		this.separator = separator != null ? separator : "";
+		this.index = -1;
 	}
 
 	@Override
@@ -94,5 +101,10 @@ public class ForEachToken extends ExpressionToken {
 
 	public Iterator<Object> getIterator() {
 		return iterator;
+	}
+	
+	public Object advance() {
+		index++;
+		return iterator.next();
 	}
 }

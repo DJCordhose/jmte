@@ -907,7 +907,7 @@ public abstract class AbstractEngineTest {
 
 	@Test
 	public void compiledIfSample() throws Exception {
-		String input = "${if empty}${address}${else}NIX${end}";
+		String input = "${if !bean.trueCond}${address}${else}NIX${end}";
 		String interpretedOutput = newEngine().transform(input, DEFAULT_MODEL);
 		String compiledOutput = new SampleIfEmptyFalseExpressionCompiledTemplate(
 				newEngine()).transform(DEFAULT_MODEL);
@@ -935,7 +935,7 @@ public abstract class AbstractEngineTest {
 	@Test
 	@Ignore
 	public void compiledNestedSample() throws Exception {
-		String input = "${foreach list item}${foreach item.list item2}${if item}${item2.property1}${end}${end}\n${end}";
+		String input = "${foreach list item}${foreach item.list item2}OUTER_PRFIX${if item}${item2.property1}INNER_SUFFIX${end}${end}\n${end}";
 		String interpretedOutput = newEngine().transform(input, DEFAULT_MODEL);
 		String compiledOutput = new SampleNestedExpressionCompiledTemplate(newEngine())
 				.transform(DEFAULT_MODEL);

@@ -16,6 +16,11 @@ public class IfToken extends ExpressionToken {
 		this.negated = negated;
 	}
 
+	public IfToken(List<String> segments, String expression, boolean negated) {
+		super(segments, expression);
+		this.negated = negated;
+	}
+
 	@Override
 	public String getText() {
 		if (text == null) {
