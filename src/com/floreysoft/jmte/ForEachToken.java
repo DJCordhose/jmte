@@ -13,14 +13,13 @@ public class ForEachToken extends ExpressionToken {
 	private final String separator;
 
 	private transient Iterator<Object> iterator;
-	private transient boolean last;
-	private transient boolean first;
 	private transient int index;
 
 	public ForEachToken(String expression, String varName, String separator) {
 		super(expression);
 		this.varName = varName;
 		this.separator = separator != null ? separator : "";
+		this.index = 0;
 	}
 
 	@Override
@@ -69,20 +68,12 @@ public class ForEachToken extends ExpressionToken {
 		return separator;
 	}
 
-	public void setLast(boolean last) {
-		this.last = last;
-	}
-
 	public boolean isLast() {
-		return last;
-	}
-
-	public void setFirst(boolean first) {
-		this.first = first;
+		return !iterator().hasNext();
 	}
 
 	public boolean isFirst() {
-		return first;
+		return index == 0;
 	}
 
 	public void setIndex(int index) {
@@ -91,6 +82,10 @@ public class ForEachToken extends ExpressionToken {
 
 	public int getIndex() {
 		return index;
+	}
+
+	public void setIterable(Iterable<Object> iterable) {
+		this.iterator = iterable.iterator();
 	}
 
 	public void setIterator(Iterator<Object> iterator) {

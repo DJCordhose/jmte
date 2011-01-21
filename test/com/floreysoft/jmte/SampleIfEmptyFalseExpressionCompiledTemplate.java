@@ -27,12 +27,17 @@ public class SampleIfEmptyFalseExpressionCompiledTemplate extends
 
 		Boolean condition = (Boolean) ifToken.evaluate(context);
 		
+		context.push(ifToken);
+		try {
 		if (condition) {
 			StringToken stringToken = new StringToken("address", "address",
 					null, null, null, null, null);
-			buffer.append(stringToken.toString());
+			buffer.append(stringToken.evaluate(context).toString());
 		} else {
 			buffer.append("NIX");
+		}
+		} finally {
+			context.pop();
 		}
 		return buffer.toString();
 	}

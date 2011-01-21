@@ -24,7 +24,6 @@ import com.floreysoft.jmte.util.UniqueNameGenerator;
  * @see http://asm.ow2.org/
  * @see http://java.sun.com/docs/books/jvms/second_edition/html/ClassFile.doc.html
  * @see http://java.sun.com/docs/books/jvms/second_edition/html/Instructions.doc.html
->>>>>>> .r103
  */
 public class Compiler {
 
@@ -46,7 +45,8 @@ public class Compiler {
 
 	private final static MyClassLoader MY_CLASS_LOADER = new MyClassLoader();
 
-	private final static String COMPILED_TEMPLATE_NAME_PREFIX = "com/floreysoft/jmte/compiledTemplates/Template";
+	// make sure we are in the same package as context to have access to its protected parts
+	private final static String COMPILED_TEMPLATE_NAME_PREFIX = "com/floreysoft/jmte/CompiledTemplate";
 
 	// must be globally unique
 	private final static UniqueNameGenerator<String, String> uniqueNameGenerator = new UniqueNameGenerator<String, String>(
@@ -190,6 +190,8 @@ public class Compiler {
 			AbstractCompiledTemplate compiledTemplate = (AbstractCompiledTemplate) myClass
 					.newInstance();
 			compiledTemplate.setEngine(engine);
+			compiledTemplate.setTemplate(template);
+			compiledTemplate.setSourceName(sourceName);
 			compiledTemplate.usedVariables.addAll(this.usedVariables);
 			return compiledTemplate;
 
