@@ -10,12 +10,16 @@ public class DefaultObjectRenderer implements Renderer<Object> {
 	public String render(Object value) {
 		final String renderedResult;
 
-		final List<Object> arrayAsList = Util.arrayAsList(value);
-		if (arrayAsList != null) {
-			renderedResult = arrayAsList.size() > 0 ? arrayAsList.get(0)
-					.toString() : "";
+		if (value instanceof String) {
+			renderedResult = (String) value;
 		} else {
-			renderedResult = value.toString();
+			final List<Object> arrayAsList = Util.arrayAsList(value);
+			if (arrayAsList != null) {
+				renderedResult = arrayAsList.size() > 0 ? arrayAsList.get(0)
+						.toString() : "";
+			} else {
+				renderedResult = value.toString();
+			}
 		}
 		return renderedResult;
 	}
