@@ -933,7 +933,6 @@ public abstract class AbstractEngineTest {
 	}
 
 	@Test
-	@Ignore
 	public void compiledNestedSample() throws Exception {
 		String input = "${foreach list item}${foreach item.list item2}OUTER_PRFIX${if item}${item2.property1}INNER_SUFFIX${end}${end}\n${end}";
 		String interpretedOutput = newEngine().transform(input, DEFAULT_MODEL);

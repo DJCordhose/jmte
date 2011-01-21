@@ -1,13 +1,18 @@
 package com.floreysoft.jmte;
 
-import java.util.Map;
-import java.util.concurrent.Callable;
+import java.util.List;
+
 
 public class IfCmpToken extends IfToken {
 	private final String operand;
 
 	public IfCmpToken(String expression, String operand, boolean negated) {
 		super(expression, negated);
+		this.operand = operand;
+	}
+
+	protected IfCmpToken(List<String> segments, String expression, String operand, boolean negated) {
+		super(segments, expression, negated);
 		this.operand = operand;
 	}
 
@@ -25,7 +30,6 @@ public class IfCmpToken extends IfToken {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public Object evaluate(TemplateContext context) {
 		final Object value = evaluatePlain(context);
 		final boolean condition = getOperand().equals(value);

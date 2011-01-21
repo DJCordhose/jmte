@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 public class IfToken extends ExpressionToken {
 	public static final String IF = "if";
@@ -16,7 +15,7 @@ public class IfToken extends ExpressionToken {
 		this.negated = negated;
 	}
 
-	public IfToken(List<String> segments, String expression, boolean negated) {
+	protected IfToken(List<String> segments, String expression, boolean negated) {
 		super(segments, expression);
 		this.negated = negated;
 	}
