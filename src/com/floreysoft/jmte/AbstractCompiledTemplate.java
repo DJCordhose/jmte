@@ -25,7 +25,6 @@ public abstract class AbstractCompiledTemplate extends AbstractTemplate
 
 	@Override
 	public String transform(Map<String, Object> model) {
-		ScopedMap scopedMap = new ScopedMap(model);
 		TemplateContext context = new TemplateContext(template, sourceName,
 				new ScopedMap(model), engine);
 

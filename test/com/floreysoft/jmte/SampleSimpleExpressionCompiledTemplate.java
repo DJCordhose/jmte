@@ -14,10 +14,12 @@ public class SampleSimpleExpressionCompiledTemplate extends
 
 	@Override
 	protected String transformCompiled(TemplateContext context) {
-		StringToken stringToken = new StringToken("address", "address", null,
-				null, null, null, null);
-		return stringToken.evaluate(context).toString();
+		StringBuilder buffer = new StringBuilder();
 
+		buffer.append(new StringToken("address", "address", null,
+				null, null, null, null).evaluate(context).toString());
+
+		return buffer.toString();
 	}
 
 }

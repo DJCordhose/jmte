@@ -3,11 +3,10 @@ package com.floreysoft.jmte;
 import java.util.HashSet;
 import java.util.Set;
 
-// ${<h1>,address(NIX),</h1>;long(full)}
-public class AssortedCompiledTemplateSamples extends
+public class SampleCompiledSequenceTemplate extends
 		AbstractCompiledTemplate {
 
-	public AssortedCompiledTemplateSamples(Engine engine) {
+	public SampleCompiledSequenceTemplate(Engine engine) {
 		super(engine);
 	}
 
