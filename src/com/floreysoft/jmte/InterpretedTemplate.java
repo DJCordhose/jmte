@@ -118,9 +118,7 @@ public class InterpretedTemplate extends AbstractTemplate implements Template {
 							ProcessListener.Action.EMPTY_FOREACH);
 				} else {
 					context.model.enterScope();
-					Object value = feToken.iterator().next();
-					context.model.put(feToken.getVarName(), value);
-					feToken.setIndex(0);
+					context.model.put(feToken.getVarName(), feToken.advance());
 					addSpecialVariables(feToken, context.model);
 					context.engine.notifyListeners(token,
 							ProcessListener.Action.ITERATE_FOREACH);
@@ -152,13 +150,11 @@ public class InterpretedTemplate extends AbstractTemplate implements Template {
 						// for each iteration we need to rewind to the beginning
 						// of the for loop
 						tokenStream.rewind(feToken);
-						Object value = feToken.iterator().next();
-						context.model.put(feToken.getVarName(), value);
+						context.model.put(feToken.getVarName(), feToken.advance());
 						context.push(feToken);
 						if (!skipMode) {
 							output.append(feToken.getSeparator());
 						}
-						feToken.setIndex(feToken.getIndex() + 1);
 						addSpecialVariables(feToken, context.model);
 						context.engine.notifyListeners(token,
 								ProcessListener.Action.ITERATE_FOREACH);

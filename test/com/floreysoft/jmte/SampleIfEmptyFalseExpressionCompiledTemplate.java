@@ -1,10 +1,11 @@
 package com.floreysoft.jmte;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-// ${if empty}${address}${else}NIX${end}
+// ${if !bean.trueCond}${address}${else}NIX${end}
 public class SampleIfEmptyFalseExpressionCompiledTemplate extends
 		AbstractCompiledTemplate {
 
@@ -23,19 +24,18 @@ public class SampleIfEmptyFalseExpressionCompiledTemplate extends
 	protected String transformCompiled(TemplateContext context) {
 		StringBuilder buffer = new StringBuilder();
 
-		IfToken ifToken = new IfToken("empty", false);
+		IfToken ifToken = new IfToken(Arrays.asList(new String[] { "bean",
+				"trueCond" }), "bean.trueCond", true);
 
-		Boolean condition = (Boolean) ifToken.evaluate(context);
-		
 		context.push(ifToken);
 		try {
-		if (condition) {
-			StringToken stringToken = new StringToken("address", "address",
-					null, null, null, null, null);
-			buffer.append(stringToken.evaluate(context).toString());
-		} else {
-			buffer.append("NIX");
-		}
+			if ((Boolean) ifToken.evaluate(context)) {
+				StringToken stringToken = new StringToken("address", "address",
+						null, null, null, null, null);
+				buffer.append(stringToken.evaluate(context).toString());
+			} else {
+				buffer.append("NIX");
+			}
 		} finally {
 			context.pop();
 		}
