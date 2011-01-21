@@ -694,6 +694,15 @@ public abstract class AbstractEngineTest {
 	}
 
 	@Test
+	public void ifInNestedForeach() throws Exception {
+		String output = newEngine()
+				.transform(
+						"${foreach list item}${foreach item.list item2}${if item}${item2.property1}${end}${end}\n${end}",
+						DEFAULT_MODEL);
+		assertEquals("1.12.1\n" + "1.12.1\n", output);
+	}
+
+	@Test
 	public void emptyForeach() throws Exception {
 		String output = newEngine().transform(
 				"${foreach emptyList item}${item.property1}\n${end}",
@@ -852,7 +861,7 @@ public abstract class AbstractEngineTest {
 		Map<String, Object> model = new HashMap<String, Object>();
 		model.putAll(DEFAULT_MODEL);
 		model.put("oddExpression", oddExpression);
-		
+
 		String output = newEngine().transform(
 				"${foreach list item}${item}\n" + "${if last_item}last${end}"
 						+ "${if first_item}first${end}"
@@ -875,6 +884,62 @@ public abstract class AbstractEngineTest {
 		String output = newEngine().transform(
 				"${foreach foreach item , }${item}${end}", model);
 		assertEquals("i1, i2, i3", output);
+	}
+
+	@Test
+	public void compiledSimpleSample() throws Exception {
+		String input = "${address}";
+		String interpretedOutput = newEngine().transform(input, DEFAULT_MODEL);
+		String compiledOutput = new SampleSimpleExpressionCompiledTemplate(
+				newEngine()).transform(DEFAULT_MODEL);
+		assertEquals(interpretedOutput, compiledOutput);
+	}
+
+	@Test
+	public void compiledComplexSample() throws Exception {
+		String input = "${<h1>,address(NIX),</h1>;long(full)}";
+		String interpretedOutput = ENGINE_WITH_CUSTOM_RENDERERS.transform(
+				input, DEFAULT_MODEL);
+		String compiledOutput = new SampleComplexExpressionCompiledTemplate(
+				ENGINE_WITH_CUSTOM_RENDERERS).transform(DEFAULT_MODEL);
+		assertEquals(interpretedOutput, compiledOutput);
+	}
+
+	@Test
+	public void compiledIfSample() throws Exception {
+		String input = "${if empty}${address}${else}NIX${end}";
+		String interpretedOutput = newEngine().transform(input, DEFAULT_MODEL);
+		String compiledOutput = new SampleIfEmptyFalseExpressionCompiledTemplate(
+				newEngine()).transform(DEFAULT_MODEL);
+		assertEquals(interpretedOutput, compiledOutput);
+	}
+
+	@Test
+	public void compiledForeachSample() throws Exception {
+		String input = "${ foreach list item \n}${item.property1}${end}";
+		String interpretedOutput = newEngine().transform(input, DEFAULT_MODEL);
+		String compiledOutput = new SampleNewlineForeachSeparatorCompiledTemplate(
+				newEngine()).transform(DEFAULT_MODEL);
+		assertEquals(interpretedOutput, compiledOutput);
+	}
+
+	@Test
+	public void compiledSequenceSample() throws Exception {
+		String input = "PREFIX${<h1>,address(NIX),</h1>;long(full)}SUFFIX";
+		String interpretedOutput = newEngine().transform(input, DEFAULT_MODEL);
+		String compiledOutput = new SampleCompiledSequenceTemplate(newEngine())
+				.transform(DEFAULT_MODEL);
+		assertEquals(interpretedOutput, compiledOutput);
+	}
+
+	@Test
+	@Ignore
+	public void compiledNestedSample() throws Exception {
+		String input = "${foreach list item}${foreach item.list item2}${if item}${item2.property1}${end}${end}\n${end}";
+		String interpretedOutput = newEngine().transform(input, DEFAULT_MODEL);
+		String compiledOutput = new SampleNestedExpressionCompiledTemplate(newEngine())
+				.transform(DEFAULT_MODEL);
+		assertEquals(interpretedOutput, compiledOutput);
 	}
 
 }
