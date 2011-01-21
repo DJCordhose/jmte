@@ -30,14 +30,13 @@ public class SampleNewlineForeachSeparatorCompiledTemplate extends
 		feToken.setIterator(iterable.iterator());
 
 		context.model.enterScope();
+		context.push(feToken);
 		try {
 			Iterator<Object> iterator = feToken.iterator();
 			boolean first = true;
 			while (iterator.hasNext()) {
 				Object value = iterator.next();
 				context.model.put(feToken.getVarName(), value);
-				feToken.setFirst(first);
-				feToken.setLast(!iterator.hasNext());
 				feToken.setIndex(feToken.getIndex() + 1);
 				addSpecialVariables(feToken, context.model);
 				getEngine().notifyListeners(feToken,
@@ -56,6 +55,7 @@ public class SampleNewlineForeachSeparatorCompiledTemplate extends
 			}
 		} finally {
 			context.model.exitScope();
+			context.pop();
 		}
 		return buffer.toString();
 	}

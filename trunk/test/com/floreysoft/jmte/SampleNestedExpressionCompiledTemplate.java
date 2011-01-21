@@ -3,7 +3,7 @@ package com.floreysoft.jmte;
 import java.util.Arrays;
 import java.util.Iterator;
 
-// ${foreach list item}${foreach item.list item2}${if item}${item2.property1}${end}${end}\n${end}
+// ${foreach list item}${foreach item.list item2}${if item2.trueCond}${item2.property1}${end}${end}\n${end}
 public class SampleNestedExpressionCompiledTemplate extends
 		AbstractCompiledTemplate {
 
@@ -19,37 +19,36 @@ public class SampleNestedExpressionCompiledTemplate extends
 	@SuppressWarnings("unchecked")
 	protected String transformCompiled(TemplateContext context) {
 		StringBuilder buffer = new StringBuilder();
-		ForEachToken feToken = new ForEachToken("list", "item", "\n");
-		Iterable iterable = (Iterable) feToken.evaluate(context);
-		feToken.setIterator(iterable.iterator());
+		ForEachToken token1 = new ForEachToken("list", "item", "\n");
+		token1.setIterable((Iterable) token1.evaluate(context));
 
 		context.model.enterScope();
+		context.push(token1);
 		try {
-			Iterator<Object> iterator = feToken.iterator();
-			boolean first = true;
-			while (iterator.hasNext()) {
-				Object value = iterator.next();
-				context.model.put(feToken.getVarName(), value);
-				feToken.setFirst(first);
-				feToken.setLast(!iterator.hasNext());
-				feToken.setIndex(feToken.getIndex() + 1);
-				addSpecialVariables(feToken, context.model);
-				getEngine().notifyListeners(feToken,
+			
+			while (token1.iterator().hasNext()) {
+				Object value = token1.iterator().next();
+				context.model.put(token1.getVarName(), value);
+				token1.setIndex(token1.getIndex() + 1);
+				addSpecialVariables(token1, context.model);
+				getEngine().notifyListeners(token1,
 						ProcessListener.Action.ITERATE_FOREACH);
 
-				StringToken stringToken = new StringToken(Arrays
+				
+				
+				StringToken token2 = new StringToken(Arrays
 						.asList(new String[] { "item", "property1" }),
 						"item.property1");
-				Object evaluated = stringToken.evaluate(context);
+				Object evaluated = token2.evaluate(context);
 				buffer.append(evaluated.toString());
 
-				first = false;
-				if (!feToken.isLast()) {
-					buffer.append(feToken.getSeparator());
+				if (!token1.isLast()) {
+					buffer.append(token1.getSeparator());
 				}
 			}
 		} finally {
 			context.model.exitScope();
+			context.pop();
 		}
 		return buffer.toString();
 	}

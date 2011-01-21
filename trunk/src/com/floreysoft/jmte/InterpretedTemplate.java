@@ -120,9 +120,7 @@ public class InterpretedTemplate extends AbstractTemplate implements Template {
 					context.model.enterScope();
 					Object value = feToken.iterator().next();
 					context.model.put(feToken.getVarName(), value);
-					feToken.setFirst(true);
 					feToken.setIndex(0);
-					feToken.setLast(!feToken.iterator().hasNext());
 					addSpecialVariables(feToken, context.model);
 					context.engine.notifyListeners(token,
 							ProcessListener.Action.ITERATE_FOREACH);
@@ -160,8 +158,6 @@ public class InterpretedTemplate extends AbstractTemplate implements Template {
 						if (!skipMode) {
 							output.append(feToken.getSeparator());
 						}
-						feToken.setFirst(false);
-						feToken.setLast(!feToken.iterator().hasNext());
 						feToken.setIndex(feToken.getIndex() + 1);
 						addSpecialVariables(feToken, context.model);
 						context.engine.notifyListeners(token,
