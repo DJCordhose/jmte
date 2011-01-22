@@ -15,7 +15,7 @@ public class IfToken extends ExpressionToken {
 		this.negated = negated;
 	}
 
-	protected IfToken(List<String> segments, String expression, boolean negated) {
+	public IfToken(List<String> segments, String expression, boolean negated) {
 		super(segments, expression);
 		this.negated = negated;
 	}

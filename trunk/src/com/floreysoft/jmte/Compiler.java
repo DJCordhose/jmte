@@ -4,6 +4,7 @@ import static org.objectweb.asm.Opcodes.*;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -12,6 +13,7 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.util.CheckClassAdapter;
 import org.objectweb.asm.util.TraceClassVisitor;
 
@@ -22,8 +24,11 @@ import com.floreysoft.jmte.util.UniqueNameGenerator;
  * @author olli
  * 
  * @see http://asm.ow2.org/
- * @see http://java.sun.com/docs/books/jvms/second_edition/html/ClassFile.doc.html
- * @see http://java.sun.com/docs/books/jvms/second_edition/html/Instructions.doc.html
+ * @see http
+ *      ://java.sun.com/docs/books/jvms/second_edition/html/ClassFile.doc.html
+ * @see http 
+ *      ://java.sun.com/docs/books/jvms/second_edition/html/Instructions.doc.
+ *      html
  */
 public class Compiler {
 
@@ -45,12 +50,19 @@ public class Compiler {
 
 	private final static MyClassLoader MY_CLASS_LOADER = new MyClassLoader();
 
-	// make sure we are in the same package as context to have access to its protected parts
+	// make sure we are in the same package as context to have access to its
+	// protected parts
 	private final static String COMPILED_TEMPLATE_NAME_PREFIX = "com/floreysoft/jmte/CompiledTemplate";
 
 	// must be globally unique
 	private final static UniqueNameGenerator<String, String> uniqueNameGenerator = new UniqueNameGenerator<String, String>(
 			COMPILED_TEMPLATE_NAME_PREFIX);
+
+	private final static int THIS = 0;
+	private final static int CONTEXT = 1;
+	private final static int BUFFER = 2;
+	private final static int EXCEPTION = 3;
+	private final static int HIGHEST = EXCEPTION;
 
 	protected final String template;
 	protected final Engine engine;
@@ -68,7 +80,7 @@ public class Compiler {
 	protected transient Label endLabel = new Label();
 
 	protected transient TokenStream tokenStream;
-	protected transient UniqueNameGenerator<String, String> tokenUq = new UniqueNameGenerator<String, String>("token");
+	protected transient int tokenLocalVarIndex = HIGHEST + 1;
 
 	protected final String sourceName;
 
@@ -84,11 +96,10 @@ public class Compiler {
 		typeDescriptor = "L" + className + ";";
 		classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
 		writer = new StringWriter();
-		classVisitor = new TraceClassVisitor(classWriter,
-				new PrintWriter(writer));
-		// CheckClassAdapter needs tree stuff
-//		classVisitor = new CheckClassAdapter(new TraceClassVisitor(classWriter,
-//				new PrintWriter(writer)));
+		TraceClassVisitor traceClassVisitor = new TraceClassVisitor(
+				classWriter, new PrintWriter(writer));
+//		classVisitor = new CheckClassAdapter(traceClassVisitor);
+		classVisitor = traceClassVisitor;
 	}
 
 	private void foreach() {
@@ -113,29 +124,44 @@ public class Compiler {
 	private void condition() {
 		IfToken ifToken = (IfToken) tokenStream.currentToken();
 		tokenStream.consume();
-		codeGenerateIfStart(ifToken);
+
+		Label tryEndLabel = new Label();
+		Label finalLabel = new Label();
+		Label elseLabel = new Label();
+
+		codeGenerateIfBlockStart(ifToken, tryEndLabel, elseLabel);
+		
 		String variableName = ifToken.getExpression();
 		usedVariables.add(variableName);
 		Token contentToken;
+
+		codeGenerateIfBranchStart();
 		while ((contentToken = tokenStream.currentToken()) != null
 				&& !(contentToken instanceof EndToken)
 				&& !(contentToken instanceof ElseToken)) {
 			content();
 		}
+		codeGenerateIfBranchEnd(finalLabel);
 
+		codeGenerateElseBranchStart(elseLabel);
 		if (contentToken instanceof ElseToken) {
 			tokenStream.consume();
+
 			while ((contentToken = tokenStream.currentToken()) != null
 					&& !(contentToken instanceof EndToken)) {
 				content();
 			}
+
 		}
+		codeGenerateElseBranchEnd(finalLabel);
+		
 		if (contentToken == null) {
 			engine.getErrorHandler().error("missing-end", ifToken);
 		} else {
 			tokenStream.consume();
-			codeGenerateIfEnd();
 		}
+
+		codeGenerateIfBlockEnd(tryEndLabel, finalLabel);
 	}
 
 	private void content() {
@@ -171,8 +197,8 @@ public class Compiler {
 		openCompilation();
 
 		List<StartEndPair> scan = engine.scan(template);
-		tokenStream = new TokenStream(sourceName, template, scan, lexer,
-				engine.getExprStartToken(), engine.getExprEndToken());
+		tokenStream = new TokenStream(sourceName, template, scan, lexer, engine
+				.getExprStartToken(), engine.getExprEndToken());
 		tokenStream.nextToken();
 		while (tokenStream.currentToken() != null) {
 			content();
@@ -182,7 +208,7 @@ public class Compiler {
 
 		classWriter.visitEnd();
 		classVisitor.visitEnd();
-		
+
 		// FIXME: Only for debugging
 		System.out.println(writer.toString());
 		byte[] byteArray = classWriter.toByteArray();
@@ -209,17 +235,12 @@ public class Compiler {
 		MethodVisitor mv = classVisitor.visitMethod(ACC_PUBLIC, "<init>",
 				"()V", null, null);
 		mv.visitCode();
-		Label l0 = new Label();
-		mv.visitLabel(l0);
-		mv.visitVarInsn(ALOAD, 0);
+		mv.visitVarInsn(ALOAD, THIS);
 		mv.visitMethodInsn(INVOKESPECIAL, superClassName, "<init>", "()V");
-		Label l1 = new Label();
-		mv.visitLabel(l1);
 		mv.visitInsn(RETURN);
-		Label l2 = new Label();
-		mv.visitLabel(l2);
-		mv.visitLocalVariable("this", typeDescriptor, null, l0, l2, 0);
-		// we can pass whatever we like as we have set ClassWriter.COMPUTE_FRAMES to ClassWriter
+
+		// we can pass whatever we like as we have set
+		// ClassWriter.COMPUTE_FRAMES to ClassWriter
 		mv.visitMaxs(1, 1);
 		mv.visitEnd();
 
@@ -230,16 +251,8 @@ public class Compiler {
 
 		mv.visitLabel(endLabel);
 
-		mv
-				.visitLocalVariable(
-						"this",
-						"Lcom/floreysoft/jmte/SampleComplexExpressionCompiledTemplate;",
-						null, startLabel, endLabel, 0);
-		mv.visitLocalVariable("model", "Lcom/floreysoft/jmte/ScopedMap;", null,
-				startLabel, endLabel, 1);
-		mv.visitLocalVariable("buffer", "Ljava/lang/StringBuilder;", null,
-				startLabel, endLabel, 2);
-		// we can pass whatever we like as we have set ClassWriter.COMPUTE_FRAMES to ClassWriter
+		// we can pass whatever we like as we have set
+		// ClassWriter.COMPUTE_FRAMES to ClassWriter
 		mv.visitMaxs(1, 1);
 		mv.visitEnd();
 	}
@@ -251,13 +264,13 @@ public class Compiler {
 		mv.visitInsn(DUP);
 		mv.visitMethodInsn(INVOKESPECIAL, "java/lang/StringBuilder", "<init>",
 				"()V");
-		mv.visitVarInsn(ASTORE, 2);
+		mv.visitVarInsn(ASTORE, BUFFER);
 	}
 
 	// return buffer.toString();
 
 	private void returnStringBuilder() {
-		mv.visitVarInsn(ALOAD, 2);
+		mv.visitVarInsn(ALOAD, BUFFER);
 		mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder",
 				"toString", "()Ljava/lang/String;");
 		mv.visitInsn(ARETURN);
@@ -277,18 +290,19 @@ public class Compiler {
 				superClassName, null);
 
 		createCtor();
-		
-		mv = classVisitor.visitMethod(ACC_PROTECTED, "transformCompiled", "(Lcom/floreysoft/jmte/TemplateContext;)Ljava/lang/String;", null, null);
 
-		mv.visitLabel(startLabel);
+		mv = classVisitor.visitMethod(ACC_PROTECTED, "transformCompiled",
+				"(Lcom/floreysoft/jmte/TemplateContext;)Ljava/lang/String;",
+				null, null);
 
 		mv.visitCode();
+		mv.visitLabel(startLabel);
 		createStringBuilder();
 	}
 
 	private void codeGenerateStringToken(StringToken stringToken) {
 
-		mv.visitVarInsn(ALOAD, 2);
+		mv.visitVarInsn(ALOAD, BUFFER);
 		mv.visitTypeInsn(NEW, "com/floreysoft/jmte/StringToken");
 		mv.visitInsn(DUP);
 		pushConstant(stringToken.getExpression());
@@ -299,29 +313,168 @@ public class Compiler {
 		pushConstant(stringToken.getRendererName());
 		pushConstant(stringToken.getParameters());
 
-		mv.visitMethodInsn(INVOKESPECIAL, "com/floreysoft/jmte/StringToken", "<init>", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
-		mv.visitVarInsn(ALOAD, 1);
-		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/StringToken", "evaluate", "(Lcom/floreysoft/jmte/TemplateContext;)Ljava/lang/Object;");
-		mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Object", "toString", "()Ljava/lang/String;");
-		mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;");
+		mv
+				.visitMethodInsn(
+						INVOKESPECIAL,
+						"com/floreysoft/jmte/StringToken",
+						"<init>",
+						"(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
+		mv.visitVarInsn(ALOAD, CONTEXT);
+		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/StringToken",
+				"evaluate",
+				"(Lcom/floreysoft/jmte/TemplateContext;)Ljava/lang/Object;");
+		mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Object", "toString",
+				"()Ljava/lang/String;");
+		mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append",
+				"(Ljava/lang/String;)Ljava/lang/StringBuilder;");
 		mv.visitInsn(POP);
 
 	}
 
 	private void codeGenerateText(String text) {
-		mv.visitVarInsn(ALOAD, 2);
+		mv.visitVarInsn(ALOAD, BUFFER);
 		pushConstant(text);
 		mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append",
 				"(Ljava/lang/String;)Ljava/lang/StringBuilder;");
 		mv.visitInsn(POP);
 	}
 
-	private void codeGenerateIfEnd() {
+	private void codeGenerateElseBranchStart(Label elseLabel) {
+
+		// } else {
+		mv.visitLabel(elseLabel);
+	}
+
+	private void codeGenerateElseBranchEnd(Label finalLabel) {
+		// end of else branch
+		mv.visitJumpInsn(GOTO, finalLabel);
+
+	}
+
+	private void codeGenerateIfBranchStart() {
 		// TODO Auto-generated method stub
 
 	}
 
-	private void codeGenerateIfStart(IfToken ifToken) {
+	private void codeGenerateIfBranchEnd(Label finalLabel) {
+		// end of if branch
+		mv.visitJumpInsn(GOTO, finalLabel);
+	}
+
+	private void codeGenerateIfBlockEnd(Label tryEndLabel, Label finalLabel) {
+		// try end block rethrowing exception
+		mv.visitLabel(tryEndLabel);
+		mv.visitVarInsn(ASTORE, EXCEPTION);
+
+		codeGeneratePopContext();
+
+		mv.visitVarInsn(ALOAD, EXCEPTION);
+		mv.visitInsn(ATHROW);
+
+		// } finally {
+		mv.visitLabel(finalLabel);
+
+		// context.pop();
+
+		codeGeneratePopContext();
+
+		tokenLocalVarIndex--;
+
+	}
+
+	private void codeGenerateIfToken(IfToken ifToken) {
+		if (ifToken instanceof IfCmpToken) {
+
+			// IfCmpToken token1 = new IfCmpToken(Arrays
+			// .asList(new String[] { "address" }), "address", "Fillbert",
+			// false);
+			mv.visitTypeInsn(NEW, "com/floreysoft/jmte/IfCmpToken");
+			mv.visitInsn(DUP);
+			pushList(ifToken.getSegments());
+			pushConstant(ifToken.getExpression());
+			pushConstant(((IfCmpToken) ifToken).getOperand());
+			mv.visitInsn(ifToken.isNegated() ? ICONST_1 : ICONST_0);
+			mv.visitMethodInsn(INVOKESPECIAL, "com/floreysoft/jmte/IfCmpToken",
+					"<init>",
+					"(Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Z)V");
+
+		} else {
+			// IfToken token1 = new IfToken(Arrays.asList(new String[] { "bean",
+			// "trueCond" }), "bean.trueCond", true);
+
+			mv.visitTypeInsn(NEW, "com/floreysoft/jmte/IfToken");
+			mv.visitInsn(DUP);
+			pushList(ifToken.getSegments());
+			pushConstant(ifToken.getExpression());
+			mv.visitInsn(ifToken.isNegated() ? ICONST_1 : ICONST_0);
+			mv.visitMethodInsn(INVOKESPECIAL, "com/floreysoft/jmte/IfToken",
+					"<init>", "(Ljava/util/List;Ljava/lang/String;Z)V");
+
+		}
+		mv.visitVarInsn(ASTORE, tokenLocalVarIndex);
+
+	}
+
+	private void pushList(List<String> list) {
+		mv.visitIntInsn(BIPUSH, list.size());
+		mv.visitTypeInsn(ANEWARRAY, "java/lang/String");
+
+		for (int i = 0; i < list.size(); i++) {
+
+			mv.visitInsn(DUP);
+			mv.visitIntInsn(BIPUSH, i);
+			mv.visitLdcInsn(list.get(i));
+			mv.visitInsn(AASTORE);
+		}
+		mv.visitMethodInsn(INVOKESTATIC, "java/util/Arrays", "asList",
+				"([Ljava/lang/Object;)Ljava/util/List;");
+
+	}
+
+	private void codeGenerateIfBlockStart(IfToken ifToken, Label tryEndLabel,
+			Label elseLabel) {
+		Label tryStartLabel = new Label();
+
+		mv.visitTryCatchBlock(tryStartLabel, tryEndLabel, tryEndLabel, null);
+
+		codeGenerateIfToken(ifToken);
+
+		// context.push(token1);
+		mv.visitVarInsn(ALOAD, CONTEXT);
+		mv.visitVarInsn(ALOAD, tokenLocalVarIndex);
+		mv.visitMethodInsn(INVOKEVIRTUAL,
+				"com/floreysoft/jmte/TemplateContext", "push",
+				"(Lcom/floreysoft/jmte/Token;)V");
+
+		// try {
+
+		mv.visitLabel(tryStartLabel);
+		// token1.evaluate(context)
+		mv.visitVarInsn(ALOAD, tokenLocalVarIndex);
+		mv.visitVarInsn(ALOAD, CONTEXT);
+		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/IfToken",
+				"evaluate",
+				"(Lcom/floreysoft/jmte/TemplateContext;)Ljava/lang/Object;");
+
+		// (Boolean)
+		mv.visitTypeInsn(CHECKCAST, "java/lang/Boolean");
+		mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Boolean", "booleanValue",
+				"()Z");
+
+		// if ((Boolean) token1.evaluate(context)) {
+		// if the condition is 0 meaning false
+		mv.visitJumpInsn(IFEQ, elseLabel);
+
+		tokenLocalVarIndex++;
+
+	}
+
+	private void codeGeneratePopContext() {
+		mv.visitVarInsn(ALOAD, CONTEXT);
+		mv.visitMethodInsn(INVOKEVIRTUAL,
+				"com/floreysoft/jmte/TemplateContext", "pop",
+				"()Lcom/floreysoft/jmte/Token;");
+		mv.visitInsn(POP);
 	}
 
 	private void codeGenerateForeachEnd() {
