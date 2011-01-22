@@ -6,7 +6,7 @@ First complete public release
 Release 2.0
 ===========
 
-Second complete publuc release mainly fixing design flaws and providing better API. Template language unchanged.
+Second complete public release mainly fixing design flaws and providing better API. Template language unchanged.
 
 *Cleaner lexing allowing for better analysis of templates*
 - Lexer now only does the job of a scanner without using evaluation. Evaluation is done on token when needed. 
@@ -17,10 +17,16 @@ Second complete publuc release mainly fixing design flaws and providing better A
 *Engine now configurable using literate programming*
 
 *More helper functions*
-- You can now merge multiple lists to a single one allowing to iterate them in parallel using the engine
+- You can now merge multiple lists into a single one allowing to iterate them in parallel using the engine
 
 *Generally more graceful reactions to expressions that might seem inappropriate*
 - If and foreach now try to make sense of any type of object being passed in as an expression parameter
 - Even a string expression tries to spit out any kind of object
 
 *Lots of internal refactoring and bug fixing*
+
+*Introduced renderers
+
+*Introduced compiled mode
+
+*Introduced dynamic expressions and a configurable model adaptor

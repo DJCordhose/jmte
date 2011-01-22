@@ -108,8 +108,9 @@ Eclipse compiler for performance measurement)
                                Foreach 16917,8 =============================
                               Renderer 20263,1 ==============================
                               
-22.01.2011, introduction of model adaptor (svn rev xxx)
+22.01.2011, introduction of model adaptor (svn rev 113)
 ==========================================================
+
                              benchmark      ns logarithmic runtime
                 StringBuilderReference   499,2 ==============
                  StringConcatReference   496,6 ==============
