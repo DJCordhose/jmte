@@ -103,19 +103,8 @@ public abstract class ExpressionToken extends AbstractToken {
 	@Override
 	public abstract Object evaluate(TemplateContext context);
 
-	@SuppressWarnings("unchecked")
 	protected Object evaluatePlain(TemplateContext context) {
-		Object value = traverse(getSegments(), context.model, context.engine
-				.getErrorHandler());
-		// if value implements both, we use the more specialized implementation
-		if (value instanceof TemplateExpression) {
-			value = ((TemplateExpression) value).eval(context);
-		} else if (value instanceof Callable) {
-			try {
-				value = ((Callable) value).call();
-			} catch (Exception e) {
-			}
-		}
+		final Object value = context.engine.getModelAdaptor().getValue(context, this, getSegments(), getExpression());
 		return value;
 	}
 

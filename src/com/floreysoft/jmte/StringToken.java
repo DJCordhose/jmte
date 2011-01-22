@@ -1,8 +1,6 @@
 package com.floreysoft.jmte;
 
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
 
 import com.floreysoft.jmte.renderer.NamedRenderer;
 import com.floreysoft.jmte.renderer.Renderer;
