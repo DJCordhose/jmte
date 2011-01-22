@@ -93,7 +93,7 @@ Eclipse compiler for performance measurement)
                                Foreach 17084,6 =============================
                               Renderer 20125,9 =============================
                               
-22.01.2011, various refactorings to enable compilation (svn rev xxx)
+21.01.2011, various refactorings to enable compilation (svn rev 112)
 ==========================================================
 
                              benchmark      ns logarithmic runtime
@@ -108,3 +108,17 @@ Eclipse compiler for performance measurement)
                                Foreach 16917,8 =============================
                               Renderer 20263,1 ==============================
                               
+22.01.2011, introduction of model adaptor (svn rev xxx)
+==========================================================
+                             benchmark      ns logarithmic runtime
+                StringBuilderReference   499,2 ==============
+                 StringConcatReference   496,6 ==============
+                       PrintfReference  2931,0 =====================
+                            Expression  7505,5 =========================
+                     NativeIfReference    22,3 =
+                                    If 10419,1 ===========================
+                NativeForeachReference   339,7 ============
+ NativeForeachNoStringBuilderReference   518,6 ==============
+                               Foreach 16857,6 =============================
+                              Renderer 20277,4 ==============================
+ 

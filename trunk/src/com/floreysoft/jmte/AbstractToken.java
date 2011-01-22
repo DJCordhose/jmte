@@ -100,61 +100,7 @@ public abstract class AbstractToken implements Token {
 	public String getSourceName() {
 		return sourceName;
 	}
-
-	protected Object traverse(List<String> segments, Map<String, Object> model,
-			ErrorHandler errorHandler) {
-		if (segments.size() == 0) {
-			return null;
-		}
-		String objectName = segments.get(0);
-		Object value = model.get(objectName);
-
-		LinkedList<String> attributeNames = new LinkedList<String>(segments);
-		attributeNames.remove(0);
-		value = traverse(value, attributeNames, errorHandler);
-		return value;
-	}
-
-	protected Object traverse(Object o, LinkedList<String> attributeNames,
-			ErrorHandler errorHandler) {
-		Object result;
-		if (attributeNames.isEmpty()) {
-			result = o;
-		} else {
-			if (o == null) {
-				return null;
-			}
-			String attributeName = attributeNames.remove(0);
-			Object nextStep = nextStep(o, attributeName, errorHandler);
-			result = traverse(nextStep, attributeNames, errorHandler);
-		}
-		return result;
-	}
-
-	@SuppressWarnings("unchecked")
-	protected Object nextStep(Object o, String attributeName,
-			ErrorHandler errorHandler) {
-		Object result;
-		if (o instanceof String) {
-			errorHandler.error("no-call-on-string", this, Engine.toModel(
-					"receiver", o.toString()));
-			return o;
-		} else if (o instanceof Map) {
-			Map map = (Map) o;
-			result = map.get(attributeName);
-		} else {
-			try {
-				result = Util.getPropertyValue(o, attributeName);
-			} catch (Exception e) {
-				errorHandler.error("property-access-error", this, Engine
-						.toModel("property", attributeName, "object", o,
-								"exception", e));
-				result = "";
-			}
-		}
-		return result;
-	}
-
+	
 	@Override
 	public int getTokenIndex() {
 		return tokenIndex;

@@ -174,7 +174,7 @@ public final class Engine {
 	}
 
 	/**
-	 * Merges any number of named lists into a single one contained their
+	 * Merges any number of named lists into a single one containing their
 	 * combined values. Can be very handy in case of a servlet request which
 	 * might contain several lists of parameters that you want to iterate over
 	 * in a combined way.
@@ -218,11 +218,12 @@ public final class Engine {
 
 	private String exprStartToken = "${";
 	private String exprEndToken = "}";
-	private double expansionSizeFactor = 1.2;
+	private double expansionSizeFactor = 2;
 	private ErrorHandler errorHandler = new DefaultErrorHandler();
 	private Locale locale = new Locale("en");
 	private boolean useCompilation = false;
-
+	private ModelAdaptor modelAdaptor = new DefaultModelAdaptor();
+	
 	// TODO: Should we rather use a cache instead of keeping them all?
 	private final Map<String, Template> compiledTemplates = new HashMap<String, Template>();
 
@@ -275,10 +276,9 @@ public final class Engine {
 	 * @param errorHandler
 	 *            the new error handler
 	 */
-	public Engine setErrorHandler(ErrorHandler errorHandler) {
+	public void setErrorHandler(ErrorHandler errorHandler) {
 		this.errorHandler = errorHandler;
 		this.errorHandler.setLocale(locale);
-		return this;
 	}
 
 	public Engine registerNamedRenderer(NamedRenderer renderer) {
@@ -375,14 +375,12 @@ public final class Engine {
 		return resolvedRenderer;
 	}
 
-	public Engine addProcessListener(ProcessListener listener) {
+	public void addProcessListener(ProcessListener listener) {
 		listeners.add(listener);
-		return this;
 	}
 
-	public Engine removeProcessListener(ProcessListener listener) {
+	public void removeProcessListener(ProcessListener listener) {
 		listeners.remove(listener);
-		return this;
 	}
 
 	void notifyListeners(Token token, Action action) {
@@ -408,31 +406,27 @@ public final class Engine {
 		return exprEndToken;
 	}
 
-	public Engine setExprStartToken(String exprStartToken) {
+	public void setExprStartToken(String exprStartToken) {
 		this.exprStartToken = exprStartToken;
-		return this;
 	}
 
-	public Engine setExprEndToken(String exprEndToken) {
+	public void setExprEndToken(String exprEndToken) {
 		this.exprEndToken = exprEndToken;
-		return this;
 	}
 
-	public Engine setExpansionSizeFactor(double expansionSizeFactor) {
+	public void setExpansionSizeFactor(double expansionSizeFactor) {
 		this.expansionSizeFactor = expansionSizeFactor;
-		return this;
 	}
 
 	public double getExpansionSizeFactor() {
 		return expansionSizeFactor;
 	}
 
-	public Engine setLocale(Locale locale) {
+	public void setLocale(Locale locale) {
 		this.locale = locale;
 		if (this.errorHandler != null) {
 			this.errorHandler.setLocale(locale);
 		}
-		return this;
 	}
 
 	public Locale getLocale() {
@@ -448,9 +442,8 @@ public final class Engine {
 		return useCompilation;
 	}
 
-	public Engine setUseCompilation(boolean useCompilation) {
+	public void setUseCompilation(boolean useCompilation) {
 		this.useCompilation = useCompilation;
-		return this;
 	}
 
 	/**
@@ -477,5 +470,13 @@ public final class Engine {
 			return new InterpretedTemplate(template, sourceName, this);
 
 		}
+	}
+
+	public void setModelAdaptor(ModelAdaptor modelAdaptor) {
+		this.modelAdaptor = modelAdaptor;
+	}
+
+	public ModelAdaptor getModelAdaptor() {
+		return modelAdaptor;
 	}
 }
