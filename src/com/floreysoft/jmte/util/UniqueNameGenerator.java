@@ -42,4 +42,5 @@ public class UniqueNameGenerator<F, T> {
 	public boolean hasTranslation(F from) {
 		return translations.containsKey(from);
 	}
+
 }

@@ -11,7 +11,7 @@ public class IfCmpToken extends IfToken {
 		this.operand = operand;
 	}
 
-	protected IfCmpToken(List<String> segments, String expression, String operand, boolean negated) {
+	public IfCmpToken(List<String> segments, String expression, String operand, boolean negated) {
 		super(segments, expression, negated);
 		this.operand = operand;
 	}

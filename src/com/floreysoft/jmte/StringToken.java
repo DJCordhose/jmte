@@ -32,7 +32,7 @@ public class StringToken extends ExpressionToken {
 		this(variableName, variableName, null, null, null, null, null);
 	}
 
-	protected StringToken(List<String> segments, String variableName) {
+	public StringToken(List<String> segments, String variableName) {
 		super(segments, variableName);
 		this.defaultValue = null;
 		this.prefix = null;

@@ -46,11 +46,11 @@ public class TemplateContext {
 		return sourceName;
 	}
 
-	protected void push(Token token) {
+	public void push(Token token) {
 		scopes.add(token);
 	}
 
-	protected Token pop() {
+	public Token pop() {
 		if (scopes.isEmpty()) {
 			return null;
 		} else {
