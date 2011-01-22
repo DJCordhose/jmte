@@ -4,11 +4,10 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-// ${if !bean.trueCond}${address}${else}NIX${end}
-public class SampleIfEmptyFalseExpressionCompiledTemplate extends
-		AbstractCompiledTemplate {
+// ${if address='Fillbert'}${address}${else}NIX${end}
+public class SampleIfCmpCompiledTemplate extends AbstractCompiledTemplate {
 
-	public SampleIfEmptyFalseExpressionCompiledTemplate(Engine engine) {
+	public SampleIfCmpCompiledTemplate(Engine engine) {
 		super(engine);
 	}
 
@@ -23,14 +22,15 @@ public class SampleIfEmptyFalseExpressionCompiledTemplate extends
 	protected String transformCompiled(TemplateContext context) {
 		StringBuilder buffer = new StringBuilder();
 
-		IfToken token1 = new IfToken(Arrays.asList(new String[] { "bean",
-				"trueCond" }), "bean.trueCond", true);
+		IfCmpToken token1 = new IfCmpToken(Arrays
+				.asList(new String[] { "address" }), "address", "Fillbert",
+				false);
 
 		context.push(token1);
 		try {
 			if ((Boolean) token1.evaluate(context)) {
-				buffer.append(new StringToken("address", "address",
-						null, null, null, null, null).evaluate(context));
+				buffer.append(new StringToken("address", "address", null, null,
+						null, null, null).evaluate(context));
 			} else {
 				buffer.append("NIX");
 			}

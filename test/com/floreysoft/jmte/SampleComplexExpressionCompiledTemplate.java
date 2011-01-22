@@ -23,7 +23,7 @@ public class SampleComplexExpressionCompiledTemplate extends
 		StringBuilder buffer = new StringBuilder();
 
 		buffer.append(new StringToken("address", "address", "NIX", "<h1>",
-				"</h1>", "long", "full").evaluate(context).toString());
+				"</h1>", "long", "full").evaluate(context));
 
 		return buffer.toString();
 	}

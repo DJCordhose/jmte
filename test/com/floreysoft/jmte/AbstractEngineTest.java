@@ -941,4 +941,13 @@ public abstract class AbstractEngineTest {
 		assertEquals(interpretedOutput, compiledOutput);
 	}
 
+	@Test
+	public void compiledIfEqSample() throws Exception {
+		String input = "${if address='Fillbert'}${address}${else}NIX${end}";
+		String interpretedOutput = newEngine().transform(input, DEFAULT_MODEL);
+		String compiledOutput = new SampleIfCmpCompiledTemplate(newEngine())
+				.transform(DEFAULT_MODEL);
+		assertEquals(interpretedOutput, compiledOutput);
+	}
+	
 }

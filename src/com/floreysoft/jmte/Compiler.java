@@ -68,6 +68,7 @@ public class Compiler {
 	protected transient Label endLabel = new Label();
 
 	protected transient TokenStream tokenStream;
+	protected transient UniqueNameGenerator<String, String> tokenUq = new UniqueNameGenerator<String, String>("token");
 
 	protected final String sourceName;
 
