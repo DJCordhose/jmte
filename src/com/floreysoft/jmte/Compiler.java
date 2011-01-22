@@ -245,6 +245,7 @@ public class Compiler {
 
 	// StringBuilder buffer = new StringBuilder();
 	private void createStringBuilder() {
+
 		mv.visitTypeInsn(NEW, "java/lang/StringBuilder");
 		mv.visitInsn(DUP);
 		mv.visitMethodInsn(INVOKESPECIAL, "java/lang/StringBuilder", "<init>",
@@ -275,10 +276,8 @@ public class Compiler {
 				superClassName, null);
 
 		createCtor();
-
-		mv = classVisitor.visitMethod(ACC_PROTECTED, "transformCompiled",
-				"(Lcom/floreysoft/jmte/ScopedMap;)Ljava/lang/String;", null,
-				null);
+		
+		mv = classVisitor.visitMethod(ACC_PROTECTED, "transformCompiled", "(Lcom/floreysoft/jmte/TemplateContext;)Ljava/lang/String;", null, null);
 
 		mv.visitLabel(startLabel);
 
@@ -287,6 +286,7 @@ public class Compiler {
 	}
 
 	private void codeGenerateStringToken(StringToken stringToken) {
+
 		mv.visitVarInsn(ALOAD, 2);
 		mv.visitTypeInsn(NEW, "com/floreysoft/jmte/StringToken");
 		mv.visitInsn(DUP);
@@ -297,31 +297,12 @@ public class Compiler {
 		pushConstant(stringToken.getSuffix());
 		pushConstant(stringToken.getRendererName());
 		pushConstant(stringToken.getParameters());
-		mv
-				.visitMethodInsn(
-						INVOKESPECIAL,
-						"com/floreysoft/jmte/StringToken",
-						"<init>",
-						"(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
-		mv.visitVarInsn(ALOAD, 0);
-		mv.visitMethodInsn(INVOKEVIRTUAL, className, "getEngine",
-				"()Lcom/floreysoft/jmte/Engine;");
+
+		mv.visitMethodInsn(INVOKESPECIAL, "com/floreysoft/jmte/StringToken", "<init>", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
 		mv.visitVarInsn(ALOAD, 1);
-		mv.visitVarInsn(ALOAD, 0);
-		mv.visitMethodInsn(INVOKEVIRTUAL, className, "getEngine",
-				"()Lcom/floreysoft/jmte/Engine;");
-		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/Engine",
-				"getErrorHandler", "()Lcom/floreysoft/jmte/ErrorHandler;");
-		mv
-				.visitMethodInsn(
-						INVOKEVIRTUAL,
-						"com/floreysoft/jmte/StringToken",
-						"evaluate",
-						"(Lcom/floreysoft/jmte/Engine;Ljava/util/Map;Lcom/floreysoft/jmte/ErrorHandler;)Ljava/lang/Object;");
-		mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Object", "toString",
-				"()Ljava/lang/String;");
-		mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append",
-				"(Ljava/lang/String;)Ljava/lang/StringBuilder;");
+		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/StringToken", "evaluate", "(Lcom/floreysoft/jmte/TemplateContext;)Ljava/lang/Object;");
+		mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Object", "toString", "()Ljava/lang/String;");
+		mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;");
 		mv.visitInsn(POP);
 
 	}
@@ -340,54 +321,6 @@ public class Compiler {
 	}
 
 	private void codeGenerateIfStart(IfToken ifToken) {
-
-		// FIXME
-		if (true) return;
-		// IfToken ifToken = new IfToken("empty", false);
-		mv.visitTypeInsn(NEW, "com/floreysoft/jmte/IfToken");
-		mv.visitInsn(DUP);
-		mv.visitLdcInsn(ifToken.getExpression());
-		mv.visitInsn(
-
-		// ifToken.isNegated()
-
-				ICONST_0
-
-				);
-		mv.visitMethodInsn(INVOKESPECIAL, "com/floreysoft/jmte/IfToken",
-				"<init>", "(Ljava/lang/String;Z)V");
-		mv.visitVarInsn(ASTORE, 3);
-
-		// Boolean condition = (Boolean) ifToken.evaluate(getEngine(), model,
-		// getEngine().getErrorHandler());
-		mv.visitVarInsn(ALOAD, 3);
-		mv.visitVarInsn(ALOAD, 0);
-		mv
-				.visitMethodInsn(
-						INVOKEVIRTUAL,
-						"com/floreysoft/jmte/SampleIfEmptyFalseExpressionCompiledTemplate",
-						"getEngine", "()Lcom/floreysoft/jmte/Engine;");
-		mv.visitVarInsn(ALOAD, 1);
-		mv.visitVarInsn(ALOAD, 0);
-		mv
-				.visitMethodInsn(
-						INVOKEVIRTUAL,
-						"com/floreysoft/jmte/SampleIfEmptyFalseExpressionCompiledTemplate",
-						"getEngine", "()Lcom/floreysoft/jmte/Engine;");
-		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/Engine",
-				"getErrorHandler", "()Lcom/floreysoft/jmte/ErrorHandler;");
-		mv
-				.visitMethodInsn(
-						INVOKEVIRTUAL,
-						"com/floreysoft/jmte/IfToken",
-						"evaluate",
-						"(Lcom/floreysoft/jmte/Engine;Ljava/util/Map;Lcom/floreysoft/jmte/ErrorHandler;)Ljava/lang/Object;");
-		mv.visitTypeInsn(CHECKCAST, "java/lang/Boolean");
-		mv.visitVarInsn(ASTORE, 4);
-		mv.visitVarInsn(ALOAD, 4);
-		mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Boolean", "booleanValue",
-				"()Z");
-
 	}
 
 	private void codeGenerateForeachEnd() {
