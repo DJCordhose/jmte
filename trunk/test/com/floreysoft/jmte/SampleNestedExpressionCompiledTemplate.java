@@ -49,22 +49,22 @@ public class SampleNestedExpressionCompiledTemplate extends
 
 						// OUTER_PRFIX
 						buffer.append("OUTER_PRFIX");
-						
+
 						// ${if item}
 						IfToken token3 = new IfToken("item", false);
 						context.push(token3);
 						try {
 							if ((Boolean) token3.evaluate(context)) {
-								
+
 								// ${item2.property1}
-								StringToken token4 = new StringToken(Arrays
-										.asList(new String[] { "item2", "property1" }),
-										"item.property1");
-								buffer.append(token4.evaluate(context));
+								buffer.append(new StringToken(Arrays
+										.asList(new String[] { "item2",
+												"property1" }),
+										"item.property1").evaluate(context));
 
 								// INNER_SUFFIX
 								buffer.append("INNER_SUFFIX");
-								
+
 							}
 						} finally {
 							context.pop();

@@ -25,32 +25,26 @@ public class SampleNewlineForeachSeparatorCompiledTemplate extends
 	@SuppressWarnings("unchecked")
 	protected String transformCompiled(TemplateContext context) {
 		StringBuilder buffer = new StringBuilder();
-		ForEachToken feToken = new ForEachToken("list", "item", "\n");
-		Iterable iterable = (Iterable) feToken.evaluate(context);
-		feToken.setIterator(iterable.iterator());
+		
+		ForEachToken token1 = new ForEachToken("list", "item", "\n");
+		token1.setIterable((Iterable) token1.evaluate(context));
 
 		context.model.enterScope();
-		context.push(feToken);
+		context.push(token1);
 		try {
-			Iterator<Object> iterator = feToken.iterator();
-			boolean first = true;
+			Iterator<Object> iterator = token1.iterator();
 			while (iterator.hasNext()) {
-				Object value = iterator.next();
-				context.model.put(feToken.getVarName(), value);
-				feToken.setIndex(feToken.getIndex() + 1);
-				addSpecialVariables(feToken, context.model);
-				getEngine().notifyListeners(feToken,
+				context.model.put(token1.getVarName(), token1.advance());
+				addSpecialVariables(token1, context.model);
+				getEngine().notifyListeners(token1,
 						ProcessListener.Action.ITERATE_FOREACH);
 
-				StringToken stringToken = new StringToken(Arrays
+				buffer.append(new StringToken(Arrays
 						.asList(new String[] { "item", "property1" }),
-						"item.property1");
-				Object evaluated = stringToken.evaluate(context);
-				buffer.append(evaluated.toString());
+				"item.property1").evaluate(context));
 
-				first = false;
-				if (!feToken.isLast()) {
-					buffer.append(feToken.getSeparator());
+				if (!token1.isLast()) {
+					buffer.append(token1.getSeparator());
 				}
 			}
 		} finally {

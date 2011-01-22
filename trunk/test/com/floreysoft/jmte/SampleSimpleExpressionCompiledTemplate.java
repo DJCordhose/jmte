@@ -17,7 +17,7 @@ public class SampleSimpleExpressionCompiledTemplate extends
 		StringBuilder buffer = new StringBuilder();
 
 		buffer.append(new StringToken("address", "address", null,
-				null, null, null, null).evaluate(context).toString());
+				null, null, null, null).evaluate(context));
 
 		return buffer.toString();
 	}

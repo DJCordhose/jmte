@@ -24,7 +24,7 @@ public class SampleCompiledSequenceTemplate extends
 		buffer.append("PREFIX");
 		
 		buffer.append(new StringToken("address", "address", "NIX", "<h1>",
-				"</h1>", "long", "full").evaluate(context).toString());
+				"</h1>", "long", "full").evaluate(context));
 
 		buffer.append("SUFFIX");
 		
