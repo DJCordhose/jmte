@@ -90,6 +90,7 @@ public class TokenStream {
 	public void rewind(Token tokenToRewindTo) {
 		initTokens();
 		this.currentTokenIndex = tokenToRewindTo.getTokenIndex() + 1;
+		consume();
 	}
 	
 	public List<Token> getAllTokens() {

@@ -35,8 +35,6 @@ public class SampleNewlineForeachSeparatorCompiledTemplate extends
 			while (token1.iterator().hasNext()) {
 				context.model.put(token1.getVarName(), token1.advance());
 				addSpecialVariables(token1, context.model);
-				getEngine().notifyProcessListeners(token1,
-						ProcessListener.Action.ITERATE_FOREACH);
 
 				buffer.append(new StringToken(Arrays
 						.asList(new String[] { "item", "property1" }),

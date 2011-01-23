@@ -77,7 +77,7 @@ public class ScopedMap implements Map<String, Object> {
 	}
 
 	public boolean isLocal(String key) {
-		return containsKey(key) && !rawModel.containsKey(key);
+		return !rawModel.containsKey(key);
 	}
 
 	public void enterScope() {

@@ -645,24 +645,6 @@ public class Compiler {
 						"addSpecialVariables",
 						"(Lcom/floreysoft/jmte/ForEachToken;Ljava/util/Map;)V");
 
-		// getEngine().notifyListeners(token1,
-		// ProcessListener.Action.ITERATE_FOREACH);
-		mv.visitVarInsn(ALOAD, THIS);
-		mv
-				.visitMethodInsn(
-						INVOKEVIRTUAL,
-						className,
-						"getEngine", "()Lcom/floreysoft/jmte/Engine;");
-		mv.visitVarInsn(ALOAD, this.tokenLocalVarIndex);
-		mv.visitFieldInsn(GETSTATIC,
-				"com/floreysoft/jmte/ProcessListener$Action",
-				"ITERATE_FOREACH",
-				"Lcom/floreysoft/jmte/ProcessListener$Action;");
-		mv
-				.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/Engine",
-						"notifyProcessListeners",
-						"(Lcom/floreysoft/jmte/Token;Lcom/floreysoft/jmte/ProcessListener$Action;)V");
-
 		this.tokenLocalVarIndex++;
 	}
 
