@@ -61,4 +61,9 @@ public abstract class AbstractCompiledTemplate extends AbstractTemplate
 		return sourceName;
 	}
 
+	@Override
+	public String toString() {
+		return template;
+	}
+
 }

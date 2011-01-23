@@ -30,8 +30,6 @@ public class SampleNestedExpressionCompiledTemplate extends
 			while (token1.iterator().hasNext()) {
 				context.model.put(token1.getVarName(), token1.advance());
 				addSpecialVariables(token1, context.model);
-				getEngine().notifyProcessListeners(token1,
-						ProcessListener.Action.ITERATE_FOREACH);
 
 				// ${foreach item.list item2}
 				ForEachToken token2 = new ForEachToken(Arrays
@@ -44,8 +42,6 @@ public class SampleNestedExpressionCompiledTemplate extends
 						context.model
 								.put(token2.getVarName(), token2.advance());
 						addSpecialVariables(token2, context.model);
-						getEngine().notifyProcessListeners(token2,
-								ProcessListener.Action.ITERATE_FOREACH);
 
 						// OUTER_PRFIX
 						buffer.append("OUTER_PRFIX");

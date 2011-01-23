@@ -123,3 +123,20 @@ Eclipse compiler for performance measurement)
                                Foreach 16857,6 =============================
                               Renderer 20277,4 ==============================
  
+24.01.2011, after transition from stack based to recursive
+descent interpreter and new process listener conecept
+(svn rev xxx)
+==========================================================
+
+                             benchmark      ns logarithmic runtime
+                StringBuilderReference   500,6 ==============
+                 StringConcatReference   518,8 ==============
+                       PrintfReference  3057,0 =====================
+                            Expression  7422,8 =========================
+                     NativeIfReference    22,4 =
+                                    If  9064,5 ==========================
+                NativeForeachReference   345,8 ============
+ NativeForeachNoStringBuilderReference   516,6 ==============
+                               Foreach 16663,3 =============================
+                              Renderer 20393,9 ==============================
+ 

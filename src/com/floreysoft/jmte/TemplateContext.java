@@ -79,22 +79,4 @@ public class TemplateContext {
 		return null;
 	}
 
-	/**
-	 * If anywhere in the stack trace there is a negative condition, all the
-	 * inner parts must be skipped.
-	 */
-	public boolean isSkipMode() {
-		for (Token token : scopes) {
-			if (token instanceof IfToken || token instanceof ElseToken
-					|| token instanceof EmptyForEachToken) {
-				boolean condition = (Boolean) token.evaluate(this);
-				if (!condition) {
-					engine.notifyProcessListeners(token, ProcessListener.Action.SKIP);
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
 }

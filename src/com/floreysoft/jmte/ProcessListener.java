@@ -10,19 +10,7 @@ public interface ProcessListener {
 		 * Expression being skipped or condition given for skipping an
 		 * expression
 		 */
-		SKIP,
-		/**
-		 * Foreach loop over empty iterable
-		 */
-		EMPTY_FOREACH,
-		/**
-		 * Iteration over a loop
-		 */
-		ITERATE_FOREACH,
-		/**
-		 * Start of an if expression
-		 */
-		IF;
+		SKIP
 	}
 
 	void log(Token token, Action action);
