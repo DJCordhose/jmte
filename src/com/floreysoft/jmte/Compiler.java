@@ -44,17 +44,28 @@ public class Compiler {
 	}
 
 	@SuppressWarnings("unchecked")
-	private static class MyClassLoader extends ClassLoader {
+	private static class DelegatingClassLoader extends ClassLoader {
+		private final ClassLoader parentClassLoader;
+		
+		public DelegatingClassLoader(ClassLoader parentClassLoader) {
+			this.parentClassLoader = parentClassLoader;
+		}
+
 		public Class defineClass(String name, byte[] b) {
 			return defineClass(name, b, 0, b.length);
 		}
+		
+		@Override
+		public Class<?> loadClass(String name) throws ClassNotFoundException {
+			return parentClassLoader.loadClass(name);
+		}
 	};
 
-	private final static MyClassLoader MY_CLASS_LOADER = new MyClassLoader();
+	private final static DelegatingClassLoader MY_CLASS_LOADER = new DelegatingClassLoader(Compiler.class.getClassLoader());
 
 	// make sure we are in the same package as context to have access to its
 	// protected parts
-	private final static String COMPILED_TEMPLATE_NAME_PREFIX = "com/floreysoft/jmte/CompiledTemplate";
+	private final static String COMPILED_TEMPLATE_NAME_PREFIX = "com/floreysoft/jmte/compiled/Template";
 
 	// must be globally unique
 	private final static UniqueNameGenerator<String, String> uniqueNameGenerator = new UniqueNameGenerator<String, String>(
@@ -99,11 +110,13 @@ public class Compiler {
 		className = uniqueNameGenerator.nextUniqueName();
 		typeDescriptor = "L" + className + ";";
 		classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-		writer = new StringWriter();
-		TraceClassVisitor traceClassVisitor = new TraceClassVisitor(
-				classWriter, new PrintWriter(writer));
+		// only for debugging
+//		writer = new StringWriter();
+//		TraceClassVisitor traceClassVisitor = new TraceClassVisitor(
+//				classWriter, new PrintWriter(writer));
 		// classVisitor = new CheckClassAdapter(traceClassVisitor);
-		classVisitor = traceClassVisitor;
+//		classVisitor = traceClassVisitor;
+		classVisitor = classWriter;
 	}
 
 	private void addUsedVariableIfNotLocal(String variableName) {
@@ -229,7 +242,7 @@ public class Compiler {
 		classVisitor.visitEnd();
 
 		// FIXME: Only for debugging
-		System.out.println(writer.toString());
+//		System.out.println(writer.toString());
 		byte[] byteArray = classWriter.toByteArray();
 		Class<?> myClass = Compiler.loadClass(byteArray);
 		try {
