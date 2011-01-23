@@ -32,6 +32,17 @@ public class StringToken extends ExpressionToken {
 		this(variableName, variableName, null, null, null, null, null);
 	}
 
+	public StringToken(String text, List<String> segments, String variableName, String defaultValue,
+			String prefix, String suffix, String rendererName, String parameters) {
+		super(segments, variableName);
+		this.defaultValue = defaultValue;
+		this.prefix = prefix;
+		this.suffix = suffix;
+		this.rendererName = rendererName;
+		this.parameters = parameters;
+		setText(text);
+	}
+
 	public StringToken(List<String> segments, String variableName) {
 		super(segments, variableName);
 		this.defaultValue = null;

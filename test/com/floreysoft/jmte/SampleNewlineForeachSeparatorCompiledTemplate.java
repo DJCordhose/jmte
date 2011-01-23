@@ -3,7 +3,6 @@ package com.floreysoft.jmte;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
 // ${ foreach list item \n}${item.property1}${end}
@@ -26,17 +25,17 @@ public class SampleNewlineForeachSeparatorCompiledTemplate extends
 	protected String transformCompiled(TemplateContext context) {
 		StringBuilder buffer = new StringBuilder();
 		
-		ForEachToken token1 = new ForEachToken("list", "item", "\n");
+		ForEachToken token1 = new ForEachToken(Arrays
+				.asList(new String[] { "list" }),"list", "item", "\n");
 		token1.setIterable((Iterable) token1.evaluate(context));
 
 		context.model.enterScope();
 		context.push(token1);
 		try {
-			Iterator<Object> iterator = token1.iterator();
-			while (iterator.hasNext()) {
+			while (token1.iterator().hasNext()) {
 				context.model.put(token1.getVarName(), token1.advance());
 				addSpecialVariables(token1, context.model);
-				getEngine().notifyListeners(token1,
+				getEngine().notifyProcessListeners(token1,
 						ProcessListener.Action.ITERATE_FOREACH);
 
 				buffer.append(new StringToken(Arrays

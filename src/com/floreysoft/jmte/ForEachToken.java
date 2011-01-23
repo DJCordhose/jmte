@@ -22,8 +22,8 @@ public class ForEachToken extends ExpressionToken {
 		this.index = -1;
 	}
 
-	public ForEachToken(List<String> segments, String varName, String separator) {
-		super(segments, varName);
+	public ForEachToken(List<String> segments, String expression, String varName, String separator) {
+		super(segments, expression);
 		this.varName = varName;
 		this.separator = separator != null ? separator : "";
 		this.index = -1;

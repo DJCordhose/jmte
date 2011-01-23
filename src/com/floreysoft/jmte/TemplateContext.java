@@ -6,12 +6,12 @@ import java.util.List;
 public class TemplateContext {
 
 	// it is stateless, so we only need one
-	protected static final Lexer lexer = new Lexer();
-	protected final ScopedMap model;
-	protected final List<Token> scopes;
-	protected final String template;
-	protected final Engine engine;
-	protected final String sourceName;
+	public static final Lexer lexer = new Lexer();
+	public final ScopedMap model;
+	public final List<Token> scopes;
+	public final String template;
+	public final Engine engine;
+	public final String sourceName;
 
 	public TemplateContext(String template, String sourceName, ScopedMap model,
 			Engine engine) {
@@ -89,7 +89,7 @@ public class TemplateContext {
 					|| token instanceof EmptyForEachToken) {
 				boolean condition = (Boolean) token.evaluate(this);
 				if (!condition) {
-					engine.notifyListeners(token, ProcessListener.Action.SKIP);
+					engine.notifyProcessListeners(token, ProcessListener.Action.SKIP);
 					return true;
 				}
 			}
