@@ -383,7 +383,7 @@ public final class Engine {
 		listeners.remove(listener);
 	}
 
-	void notifyListeners(Token token, Action action) {
+	public void notifyProcessListeners(Token token, Action action) {
 		for (ProcessListener processListener : listeners) {
 			processListener.log(token, action);
 		}

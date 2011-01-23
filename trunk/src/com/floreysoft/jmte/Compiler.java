@@ -4,8 +4,10 @@ import static org.objectweb.asm.Opcodes.*;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -68,6 +70,7 @@ public class Compiler {
 	protected final Engine engine;
 	protected final Lexer lexer = new Lexer();
 	protected final Set<String> usedVariables = new HashSet<String>();
+	protected final List<String> localVarStack = new LinkedList<String>();
 	protected transient ClassVisitor classVisitor;
 	protected transient ClassWriter classWriter;
 	protected final String superClassName = "com/floreysoft/jmte/AbstractCompiledTemplate";
@@ -92,22 +95,36 @@ public class Compiler {
 
 	private void initCompilation() {
 		usedVariables.clear();
+		localVarStack.clear();
 		className = uniqueNameGenerator.nextUniqueName();
 		typeDescriptor = "L" + className + ";";
 		classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
 		writer = new StringWriter();
 		TraceClassVisitor traceClassVisitor = new TraceClassVisitor(
 				classWriter, new PrintWriter(writer));
-//		classVisitor = new CheckClassAdapter(traceClassVisitor);
+		// classVisitor = new CheckClassAdapter(traceClassVisitor);
 		classVisitor = traceClassVisitor;
 	}
 
+	private void addUsedVariableIfNotLocal(String variableName) {
+		if (!localVarStack.contains(variableName)) {
+			usedVariables.add(variableName);
+		}
+	}
+	
 	private void foreach() {
 		ForEachToken feToken = (ForEachToken) tokenStream.currentToken();
 		tokenStream.consume();
-		codeGenerateForeachStart(feToken);
-		String variableName = feToken.getVarName();
-		usedVariables.add(variableName);
+
+		localVarStack.add(0, feToken.getVarName());
+		
+		Label loopStart = new Label();
+		Label loopEnd = new Label();
+		Label tryEndLabel = new Label();
+
+		codeGenerateForeachBlockStart(feToken, loopStart, loopEnd, tryEndLabel);
+
+		addUsedVariableIfNotLocal(feToken.getExpression());
 		Token contentToken;
 		while ((contentToken = tokenStream.currentToken()) != null
 				&& !(contentToken instanceof EndToken)) {
@@ -117,8 +134,10 @@ public class Compiler {
 			engine.getErrorHandler().error("missing-end", feToken);
 		} else {
 			tokenStream.consume();
-			codeGenerateForeachEnd();
 		}
+		codeGenerateForeachBlockEnd(loopStart, loopEnd, tryEndLabel);
+		
+		localVarStack.remove(0);
 	}
 
 	private void condition() {
@@ -130,9 +149,9 @@ public class Compiler {
 		Label elseLabel = new Label();
 
 		codeGenerateIfBlockStart(ifToken, tryEndLabel, elseLabel);
-		
+
 		String variableName = ifToken.getExpression();
-		usedVariables.add(variableName);
+		addUsedVariableIfNotLocal(variableName);
 		Token contentToken;
 
 		codeGenerateIfBranchStart();
@@ -154,7 +173,7 @@ public class Compiler {
 
 		}
 		codeGenerateElseBranchEnd(finalLabel);
-		
+
 		if (contentToken == null) {
 			engine.getErrorHandler().error("missing-end", ifToken);
 		} else {
@@ -175,7 +194,7 @@ public class Compiler {
 			StringToken stringToken = (StringToken) token;
 			tokenStream.consume();
 			String variableName = stringToken.getExpression();
-			usedVariables.add(variableName);
+			addUsedVariableIfNotLocal(variableName);
 			codeGenerateStringToken(stringToken);
 		} else if (token instanceof ForEachToken) {
 			foreach();
@@ -306,19 +325,20 @@ public class Compiler {
 		mv.visitTypeInsn(NEW, "com/floreysoft/jmte/StringToken");
 		mv.visitInsn(DUP);
 		pushConstant(stringToken.getExpression());
+		pushList(stringToken.getSegments());
 		pushConstant(stringToken.getExpression());
 		pushConstant(stringToken.getDefaultValue());
 		pushConstant(stringToken.getPrefix());
 		pushConstant(stringToken.getSuffix());
 		pushConstant(stringToken.getRendererName());
 		pushConstant(stringToken.getParameters());
-
 		mv
 				.visitMethodInsn(
 						INVOKESPECIAL,
 						"com/floreysoft/jmte/StringToken",
 						"<init>",
-						"(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
+						"(Ljava/lang/String;Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
+
 		mv.visitVarInsn(ALOAD, CONTEXT);
 		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/StringToken",
 				"evaluate",
@@ -362,6 +382,9 @@ public class Compiler {
 	}
 
 	private void codeGenerateIfBlockEnd(Label tryEndLabel, Label finalLabel) {
+		
+		tokenLocalVarIndex--;
+
 		// try end block rethrowing exception
 		mv.visitLabel(tryEndLabel);
 		mv.visitVarInsn(ASTORE, EXCEPTION);
@@ -377,8 +400,6 @@ public class Compiler {
 		// context.pop();
 
 		codeGeneratePopContext();
-
-		tokenLocalVarIndex--;
 
 	}
 
@@ -470,6 +491,7 @@ public class Compiler {
 	}
 
 	private void codeGeneratePopContext() {
+		// context.pop();
 		mv.visitVarInsn(ALOAD, CONTEXT);
 		mv.visitMethodInsn(INVOKEVIRTUAL,
 				"com/floreysoft/jmte/TemplateContext", "pop",
@@ -477,14 +499,167 @@ public class Compiler {
 		mv.visitInsn(POP);
 	}
 
-	private void codeGenerateForeachEnd() {
-		// TODO Auto-generated method stub
+	private void codeGenerateForeachBlockEnd(Label loopStart, Label loopEnd,
+			Label tryEndLabel) {
+
+		this.tokenLocalVarIndex--;
+
+		// if (!token1.isLast()) {
+		// buffer.append(token1.getSeparator());
+		// }
+		mv.visitVarInsn(ALOAD, this.tokenLocalVarIndex);
+		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/ForEachToken",
+				"isLast", "()Z");
+		mv.visitJumpInsn(IFNE, loopEnd);
+		mv.visitVarInsn(ALOAD, BUFFER);
+		mv.visitVarInsn(ALOAD, this.tokenLocalVarIndex);
+		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/ForEachToken",
+				"getSeparator", "()Ljava/lang/String;");
+		mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append",
+				"(Ljava/lang/String;)Ljava/lang/StringBuilder;");
+		mv.visitInsn(POP);
+
+		// while (token1.iterator().hasNext()) {
+		mv.visitLabel(loopEnd);
+		mv.visitVarInsn(ALOAD, this.tokenLocalVarIndex);
+		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/ForEachToken",
+				"iterator", "()Ljava/util/Iterator;");
+		mv.visitMethodInsn(INVOKEINTERFACE, "java/util/Iterator", "hasNext",
+				"()Z");
+		mv.visitJumpInsn(IFNE, loopStart);
+
+		Label noExceptionFinallyLabel = new Label();
+		mv.visitJumpInsn(GOTO, noExceptionFinallyLabel);
+
+		// exception occurred => first finally block, then throw exception
+		mv.visitLabel(tryEndLabel);
+		mv.visitVarInsn(ASTORE, EXCEPTION);
+
+		codeGenerateExitScope();
+		codeGeneratePopContext();
+
+		mv.visitVarInsn(ALOAD, EXCEPTION);
+		mv.visitInsn(ATHROW);
+
+		// no exception occurred => execute finally block only
+		mv.visitLabel(noExceptionFinallyLabel);
+		codeGenerateExitScope();
+		codeGeneratePopContext();
+	}
+
+	private void codeGenerateForeachToken(ForEachToken feToken) {
+		// ForEachToken token1 = new ForEachToken(Arrays
+		// .asList(new String[] { "list" }),"list", "item", "\n");
+		mv.visitTypeInsn(NEW, "com/floreysoft/jmte/ForEachToken");
+		mv.visitInsn(DUP);
+		pushList(feToken.getSegments());
+		pushConstant(feToken.getExpression());
+		pushConstant(feToken.getVarName());
+		pushConstant(feToken.getSeparator());
+		mv
+				.visitMethodInsn(INVOKESPECIAL,
+						"com/floreysoft/jmte/ForEachToken", "<init>",
+						"(Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
+		mv.visitVarInsn(ASTORE, this.tokenLocalVarIndex);
+
+		// token1.setIterable((Iterable) token1.evaluate(context));
+		mv.visitVarInsn(ALOAD, this.tokenLocalVarIndex);
+		mv.visitVarInsn(ALOAD, this.tokenLocalVarIndex);
+		mv.visitVarInsn(ALOAD, CONTEXT);
+		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/ForEachToken",
+				"evaluate",
+				"(Lcom/floreysoft/jmte/TemplateContext;)Ljava/lang/Object;");
+		mv.visitTypeInsn(CHECKCAST, "java/lang/Iterable");
+		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/ForEachToken",
+				"setIterable", "(Ljava/lang/Iterable;)V");
 
 	}
 
-	private void codeGenerateForeachStart(ForEachToken feToken) {
-		// TODO Auto-generated method stub
+	private void codeGenerateForeachBlockStart(ForEachToken feToken,
+			Label loopStart, Label loopEnd, Label tryEndLabel) {
+		Label tryStartLabel = new Label();
+		mv.visitTryCatchBlock(tryStartLabel, tryEndLabel, tryEndLabel, null);
 
+		codeGenerateForeachToken(feToken);
+
+		// context.model.enterScope();
+		mv.visitVarInsn(ALOAD, CONTEXT);
+		mv.visitFieldInsn(GETFIELD, "com/floreysoft/jmte/TemplateContext",
+				"model", "Lcom/floreysoft/jmte/ScopedMap;");
+		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/ScopedMap",
+				"enterScope", "()V");
+
+		// context.push(token1);
+		mv.visitVarInsn(ALOAD, CONTEXT);
+		mv.visitVarInsn(ALOAD, this.tokenLocalVarIndex);
+		mv.visitMethodInsn(INVOKEVIRTUAL,
+				"com/floreysoft/jmte/TemplateContext", "push",
+				"(Lcom/floreysoft/jmte/Token;)V");
+
+		// try {
+		mv.visitLabel(tryStartLabel);
+
+		// while (token1.iterator().hasNext()) {
+
+		mv.visitJumpInsn(GOTO, loopEnd);
+		mv.visitLabel(loopStart);
+
+		// context.model.put(token1.getVarName(), token1.advance());
+		mv.visitVarInsn(ALOAD, CONTEXT);
+		mv.visitFieldInsn(GETFIELD, "com/floreysoft/jmte/TemplateContext",
+				"model", "Lcom/floreysoft/jmte/ScopedMap;");
+		mv.visitVarInsn(ALOAD, this.tokenLocalVarIndex);
+		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/ForEachToken",
+				"getVarName", "()Ljava/lang/String;");
+		mv.visitVarInsn(ALOAD, this.tokenLocalVarIndex);
+		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/ForEachToken",
+				"advance", "()Ljava/lang/Object;");
+		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/ScopedMap",
+				"put",
+				"(Ljava/lang/String;Ljava/lang/Object;)Ljava/lang/Object;");
+		mv.visitInsn(POP);
+
+		// addSpecialVariables(token1, context.model);
+		mv.visitVarInsn(ALOAD, THIS);
+		mv.visitVarInsn(ALOAD, this.tokenLocalVarIndex);
+		mv.visitVarInsn(ALOAD, CONTEXT);
+		mv.visitFieldInsn(GETFIELD, "com/floreysoft/jmte/TemplateContext",
+				"model", "Lcom/floreysoft/jmte/ScopedMap;");
+		mv
+				.visitMethodInsn(
+						INVOKEVIRTUAL,
+						className,
+						"addSpecialVariables",
+						"(Lcom/floreysoft/jmte/ForEachToken;Ljava/util/Map;)V");
+
+		// getEngine().notifyListeners(token1,
+		// ProcessListener.Action.ITERATE_FOREACH);
+		mv.visitVarInsn(ALOAD, THIS);
+		mv
+				.visitMethodInsn(
+						INVOKEVIRTUAL,
+						className,
+						"getEngine", "()Lcom/floreysoft/jmte/Engine;");
+		mv.visitVarInsn(ALOAD, this.tokenLocalVarIndex);
+		mv.visitFieldInsn(GETSTATIC,
+				"com/floreysoft/jmte/ProcessListener$Action",
+				"ITERATE_FOREACH",
+				"Lcom/floreysoft/jmte/ProcessListener$Action;");
+		mv
+				.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/Engine",
+						"notifyProcessListeners",
+						"(Lcom/floreysoft/jmte/Token;Lcom/floreysoft/jmte/ProcessListener$Action;)V");
+
+		this.tokenLocalVarIndex++;
+	}
+
+	private void codeGenerateExitScope() {
+		// context.model.exitScope();
+		mv.visitVarInsn(ALOAD, CONTEXT);
+		mv.visitFieldInsn(GETFIELD, "com/floreysoft/jmte/TemplateContext",
+				"model", "Lcom/floreysoft/jmte/ScopedMap;");
+		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/ScopedMap",
+				"exitScope", "()V");
 	}
 
 }

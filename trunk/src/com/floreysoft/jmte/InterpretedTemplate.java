@@ -101,10 +101,10 @@ public class InterpretedTemplate extends AbstractTemplate implements Template {
 				if (!skipMode) {
 					String expanded = (String) token.evaluate(context);
 					output.append(expanded);
-					context.engine.notifyListeners(token,
+					context.engine.notifyProcessListeners(token,
 							ProcessListener.Action.EVAL);
 				} else {
-					context.engine.notifyListeners(token,
+					context.engine.notifyProcessListeners(token,
 							ProcessListener.Action.SKIP);
 				}
 			} else if (token instanceof ForEachToken) {
@@ -114,20 +114,20 @@ public class InterpretedTemplate extends AbstractTemplate implements Template {
 				if (!feToken.iterator().hasNext()) {
 					token = new EmptyForEachToken(feToken.getExpression(),
 							feToken.getVarName(), feToken.getText());
-					context.engine.notifyListeners(token,
+					context.engine.notifyProcessListeners(token,
 							ProcessListener.Action.EMPTY_FOREACH);
 				} else {
 					context.model.enterScope();
 					context.model.put(feToken.getVarName(), feToken.advance());
 					addSpecialVariables(feToken, context.model);
-					context.engine.notifyListeners(token,
+					context.engine.notifyProcessListeners(token,
 							ProcessListener.Action.ITERATE_FOREACH);
 				}
 				context.push(token);
 			} else if (token instanceof IfToken) {
 				context.push(token);
 				context.engine
-						.notifyListeners(token, ProcessListener.Action.IF);
+						.notifyProcessListeners(token, ProcessListener.Action.IF);
 			} else if (token instanceof ElseToken) {
 				Token poppedToken = context.pop();
 				if (!(poppedToken instanceof IfToken)) {
@@ -156,7 +156,7 @@ public class InterpretedTemplate extends AbstractTemplate implements Template {
 							output.append(feToken.getSeparator());
 						}
 						addSpecialVariables(feToken, context.model);
-						context.engine.notifyListeners(token,
+						context.engine.notifyProcessListeners(token,
 								ProcessListener.Action.ITERATE_FOREACH);
 					} else {
 						context.model.exitScope();

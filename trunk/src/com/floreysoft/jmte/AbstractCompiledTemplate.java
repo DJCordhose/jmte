@@ -3,10 +3,11 @@ package com.floreysoft.jmte;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 public abstract class AbstractCompiledTemplate extends AbstractTemplate
 		implements Template {
-	protected final Set<String> usedVariables = new HashSet<String>();
+	protected final Set<String> usedVariables = new TreeSet<String>();;
 	private Engine engine;
 	private String template;
 	private String sourceName;

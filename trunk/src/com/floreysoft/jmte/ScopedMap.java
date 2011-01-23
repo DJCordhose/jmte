@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
-class ScopedMap implements Map<String, Object> {
+public class ScopedMap implements Map<String, Object> {
 	private final Map<String, Object> rawModel;
 	private final Stack<Map<String, Object>> scopes = new Stack<Map<String, Object>>();
 

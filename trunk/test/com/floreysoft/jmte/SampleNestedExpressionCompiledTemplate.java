@@ -30,12 +30,12 @@ public class SampleNestedExpressionCompiledTemplate extends
 			while (token1.iterator().hasNext()) {
 				context.model.put(token1.getVarName(), token1.advance());
 				addSpecialVariables(token1, context.model);
-				getEngine().notifyListeners(token1,
+				getEngine().notifyProcessListeners(token1,
 						ProcessListener.Action.ITERATE_FOREACH);
 
 				// ${foreach item.list item2}
 				ForEachToken token2 = new ForEachToken(Arrays
-						.asList(new String[] { "item", "list" }), "item2", "");
+						.asList(new String[] { "item", "list" }), "item.list", "item2", "");
 				token2.setIterable((Iterable) token2.evaluate(context));
 				context.model.enterScope();
 				context.push(token2);
@@ -44,7 +44,7 @@ public class SampleNestedExpressionCompiledTemplate extends
 						context.model
 								.put(token2.getVarName(), token2.advance());
 						addSpecialVariables(token2, context.model);
-						getEngine().notifyListeners(token2,
+						getEngine().notifyProcessListeners(token2,
 								ProcessListener.Action.ITERATE_FOREACH);
 
 						// OUTER_PRFIX
@@ -61,7 +61,7 @@ public class SampleNestedExpressionCompiledTemplate extends
 										.asList(new String[] { "item2",
 												"property1" }),
 										"item.property1").evaluate(context));
-
+								
 								// INNER_SUFFIX
 								buffer.append("INNER_SUFFIX");
 
