@@ -16,6 +16,7 @@ import com.floreysoft.jmte.token.PlainTextToken;
 import com.floreysoft.jmte.token.StringToken;
 import com.floreysoft.jmte.token.Token;
 import com.floreysoft.jmte.token.TokenStream;
+import com.floreysoft.jmte.util.Util;
 
 public class InterpretedTemplate extends AbstractTemplate implements Template {
 

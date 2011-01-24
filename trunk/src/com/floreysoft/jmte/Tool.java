@@ -8,6 +8,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.Map;
 import java.util.Properties;
 
+import com.floreysoft.jmte.util.Util;
+
 
 /**
  * <p>Main class used as a command line tool. You pass at least two arguments</p>

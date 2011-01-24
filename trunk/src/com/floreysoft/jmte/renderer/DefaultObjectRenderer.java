@@ -2,7 +2,7 @@ package com.floreysoft.jmte.renderer;
 
 import java.util.List;
 
-import com.floreysoft.jmte.Util;
+import com.floreysoft.jmte.util.Util;
 
 public class DefaultObjectRenderer implements Renderer<Object> {
 

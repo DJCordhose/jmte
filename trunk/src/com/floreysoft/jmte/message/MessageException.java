@@ -1,4 +1,4 @@
-package com.floreysoft.jmte;
+package com.floreysoft.jmte.message;
 
 @SuppressWarnings("serial")
 public class MessageException extends RuntimeException {

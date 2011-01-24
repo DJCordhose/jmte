@@ -1,8 +1,10 @@
-package com.floreysoft.jmte;
+package com.floreysoft.jmte.message;
 
 import java.util.Locale;
 import java.util.Map;
 
+import com.floreysoft.jmte.Engine;
+import com.floreysoft.jmte.token.Lexer;
 import com.floreysoft.jmte.token.Token;
 
 /**

@@ -1,6 +1,5 @@
 package com.floreysoft.jmte.token;
 
-import com.floreysoft.jmte.AbstractToken;
 import com.floreysoft.jmte.TemplateContext;
 
 

@@ -21,6 +21,7 @@ import com.floreysoft.jmte.renderer.NamedRenderer;
 import com.floreysoft.jmte.renderer.OptionRenderFormatInfo;
 import com.floreysoft.jmte.renderer.RenderFormatInfo;
 import com.floreysoft.jmte.token.Token;
+import com.floreysoft.jmte.util.Util;
 
 public final class InterpretedEngineTest extends AbstractEngineTest {
 

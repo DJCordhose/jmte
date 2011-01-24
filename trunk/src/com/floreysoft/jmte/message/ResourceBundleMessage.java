@@ -1,10 +1,11 @@
-package com.floreysoft.jmte;
+package com.floreysoft.jmte.message;
 
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import com.floreysoft.jmte.Engine;
 import com.floreysoft.jmte.token.Token;
 
 public class ResourceBundleMessage implements Message {
@@ -25,7 +26,7 @@ public class ResourceBundleMessage implements Message {
 	private String prefixCode = "prefix";
 	private String frameCode = "frame";
 	private Map<String, Object> argumentModel = new HashMap<String, Object>();
-	private String baseName = "com.floreysoft.jmte.messages";
+	private String baseName = "com.floreysoft.jmte.message.messages";
 
 	public ResourceBundleMessage useLocationCode(String locationCode) {
 		this.locationCode = locationCode;

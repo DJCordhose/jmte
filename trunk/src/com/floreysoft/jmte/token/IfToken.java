@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.floreysoft.jmte.TemplateContext;
-import com.floreysoft.jmte.Util;
+import com.floreysoft.jmte.util.Util;
 
 public class IfToken extends ExpressionToken {
 	public static final String IF = "if";
