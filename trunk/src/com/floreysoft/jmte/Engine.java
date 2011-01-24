@@ -16,6 +16,7 @@ import com.floreysoft.jmte.renderer.DefaultMapRenderer;
 import com.floreysoft.jmte.renderer.DefaultObjectRenderer;
 import com.floreysoft.jmte.renderer.NamedRenderer;
 import com.floreysoft.jmte.renderer.Renderer;
+import com.floreysoft.jmte.token.Token;
 
 /**
  * <p>

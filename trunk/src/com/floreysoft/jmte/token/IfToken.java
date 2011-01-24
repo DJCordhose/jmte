@@ -1,9 +1,12 @@
-package com.floreysoft.jmte;
+package com.floreysoft.jmte.token;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import com.floreysoft.jmte.TemplateContext;
+import com.floreysoft.jmte.Util;
 
 public class IfToken extends ExpressionToken {
 	public static final String IF = "if";

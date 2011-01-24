@@ -2,6 +2,10 @@ package com.floreysoft.jmte;
 
 import java.util.Arrays;
 
+import com.floreysoft.jmte.token.ForEachToken;
+import com.floreysoft.jmte.token.IfToken;
+import com.floreysoft.jmte.token.StringToken;
+
 // ${foreach list item}${foreach item.list item2}OUTER_PRFIX${if item}${item2.property1}INNER_SUFFIX${end}${end}\n${end}
 public class SampleNestedExpressionCompiledTemplate extends
 		AbstractCompiledTemplate {

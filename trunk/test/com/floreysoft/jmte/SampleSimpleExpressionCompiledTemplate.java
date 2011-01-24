@@ -1,5 +1,7 @@
 package com.floreysoft.jmte;
 
+import com.floreysoft.jmte.token.StringToken;
+
 // ${address}
 public class SampleSimpleExpressionCompiledTemplate extends
 		AbstractCompiledTemplate {

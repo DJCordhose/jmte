@@ -5,6 +5,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import com.floreysoft.jmte.token.ForEachToken;
+import com.floreysoft.jmte.token.StringToken;
+
 // ${ foreach list item \n}${item.property1}${end}
 public class SampleNewlineForeachSeparatorCompiledTemplate extends
 		AbstractCompiledTemplate {

@@ -4,6 +4,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.floreysoft.jmte.token.IfCmpToken;
+import com.floreysoft.jmte.token.StringToken;
+
 // ${if address='Fillbert'}${address}${else}NIX${end}
 public class SampleIfCmpCompiledTemplate extends AbstractCompiledTemplate {
 

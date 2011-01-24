@@ -1,10 +1,13 @@
-package com.floreysoft.jmte;
+package com.floreysoft.jmte.token;
 
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+
+import com.floreysoft.jmte.TemplateContext;
+import com.floreysoft.jmte.Util;
 
 public class ForEachToken extends ExpressionToken {
 	public static final String FOREACH = "foreach";

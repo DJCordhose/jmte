@@ -3,6 +3,8 @@ package com.floreysoft.jmte;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.floreysoft.jmte.token.StringToken;
+
 public class SampleCompiledSequenceTemplate extends
 		AbstractCompiledTemplate {
 

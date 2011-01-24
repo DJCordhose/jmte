@@ -3,6 +3,8 @@ package com.floreysoft.jmte;
 import java.util.Locale;
 import java.util.Map;
 
+import com.floreysoft.jmte.token.Token;
+
 /**
  * Interface used to handle errors while expanding a template. This interface is
  * called by the {@link Engine} and by the {@link Lexer}.

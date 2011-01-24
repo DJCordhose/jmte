@@ -1,5 +1,7 @@
 package com.floreysoft.jmte;
 
+import com.floreysoft.jmte.token.Token;
+
 public interface ProcessListener {
 	public static enum Action {
 		/**

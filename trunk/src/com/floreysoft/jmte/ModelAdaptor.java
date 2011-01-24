@@ -2,6 +2,8 @@ package com.floreysoft.jmte;
 
 import java.util.List;
 
+import com.floreysoft.jmte.token.Token;
+
 /**
  * Adaptor between engine and model.
  * 
