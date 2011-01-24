@@ -5,6 +5,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import com.floreysoft.jmte.token.Token;
+
 public class ResourceBundleMessage implements Message {
 
 	protected static String getTemplate(ResourceBundle bundle, String key,

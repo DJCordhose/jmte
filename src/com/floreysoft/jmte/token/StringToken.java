@@ -1,7 +1,8 @@
-package com.floreysoft.jmte;
+package com.floreysoft.jmte.token;
 
 import java.util.List;
 
+import com.floreysoft.jmte.TemplateContext;
 import com.floreysoft.jmte.renderer.NamedRenderer;
 import com.floreysoft.jmte.renderer.Renderer;
 

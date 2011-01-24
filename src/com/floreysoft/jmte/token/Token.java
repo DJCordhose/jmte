@@ -1,4 +1,8 @@
-package com.floreysoft.jmte;
+package com.floreysoft.jmte.token;
+
+import com.floreysoft.jmte.Engine;
+import com.floreysoft.jmte.Lexer;
+import com.floreysoft.jmte.TemplateContext;
 
 
 /**

@@ -4,6 +4,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import com.floreysoft.jmte.token.Token;
+
 public class ProductionErrorHandler implements ErrorHandler {
 
 	private static final Logger LOG = Logger

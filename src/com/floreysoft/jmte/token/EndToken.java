@@ -1,4 +1,7 @@
-package com.floreysoft.jmte;
+package com.floreysoft.jmte.token;
+
+import com.floreysoft.jmte.AbstractToken;
+import com.floreysoft.jmte.TemplateContext;
 
 
 public class EndToken extends AbstractToken {

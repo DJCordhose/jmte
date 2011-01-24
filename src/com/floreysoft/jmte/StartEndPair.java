@@ -4,7 +4,7 @@ package com.floreysoft.jmte;
  * Pairs of begin/end.
  * 
  */
-class StartEndPair {
+public class StartEndPair {
 	public final int start;
 	public final int end;
 

@@ -1,6 +1,8 @@
-package com.floreysoft.jmte;
+package com.floreysoft.jmte.token;
 
 import java.util.List;
+
+import com.floreysoft.jmte.TemplateContext;
 
 
 public class IfCmpToken extends IfToken {

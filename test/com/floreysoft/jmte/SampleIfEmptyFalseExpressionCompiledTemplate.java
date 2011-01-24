@@ -4,6 +4,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.floreysoft.jmte.token.IfToken;
+import com.floreysoft.jmte.token.StringToken;
+
 // ${if !bean.trueCond}${address}${else}NIX${end}
 public class SampleIfEmptyFalseExpressionCompiledTemplate extends
 		AbstractCompiledTemplate {

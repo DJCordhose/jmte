@@ -2,6 +2,8 @@ package com.floreysoft.jmte;
 
 import java.util.Map;
 
+import com.floreysoft.jmte.token.ForEachToken;
+
 
 
 public abstract class AbstractTemplate implements Template {

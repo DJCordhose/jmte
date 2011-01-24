@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import com.floreysoft.jmte.token.Token;
+
 /**
  * Default implementation of the model adapter.
  * <p>

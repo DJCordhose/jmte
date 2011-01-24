@@ -1,7 +1,11 @@
-package com.floreysoft.jmte;
+package com.floreysoft.jmte.token;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.floreysoft.jmte.AbstractToken;
+import com.floreysoft.jmte.Lexer;
+import com.floreysoft.jmte.StartEndPair;
 
 
 public class TokenStream {

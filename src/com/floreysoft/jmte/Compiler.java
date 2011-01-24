@@ -19,6 +19,15 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.util.CheckClassAdapter;
 import org.objectweb.asm.util.TraceClassVisitor;
 
+import com.floreysoft.jmte.token.ElseToken;
+import com.floreysoft.jmte.token.EndToken;
+import com.floreysoft.jmte.token.ForEachToken;
+import com.floreysoft.jmte.token.IfCmpToken;
+import com.floreysoft.jmte.token.IfToken;
+import com.floreysoft.jmte.token.PlainTextToken;
+import com.floreysoft.jmte.token.StringToken;
+import com.floreysoft.jmte.token.Token;
+import com.floreysoft.jmte.token.TokenStream;
 import com.floreysoft.jmte.util.UniqueNameGenerator;
 
 /**
@@ -335,7 +344,7 @@ public class Compiler {
 	private void codeGenerateStringToken(StringToken stringToken) {
 
 		mv.visitVarInsn(ALOAD, BUFFER);
-		mv.visitTypeInsn(NEW, "com/floreysoft/jmte/StringToken");
+		mv.visitTypeInsn(NEW, "com/floreysoft/jmte/token/StringToken");
 		mv.visitInsn(DUP);
 		pushConstant(stringToken.getExpression());
 		pushList(stringToken.getSegments());
@@ -348,12 +357,12 @@ public class Compiler {
 		mv
 				.visitMethodInsn(
 						INVOKESPECIAL,
-						"com/floreysoft/jmte/StringToken",
+						"com/floreysoft/jmte/token/StringToken",
 						"<init>",
 						"(Ljava/lang/String;Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
 
 		mv.visitVarInsn(ALOAD, CONTEXT);
-		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/StringToken",
+		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/token/StringToken",
 				"evaluate",
 				"(Lcom/floreysoft/jmte/TemplateContext;)Ljava/lang/Object;");
 		mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Object", "toString",
@@ -422,13 +431,13 @@ public class Compiler {
 			// IfCmpToken token1 = new IfCmpToken(Arrays
 			// .asList(new String[] { "address" }), "address", "Fillbert",
 			// false);
-			mv.visitTypeInsn(NEW, "com/floreysoft/jmte/IfCmpToken");
+			mv.visitTypeInsn(NEW, "com/floreysoft/jmte/token/IfCmpToken");
 			mv.visitInsn(DUP);
 			pushList(ifToken.getSegments());
 			pushConstant(ifToken.getExpression());
 			pushConstant(((IfCmpToken) ifToken).getOperand());
 			mv.visitInsn(ifToken.isNegated() ? ICONST_1 : ICONST_0);
-			mv.visitMethodInsn(INVOKESPECIAL, "com/floreysoft/jmte/IfCmpToken",
+			mv.visitMethodInsn(INVOKESPECIAL, "com/floreysoft/jmte/token/IfCmpToken",
 					"<init>",
 					"(Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Z)V");
 
@@ -436,12 +445,12 @@ public class Compiler {
 			// IfToken token1 = new IfToken(Arrays.asList(new String[] { "bean",
 			// "trueCond" }), "bean.trueCond", true);
 
-			mv.visitTypeInsn(NEW, "com/floreysoft/jmte/IfToken");
+			mv.visitTypeInsn(NEW, "com/floreysoft/jmte/token/IfToken");
 			mv.visitInsn(DUP);
 			pushList(ifToken.getSegments());
 			pushConstant(ifToken.getExpression());
 			mv.visitInsn(ifToken.isNegated() ? ICONST_1 : ICONST_0);
-			mv.visitMethodInsn(INVOKESPECIAL, "com/floreysoft/jmte/IfToken",
+			mv.visitMethodInsn(INVOKESPECIAL, "com/floreysoft/jmte/token/IfToken",
 					"<init>", "(Ljava/util/List;Ljava/lang/String;Z)V");
 
 		}
@@ -478,7 +487,7 @@ public class Compiler {
 		mv.visitVarInsn(ALOAD, tokenLocalVarIndex);
 		mv.visitMethodInsn(INVOKEVIRTUAL,
 				"com/floreysoft/jmte/TemplateContext", "push",
-				"(Lcom/floreysoft/jmte/Token;)V");
+				"(Lcom/floreysoft/jmte/token/Token;)V");
 
 		// try {
 
@@ -486,7 +495,7 @@ public class Compiler {
 		// token1.evaluate(context)
 		mv.visitVarInsn(ALOAD, tokenLocalVarIndex);
 		mv.visitVarInsn(ALOAD, CONTEXT);
-		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/IfToken",
+		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/token/IfToken",
 				"evaluate",
 				"(Lcom/floreysoft/jmte/TemplateContext;)Ljava/lang/Object;");
 
@@ -508,7 +517,7 @@ public class Compiler {
 		mv.visitVarInsn(ALOAD, CONTEXT);
 		mv.visitMethodInsn(INVOKEVIRTUAL,
 				"com/floreysoft/jmte/TemplateContext", "pop",
-				"()Lcom/floreysoft/jmte/Token;");
+				"()Lcom/floreysoft/jmte/token/Token;");
 		mv.visitInsn(POP);
 	}
 
@@ -521,12 +530,12 @@ public class Compiler {
 		// buffer.append(token1.getSeparator());
 		// }
 		mv.visitVarInsn(ALOAD, this.tokenLocalVarIndex);
-		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/ForEachToken",
+		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/token/ForEachToken",
 				"isLast", "()Z");
 		mv.visitJumpInsn(IFNE, loopEnd);
 		mv.visitVarInsn(ALOAD, BUFFER);
 		mv.visitVarInsn(ALOAD, this.tokenLocalVarIndex);
-		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/ForEachToken",
+		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/token/ForEachToken",
 				"getSeparator", "()Ljava/lang/String;");
 		mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append",
 				"(Ljava/lang/String;)Ljava/lang/StringBuilder;");
@@ -535,7 +544,7 @@ public class Compiler {
 		// while (token1.iterator().hasNext()) {
 		mv.visitLabel(loopEnd);
 		mv.visitVarInsn(ALOAD, this.tokenLocalVarIndex);
-		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/ForEachToken",
+		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/token/ForEachToken",
 				"iterator", "()Ljava/util/Iterator;");
 		mv.visitMethodInsn(INVOKEINTERFACE, "java/util/Iterator", "hasNext",
 				"()Z");
@@ -563,7 +572,7 @@ public class Compiler {
 	private void codeGenerateForeachToken(ForEachToken feToken) {
 		// ForEachToken token1 = new ForEachToken(Arrays
 		// .asList(new String[] { "list" }),"list", "item", "\n");
-		mv.visitTypeInsn(NEW, "com/floreysoft/jmte/ForEachToken");
+		mv.visitTypeInsn(NEW, "com/floreysoft/jmte/token/ForEachToken");
 		mv.visitInsn(DUP);
 		pushList(feToken.getSegments());
 		pushConstant(feToken.getExpression());
@@ -571,7 +580,7 @@ public class Compiler {
 		pushConstant(feToken.getSeparator());
 		mv
 				.visitMethodInsn(INVOKESPECIAL,
-						"com/floreysoft/jmte/ForEachToken", "<init>",
+						"com/floreysoft/jmte/token/ForEachToken", "<init>",
 						"(Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
 		mv.visitVarInsn(ASTORE, this.tokenLocalVarIndex);
 
@@ -579,11 +588,11 @@ public class Compiler {
 		mv.visitVarInsn(ALOAD, this.tokenLocalVarIndex);
 		mv.visitVarInsn(ALOAD, this.tokenLocalVarIndex);
 		mv.visitVarInsn(ALOAD, CONTEXT);
-		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/ForEachToken",
+		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/token/ForEachToken",
 				"evaluate",
 				"(Lcom/floreysoft/jmte/TemplateContext;)Ljava/lang/Object;");
 		mv.visitTypeInsn(CHECKCAST, "java/lang/Iterable");
-		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/ForEachToken",
+		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/token/ForEachToken",
 				"setIterable", "(Ljava/lang/Iterable;)V");
 
 	}
@@ -607,7 +616,7 @@ public class Compiler {
 		mv.visitVarInsn(ALOAD, this.tokenLocalVarIndex);
 		mv.visitMethodInsn(INVOKEVIRTUAL,
 				"com/floreysoft/jmte/TemplateContext", "push",
-				"(Lcom/floreysoft/jmte/Token;)V");
+				"(Lcom/floreysoft/jmte/token/Token;)V");
 
 		// try {
 		mv.visitLabel(tryStartLabel);
@@ -622,10 +631,10 @@ public class Compiler {
 		mv.visitFieldInsn(GETFIELD, "com/floreysoft/jmte/TemplateContext",
 				"model", "Lcom/floreysoft/jmte/ScopedMap;");
 		mv.visitVarInsn(ALOAD, this.tokenLocalVarIndex);
-		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/ForEachToken",
+		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/token/ForEachToken",
 				"getVarName", "()Ljava/lang/String;");
 		mv.visitVarInsn(ALOAD, this.tokenLocalVarIndex);
-		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/ForEachToken",
+		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/token/ForEachToken",
 				"advance", "()Ljava/lang/Object;");
 		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/ScopedMap",
 				"put",
@@ -643,7 +652,7 @@ public class Compiler {
 						INVOKEVIRTUAL,
 						className,
 						"addSpecialVariables",
-						"(Lcom/floreysoft/jmte/ForEachToken;Ljava/util/Map;)V");
+						"(Lcom/floreysoft/jmte/token/ForEachToken;Ljava/util/Map;)V");
 
 		this.tokenLocalVarIndex++;
 	}
