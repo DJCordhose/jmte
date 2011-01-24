@@ -224,7 +224,8 @@ public final class Engine {
 	private boolean useCompilation = false;
 	private ModelAdaptor modelAdaptor = new DefaultModelAdaptor();
 	
-	// TODO: Should we rather use a cache instead of keeping them all?
+	// will be kept as long as the engine lives
+	// TODO: As classes will never be unloaded it might be a good idea to have the templates in a static, shared location?
 	private final Map<String, Template> compiledTemplates = new HashMap<String, Template>();
 
 	private final Map<Class<?>, Renderer<?>> renderers = new HashMap<Class<?>, Renderer<?>>();

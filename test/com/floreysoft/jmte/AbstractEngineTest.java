@@ -846,8 +846,8 @@ public abstract class AbstractEngineTest {
 	}
 
 	@Test
-	public void expression() throws Exception {
-		TemplateExpression<Boolean> oddExpression = new TemplateExpression<Boolean>() {
+	public void processor() throws Exception {
+		Processor<Boolean> oddExpression = new Processor<Boolean>() {
 
 			@Override
 			public Boolean eval(TemplateContext context) {

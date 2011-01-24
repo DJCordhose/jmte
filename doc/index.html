@@ -18,36 +18,32 @@ everything you need in a template language including 'if' and 'foreach',
 but nothing else. Because of this it is small, easy to learn and clearly
 focused. It does not try to solve what Java can do better anyway.</p>
 
-<p>It has no external dependencies, can be extended and configured
-in many ways and has barely 1000 lines of code. It runs in almost all
-environments including Google App Engine.</p>
+<p>It has no external dependencies (except when running in
+compilation mode), can be extended and configured in many ways and has
+barely 80k of code size. It runs in almost all environments including
+the Google App Engine.</p>
 
 
 <h2>Minimal Template Engine is</h2>
 <ul>
-	<li><em>minimal</em> - you can express everything who need in a
+	<li><em>minimal</em> - you can express everything you need in a
 	template language including if and foreach, but nothing more
 	<li><em>non-toy</em> - this is for real stuff
-	<li><em>extensible</em> - you can either extend or completely
-	replace both internal parsing and error handling
+	<li><em>extensible</em> - you can either change the behavior by
+	adding your own renderers, processors, and error handlers
 	<li><em>configurable</em> - you do not like ${name}? Simply change
 	it to {name} or &lt;name> or whatever you like
 	<li><em>flexible</em> - feed in templates as String, Reader, File
 	or InputStream - you can also use it as a stand alone tool and feed the
 	model in a property file - or use it as a replacement for <code>String.format</code>
 	passing in <code>Object...</code> as model
-	<li><em>small</em> - barely 1000 lines of code and no dependencies
-	<li><em>simply to learn</em> - it takes less than 5 minutes to
+	<li><em>simple to learn</em> - it takes less than 5 minutes to
 	learn
-	<li><em>simply to deploy</em> - no external dependencies and runs
-	almost in all environments (including Google App Engine)
-	<li><em>fun</em> - you have first class error messages in
-	development and robustness in production
-	<li><em>robust</em> - it is well tested by a set of JUnit tests
-	<li><em>compatible</em> - pass in <code>Map&lt;String,
+	<li><em>no vendor lock-in</em> - pass in <code>Map&lt;String,
 	Object></code> as model
-	<li><em>fast</em> - no time consuming parsing (you can switch off
-	escaping of special characters, making it even faster)
+	<li><em>fast</em> - no time consuming parsing - you can switch off
+	escaping of special characters, making it even faster or even enable
+	compiled mode making it as fast as hand written Java code
 </ul>
 
 <h2>The model</h2>
@@ -73,9 +69,33 @@ by default
 <p>The simplest form of an expression is to expand an entry
 contained in the model to a string: <code> ${name} </code></p>
 
-<p>If you model contains complex objects and you want to expand a
+<p>If your model contains complex objects and you want to expand a
 certain property or field you can use the "." notation to navigate to it
 like e.g. <code> ${object.name} </code>.</p>
+
+<h3>Renderer information</h3>
+
+<p>How a variable is eventually converted to a string is determined
+by renderers. There are renderers which are automatically called based
+on the type of the variable, but calling them is not part of the
+template langauage, but rather a matter of configuring them on the
+engine - which is described in the API section.</p>
+
+<p>However, there are also so called "named renderers" which you can
+address by passing their name along with the name of the variable. You
+do this by adding a semicolon and the name of the renderer to the
+variable name. You can even pass format information in brackets.</p>
+
+For example this
+<pre>
+${currentDate;date(yyyy.MM.dd HH:mm:ss z)}
+</pre>
+
+would cause the variable called "currentDate" to be formatted with a
+renderer named "date". This named renderer would then be passed the
+format "yyyy.MM.dd HH:mm:ss z" along with the variable to be rendered.
+Named renderers know which types they support and are responsible to do
+the necessary conversion for them.
 
 <h3>Conditional expansion</h3>
 
@@ -93,25 +113,60 @@ ${end}
 
 <p>The else-part is optional and the whole conditional block has to
 be terminated by the end-expression. If-expressions can be nested and
-conditions can be negated using the "!"-operator. There are no other
-logical operators, i.e. you can not combine conditions using <code>and</code>
-or <code>or</code>. The reason is that this is a minimal language,
-expressions can be complex and conditions can be constructed in the Java
-model. If you are not satisfied with his decision you can extend the
-language in any way you like.</p>
+conditions can be negated using the "!"-operator. You can also compare
+to a string constant using the "="-operator.</p>
+<p>There are no other logical operators, i.e. you can not combine
+conditions using <code>and</code> or <code>or</code>. The reason is that
+this is a minimal language, expressions can be complex and conditions
+can be constructed in the Java model. You can either have a condition
+directly inside the model or you can build a processor that computes it
+and add it to the model.</p>
 
 <p>The condition can be any object. It evaluates using these rules
 <ul>
-	<li>if the object is a boolean the condition evaluates to <code>true</code>
-	if the boolean is <code>true</code> (hear, hear)
+	<li>if the object is <code>null</code> or calling <code>toString</code>
+	on the object returns the empty string or <code>"false"</code> the
+	condition evaluates to <code>false</code>
+	<li>if the object is a boolean, the condition evaluates to the
+	value of that boolean
 	<li>if the object is a map, a collection, an array or any iterable
 	the condition evaluates to <code>true</code> if they contain any
 	elements
-	<li>otherwise the condition evaluates to <code>true</code> if the
-	object is not <code>null</code> and <code>toString</code> is not equal
-	to <code>""</code>
+	<li>otherwise the condition evaluates to <code>true</code>
 </ul>
 </p>
+
+<h3>Conditional shortcuts</h3>
+
+For convenience reasons there are some shortcuts for the most commonly
+used conditional statements. The first shortcut works by supplying a
+default constant value which will used in case the variable is
+undefined. You can specify such a default value in brackets. E.g.
+<pre>
+${address(unknown)}
+</pre>
+
+would be equivalent to
+
+<pre>
+${if address}${address}${else}unknown${end}
+</pre>
+
+The second shortcut works by wrapping a value, but only if it is
+defined. You can wrap a value by adding a prefix and a suffix separated
+by commas. This means
+<pre>
+${&lt;h1>,address,&lt;/h1>}
+</pre>
+
+is essentially the same as
+
+<pre>
+${if address}&lt;h1>${address}&lt;/h1>${end}
+</pre>
+
+To avoid ambiguities, both prefix and suffix must be supplied or none at
+all, but they can also be the empty string.
 
 <h3>Loops (expanding more than one item)</h3>
 
@@ -137,8 +192,8 @@ using <code>${item.key}</code> and <code>${item.value}</code>.</p>
 expressions. You are not able to specify a step or a start of end index.</p>
 
 <h4>Special variables</h4>
-<p>In certain cases you might want to have change the way an item in
-a container shall be displayed depending on its position inside the
+<p>In certain cases you might want to change the way an item in a
+container shall be displayed depending on its position inside the
 container. One example is to have the rows in a table be displayed
 having an alternating format depending whether their row number is even
 or odd.</p>
@@ -173,10 +228,10 @@ ${end}
 
 <p>When displaying a list of items you might want to have a
 separator between each item. This will not work using a normal body as
-this means there shall be no additional separator after the last item.
-You can either solve this using special variables - explained in the
-previous section - or more easily using a separator. Such is separator
-is added into the foreach expression like this</p>
+there shall be no additional separator after the last item. You can
+either solve this using special variables - explained in the previous
+section - or more easily using a separator. Such a separator is added
+into the foreach expression like this</p>
 <pre>
 ${foreach container item , }${item}${end}
 </pre>
@@ -206,6 +261,7 @@ can also escape the backslash by adding a second.</p>
 
 <h2>API</h2>
 API reference can be found
-<a href="api/index.html">here</a>.
+<a href="api/index.html">here</a>
+.
 </body>
 </html>
