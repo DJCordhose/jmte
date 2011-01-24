@@ -86,6 +86,25 @@ public final class MiniParserTest {
 	}
 
 	@Test
+	public void scanAndSplit() throws Exception {
+		String input = "function(param1, param2)";
+		
+		List<String> segments = MiniParser.defaultInstance().scan(input, "(", ")");
+		assertEquals(2, segments.size());
+	
+		String functionName = segments.get(0);
+		String parameterString = segments.get(1);
+		
+		assertEquals("function", functionName);
+		assertEquals("param1, param2", parameterString);
+		
+		List<String> parameters = MiniParser.trimmedInstance().split(parameterString, ',');
+		assertEquals(2, parameters.size());
+		assertEquals("param1", parameters.get(0));
+		assertEquals("param2", parameters.get(1));
+	}
+	
+	@Test
 	public void scanStringSeparator() throws Exception {
 		String input = "function${param1, param2}$";
 		List<String> segments = miniParser.scan(input, "${", "}$");
