@@ -12,18 +12,20 @@ public class CompiledCaliperTest {
 	 */
 	public static class PortfolioBenchmark extends SimpleBenchmark {
 		InterpretedEngineTest engineTest = new InterpretedEngineTest();
+		CompiledEngineTest compiledEngineTest = new CompiledEngineTest();
 
 		public void timeSimpleExpressionReference(int reps) throws Exception {
+			Engine engine = engineTest.newEngine();
 			for (int i = 0; i < reps; i++) {
-				new Engine().transform("${address}", InterpretedEngineTest.DEFAULT_MODEL);
-				;
+				engine.transform("${address}",
+						InterpretedEngineTest.DEFAULT_MODEL);
 			}
 		}
 
-		public void timeComplexExpressionReference(int reps) throws Exception {
+		public void timeSimpleExpressionCompiled(int reps) throws Exception {
+			Engine engine = compiledEngineTest.newEngine();
 			for (int i = 0; i < reps; i++) {
-				engineTest.ENGINE_WITH_CUSTOM_RENDERERS.transform(
-						"${<h1>,address(NIX),</h1>;long(full)}",
+				engine.transform("${address}",
 						InterpretedEngineTest.DEFAULT_MODEL);
 			}
 		}
@@ -36,6 +38,22 @@ public class CompiledCaliperTest {
 			}
 		}
 
+		public void timeComplexExpressionReference(int reps) throws Exception {
+			Engine engine = engineTest.newEngine();
+			for (int i = 0; i < reps; i++) {
+				engine.transform("${<h1>,address(NIX),</h1>;long(full)}",
+						InterpretedEngineTest.DEFAULT_MODEL);
+			}
+		}
+
+		public void timeComplexExpressionCompiled(int reps) throws Exception {
+			Engine engine = compiledEngineTest.newEngine();
+			for (int i = 0; i < reps; i++) {
+				engine.transform("${<h1>,address(NIX),</h1>;long(full)}",
+						InterpretedEngineTest.DEFAULT_MODEL);
+			}
+		}
+
 		public void timePrototypeCompiledComplexExpression(int reps)
 				throws Exception {
 			for (int i = 0; i < reps; i++) {
@@ -45,8 +63,18 @@ public class CompiledCaliperTest {
 		}
 
 		public void timeIf(int reps) throws Exception {
+			Engine engine = engineTest.newEngine();
 			for (int i = 0; i < reps; i++) {
-				engineTest.ifEmptyFalseExpression();
+				engine.transform("${if empty}${address}${else}NIX${end}",
+						InterpretedEngineTest.DEFAULT_MODEL);
+			}
+		}
+
+		public void timeIfCompiled(int reps) throws Exception {
+			Engine engine = compiledEngineTest.newEngine();
+			for (int i = 0; i < reps; i++) {
+				engine.transform("${if empty}${address}${else}NIX${end}",
+						InterpretedEngineTest.DEFAULT_MODEL);
 			}
 		}
 
@@ -59,8 +87,20 @@ public class CompiledCaliperTest {
 		}
 
 		public void timeForeach(int reps) throws Exception {
+			Engine engine = engineTest.newEngine();
 			for (int i = 0; i < reps; i++) {
-				engineTest.newlineForeachSeparator();
+				engine.transform(
+						"${ foreach list item \n}${item.property1}${end}",
+						InterpretedEngineTest.DEFAULT_MODEL);
+			}
+		}
+
+		public void timeForeachCompiled(int reps) throws Exception {
+			Engine engine = compiledEngineTest.newEngine();
+			for (int i = 0; i < reps; i++) {
+				engine.transform(
+						"${ foreach list item \n}${item.property1}${end}",
+						InterpretedEngineTest.DEFAULT_MODEL);
 			}
 		}
 
@@ -71,6 +111,6 @@ public class CompiledCaliperTest {
 						.transform(InterpretedEngineTest.DEFAULT_MODEL);
 			}
 		}
-
 	}
+
 }

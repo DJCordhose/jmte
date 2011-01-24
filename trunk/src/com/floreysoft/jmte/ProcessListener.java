@@ -3,14 +3,17 @@ package com.floreysoft.jmte;
 public interface ProcessListener {
 	public static enum Action {
 		/**
-		 * Expression being executed
+		 * Expression being executed. Not reported in compiled mode.
 		 */
 		EVAL,
 		/**
-		 * Expression being skipped or condition given for skipping an
-		 * expression
+		 * Expression being skipped. Not reported in compiled mode.
 		 */
-		SKIP
+		SKIP,
+		/**
+		 * End of control structure. Not reported in compiled mode.
+		 */
+		END
 	}
 
 	void log(Token token, Action action);

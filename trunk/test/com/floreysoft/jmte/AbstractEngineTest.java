@@ -949,5 +949,5 @@ public abstract class AbstractEngineTest {
 				.transform(DEFAULT_MODEL);
 		assertEquals(interpretedOutput, compiledOutput);
 	}
-	
+
 }

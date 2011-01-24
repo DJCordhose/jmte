@@ -268,7 +268,6 @@ public final class Engine {
 	public String transform(String template, Map<String, Object> model) {
 		return transform(template, null, model);
 	}
-
 	
 	/**
 	 * Sets the error handler to be used in this engine
@@ -383,7 +382,7 @@ public final class Engine {
 		listeners.remove(listener);
 	}
 
-	public void notifyProcessListeners(Token token, Action action) {
+	protected void notifyProcessListeners(Token token, Action action) {
 		for (ProcessListener processListener : listeners) {
 			processListener.log(token, action);
 		}
