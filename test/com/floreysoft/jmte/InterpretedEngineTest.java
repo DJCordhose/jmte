@@ -8,6 +8,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -147,6 +148,29 @@ public final class InterpretedEngineTest extends AbstractEngineTest {
 		Collection<NamedRenderer> compatibleRenderers3 = ENGINE_WITH_NAMED_RENDERERS
 				.getCompatibleRenderers(Boolean.class);
 		assertEquals(0, compatibleRenderers3.size());
+
+	}
+
+	@Test
+	public void processListener() throws Exception {
+		String input = "${if empty}EMPTY${else}NOT_EMPTY${end}${foreach not_there var}${var}${end}";
+		Engine engine = newEngine();
+		final List<ProcessListener.Action> actions = new ArrayList<ProcessListener.Action>();
+		engine.addProcessListener(new ProcessListener() {
+
+			@Override
+			public void log(Token token, Action action) {
+				actions.add(action);
+			}
+
+		});
+		engine.transform(input, DEFAULT_MODEL);
+		assertArrayEquals(new ProcessListener.Action[] {
+				ProcessListener.Action.EVAL, ProcessListener.Action.SKIP,
+				ProcessListener.Action.EVAL, ProcessListener.Action.EVAL,
+				ProcessListener.Action.END, ProcessListener.Action.EVAL,
+				ProcessListener.Action.SKIP, ProcessListener.Action.END },
+				actions.toArray());
 
 	}
 

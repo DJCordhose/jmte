@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.floreysoft.jmte.ProcessListener.Action;
+
 public class InterpretedTemplate extends AbstractTemplate implements Template {
 
 	protected final String template;
@@ -120,6 +122,7 @@ public class InterpretedTemplate extends AbstractTemplate implements Template {
 					engine.getErrorHandler().error("missing-end", feToken);
 				} else {
 					tokenStream.consume();
+					engine.notifyProcessListeners(contentToken, Action.END);
 				}
 			} else {
 
@@ -140,6 +143,7 @@ public class InterpretedTemplate extends AbstractTemplate implements Template {
 						engine.getErrorHandler().error("missing-end", feToken);
 					} else {
 						tokenStream.consume();
+						engine.notifyProcessListeners(contentToken, Action.END);
 					}
 					if (!feToken.isLast()) {
 						output.append(feToken.getSeparator());
@@ -179,6 +183,7 @@ public class InterpretedTemplate extends AbstractTemplate implements Template {
 				if (!inheritedSkip) {
 					localSkip = !localSkip;
 				}
+				engine.notifyProcessListeners(contentToken, inheritedSkip ? Action.SKIP : Action.EVAL);
 
 				while ((contentToken = tokenStream.currentToken()) != null
 						&& !(contentToken instanceof EndToken)) {
@@ -191,6 +196,7 @@ public class InterpretedTemplate extends AbstractTemplate implements Template {
 				engine.getErrorHandler().error("missing-end", ifToken);
 			} else {
 				tokenStream.consume();
+				engine.notifyProcessListeners(contentToken, Action.END);
 			}
 		} finally {
 			context.pop();
@@ -199,13 +205,7 @@ public class InterpretedTemplate extends AbstractTemplate implements Template {
 
 	private void content(boolean skip) {
 		Token token = tokenStream.currentToken();
-		if (!skip) {
-			context.engine.notifyProcessListeners(token,
-					ProcessListener.Action.EVAL);
-		} else {
-			context.engine.notifyProcessListeners(token,
-					ProcessListener.Action.SKIP);
-		}
+		engine.notifyProcessListeners(token, skip ? Action.SKIP : Action.EVAL);
 		if (token instanceof PlainTextToken) {
 			tokenStream.consume();
 			if (!skip) {
