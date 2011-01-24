@@ -1,4 +1,4 @@
-package com.floreysoft.jmte;
+package com.floreysoft.jmte.util;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import com.floreysoft.jmte.util.MiniParser;
+import com.floreysoft.jmte.StartEndPair;
 
 
 
@@ -295,7 +295,7 @@ public class Util {
 		return null;
 	}
 
-	static List<StartEndPair> scan(String input, String splitStart,
+	public static List<StartEndPair> scan(String input, String splitStart,
 			String splitEnd, boolean useEscaping) {
 		List<StartEndPair> result = new ArrayList<StartEndPair>();
 		int fromIndex = 0;
@@ -351,6 +351,7 @@ public class Util {
 	}
 
 	@SuppressWarnings("unchecked")
+	public
 	static <T> Set<T> asSet(T... a) {
 		return a != null ? new HashSet(Arrays.asList(a)) : Collections
 				.emptySet();

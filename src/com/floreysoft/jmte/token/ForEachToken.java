@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 import com.floreysoft.jmte.TemplateContext;
-import com.floreysoft.jmte.Util;
+import com.floreysoft.jmte.util.Util;
 
 public class ForEachToken extends ExpressionToken {
 	public static final String FOREACH = "foreach";

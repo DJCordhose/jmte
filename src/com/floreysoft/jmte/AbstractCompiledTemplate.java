@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.floreysoft.jmte.util.Util;
+
 public abstract class AbstractCompiledTemplate extends AbstractTemplate
 		implements Template {
 	protected final Set<String> usedVariables = new TreeSet<String>();;

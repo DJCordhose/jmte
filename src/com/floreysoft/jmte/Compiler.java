@@ -24,6 +24,7 @@ import com.floreysoft.jmte.token.EndToken;
 import com.floreysoft.jmte.token.ForEachToken;
 import com.floreysoft.jmte.token.IfCmpToken;
 import com.floreysoft.jmte.token.IfToken;
+import com.floreysoft.jmte.token.Lexer;
 import com.floreysoft.jmte.token.PlainTextToken;
 import com.floreysoft.jmte.token.StringToken;
 import com.floreysoft.jmte.token.Token;
