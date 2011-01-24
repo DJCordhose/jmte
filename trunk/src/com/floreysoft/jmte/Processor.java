@@ -1,6 +1,6 @@
 package com.floreysoft.jmte;
 
-public interface TemplateExpression<T> {
+public interface Processor<T> {
 
 	T eval(TemplateContext context);
 	

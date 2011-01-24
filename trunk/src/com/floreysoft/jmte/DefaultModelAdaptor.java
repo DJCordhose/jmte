@@ -5,6 +5,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+/**
+ * Default implementation of the model adapter.
+ * <p>
+ * Does the object traversal using the "." operator. Resolved value will be
+ * checked if it is either a {@link Processor} or a {@link Callable} in which
+ * case the final resolved value is computed by calling those executable
+ * objects.
+ * </p>
+ * 
+ * <p>
+ * Inherit from this adapter if you want a slight change of this behavior and
+ * set you new adator on the engine {@link Engine#setModelAdaptor(ModelAdaptor)}
+ * .
+ * </p>
+ */
 public class DefaultModelAdaptor implements ModelAdaptor {
 
 	@Override
@@ -14,8 +29,8 @@ public class DefaultModelAdaptor implements ModelAdaptor {
 		Object value = traverse(segments, context.model, context.engine
 				.getErrorHandler(), token);
 		// if value implements both, we use the more specialized implementation
-		if (value instanceof TemplateExpression) {
-			value = ((TemplateExpression) value).eval(context);
+		if (value instanceof Processor) {
+			value = ((Processor) value).eval(context);
 		} else if (value instanceof Callable) {
 			try {
 				value = ((Callable) value).call();
