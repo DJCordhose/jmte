@@ -12,8 +12,11 @@
 
   <property name="creator" value="floreysoft GmbH"/>
   <property name="final.name" value="${name}-${version}"/>
+  <property name="nocompiler.name" value="${name}-unbundled-${version}"/>
   <property name="dist.name" value="${name}-${version}-full.zip"/>
   <property name="jar.name" value="${final.name}.jar"/>
+  <property name="nocompiler.jar.name" value="${nocompiler.name}.jar"/>
+  <property name="asm" value="lib/asm-3.3.1.jar"/>
 
   <tstamp>
 	<format property="TODAY.DATE" pattern="yyyy-MM-dd" locale="us" />
@@ -91,7 +94,7 @@
   =================================================================== 
   -->	
 <target name="archive-jars" depends="build" description="Builds the exectutable jar-archives">
-	<jar destfile="${dist.dir}/${jar.name}" filesetmanifest="skip">
+	<jar destfile="${dist.dir}/${nocompiler.jar.name}" filesetmanifest="skip">
 		<manifest>
 			<attribute name="Built-By" value="${creator}"/>
 			<attribute name="Main-Class" value="${main-class}"/>
@@ -100,6 +103,24 @@
 		</manifest>
 		<fileset dir="${build.dir}" excludes="**/*Test*.class,tmp/**"/>
 	</jar>
+	
+    <taskdef name="jarjar"
+             classname="com.tonicsystems.jarjar.JarJarTask"
+             classpath="lib/jarjar-1.0.jar"/>
+
+    <jarjar jarfile="${dist.dir}/${jar.name}">
+		<manifest>
+			<attribute name="Built-By" value="${creator}"/>
+			<attribute name="Main-Class" value="${main-class}"/>
+			<attribute name="Version" value="${version}"/>
+			<attribute name="Build-Date" value="${today}"/>
+		</manifest>
+        <zipfileset src="${dist.dir}/${nocompiler.jar.name}"/>
+        <zipfileset src="${asm}"/>
+        <rule pattern="org.objectweb.asm.**" result="com.floreysoft.jmte.internal.asm.@1"/>
+        <keep pattern="com.floreysoft.jmte.**"/>
+    </jarjar>
+
 </target>
   
   <!--
