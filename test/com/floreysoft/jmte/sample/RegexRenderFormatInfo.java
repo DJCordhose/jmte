@@ -1,4 +1,6 @@
-package com.floreysoft.jmte;
+package com.floreysoft.jmte.sample;
+
+import com.floreysoft.jmte.RenderFormatInfo;
 
 
 public class RegexRenderFormatInfo implements RenderFormatInfo {

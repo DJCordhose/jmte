@@ -1,5 +1,8 @@
 package com.floreysoft.jmte;
 
+import com.floreysoft.jmte.sample.SampleIfEmptyFalseExpressionCompiledTemplate;
+import com.floreysoft.jmte.sample.SampleNewlineForeachSeparatorCompiledTemplate;
+import com.floreysoft.jmte.sample.SampleSimpleExpressionCompiledTemplate;
 import com.google.caliper.SimpleBenchmark;
 
 public class CompiledCaliperTest {
@@ -12,10 +15,22 @@ public class CompiledCaliperTest {
 	 */
 	public static class PortfolioBenchmark extends SimpleBenchmark {
 		InterpretedEngineTest engineTest = new InterpretedEngineTest();
+		Engine cachingEngine = new Engine();
+		{
+			cachingEngine.setEnabledInterpretedTemplateCache(true);
+		}
 		CompiledEngineTest compiledEngineTest = new CompiledEngineTest();
 
 		public void timeSimpleExpressionReference(int reps) throws Exception {
 			Engine engine = engineTest.newEngine();
+			for (int i = 0; i < reps; i++) {
+				engine.transform("${address}",
+						InterpretedEngineTest.DEFAULT_MODEL);
+			}
+		}
+
+		public void timeSimpleExpressionCached(int reps) throws Exception {
+			Engine engine = cachingEngine;
 			for (int i = 0; i < reps; i++) {
 				engine.transform("${address}",
 						InterpretedEngineTest.DEFAULT_MODEL);
@@ -46,6 +61,14 @@ public class CompiledCaliperTest {
 			}
 		}
 
+		public void timeComplexExpressionCached(int reps) throws Exception {
+			Engine engine = cachingEngine;
+			for (int i = 0; i < reps; i++) {
+				engine.transform("${<h1>,address(NIX),</h1>;long(full)}",
+						InterpretedEngineTest.DEFAULT_MODEL);
+			}
+		}
+
 		public void timeComplexExpressionCompiled(int reps) throws Exception {
 			Engine engine = compiledEngineTest.newEngine();
 			for (int i = 0; i < reps; i++) {
@@ -70,6 +93,15 @@ public class CompiledCaliperTest {
 			}
 		}
 
+
+		public void timeIfCached(int reps) throws Exception {
+			Engine engine = cachingEngine;
+			for (int i = 0; i < reps; i++) {
+				engine.transform("${if empty}${address}${else}NIX${end}",
+						InterpretedEngineTest.DEFAULT_MODEL);
+			}
+		}
+
 		public void timeIfCompiled(int reps) throws Exception {
 			Engine engine = compiledEngineTest.newEngine();
 			for (int i = 0; i < reps; i++) {
@@ -88,6 +120,15 @@ public class CompiledCaliperTest {
 
 		public void timeForeach(int reps) throws Exception {
 			Engine engine = engineTest.newEngine();
+			for (int i = 0; i < reps; i++) {
+				engine.transform(
+						"${ foreach list item \n}${item.property1}${end}",
+						InterpretedEngineTest.DEFAULT_MODEL);
+			}
+		}
+
+		public void timeForeachCached(int reps) throws Exception {
+			Engine engine = cachingEngine;
 			for (int i = 0; i < reps; i++) {
 				engine.transform(
 						"${ foreach list item \n}${item.property1}${end}",

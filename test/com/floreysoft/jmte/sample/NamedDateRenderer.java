@@ -1,9 +1,12 @@
-package com.floreysoft.jmte;
+package com.floreysoft.jmte.sample;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import com.floreysoft.jmte.NamedRenderer;
+import com.floreysoft.jmte.RenderFormatInfo;
 
 
 public class NamedDateRenderer implements NamedRenderer {

@@ -27,6 +27,15 @@ import org.objectweb.asm.ClassWriter;
 
 import com.floreysoft.jmte.message.ParseException;
 import com.floreysoft.jmte.renderer.OptionRenderFormatInfo;
+import com.floreysoft.jmte.sample.NamedDateRenderer;
+import com.floreysoft.jmte.sample.NamedStringRenderer;
+import com.floreysoft.jmte.sample.SampleCompiledSequenceTemplate;
+import com.floreysoft.jmte.sample.SampleComplexExpressionCompiledTemplate;
+import com.floreysoft.jmte.sample.SampleIfCmpCompiledTemplate;
+import com.floreysoft.jmte.sample.SampleIfEmptyFalseExpressionCompiledTemplate;
+import com.floreysoft.jmte.sample.SampleNestedExpressionCompiledTemplate;
+import com.floreysoft.jmte.sample.SampleNewlineForeachSeparatorCompiledTemplate;
+import com.floreysoft.jmte.sample.SampleSimpleExpressionCompiledTemplate;
 import com.floreysoft.jmte.token.ForEachToken;
 import com.floreysoft.jmte.util.Util;
 

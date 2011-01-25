@@ -1,5 +1,7 @@
-package com.floreysoft.jmte;
+package com.floreysoft.jmte.sample;
 
+import com.floreysoft.jmte.Engine;
+import com.floreysoft.jmte.TemplateContext;
 import com.floreysoft.jmte.template.AbstractCompiledTemplate;
 import com.floreysoft.jmte.token.StringToken;
 

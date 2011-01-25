@@ -31,7 +31,7 @@ Dell Latitude E5510, i5 M520@2.4GHz, 4,00 GB, Windows 7 Professional, 32 bit, JD
                     ForeachCompiled  5275 ====================
  PrototypeCompiledForeachExpression  8485 =========================
  
-25.01.2011 rc1 (svn rev 135)
+25.01.2011 (svn tag 2.0-rc1 / rev 135)
 ==========================================
 
                           benchmark    ns logarithmic runtime
@@ -47,4 +47,25 @@ Dell Latitude E5510, i5 M520@2.4GHz, 4,00 GB, Windows 7 Professional, 32 bit, JD
                             Foreach 13629 ==============================
                     ForeachCompiled  5849 =====================
  PrototypeCompiledForeachExpression  8508 =========================
+ 
+25.01.2011 after token stream caching for interpreter (svn tag rc2 / rev xxx)
+=============================================================================
+
+                          benchmark    ns logarithmic runtime
+          SimpleExpressionReference  3420 ===============
+             SimpleExpressionCached  1010 ===
+           SimpleExpressionCompiled   972 ==
+ PrototypeCompiledSimpleExpression  3857 =================
+         ComplexExpressionReference  7073 =======================
+            ComplexExpressionCached  1275 =====
+          ComplexExpressionCompiled  1307 =====
+ PrototypeCompiledComplexExpression  3821 =================
+                                 If  7132 =======================
+                           IfCached  1251 =====
+                         IfCompiled   810 =
+      PrototypeCompiledIfExpression  2628 =============
+                            Foreach 13210 ==============================
+                      ForeachCached  5953 =====================
+                    ForeachCompiled  5692 =====================
+ PrototypeCompiledForeachExpression  8353 =========================
  
