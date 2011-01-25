@@ -48,7 +48,7 @@ Dell Latitude E5510, i5 M520@2.4GHz, 4,00 GB, Windows 7 Professional, 32 bit, JD
                     ForeachCompiled  5849 =====================
  PrototypeCompiledForeachExpression  8508 =========================
  
-25.01.2011 after token stream caching for interpreter (svn tag rc2 / rev xxx)
+25.01.2011 after token stream caching for interpreter (svn tag rc2 / rev 138)
 =============================================================================
 
                           benchmark    ns logarithmic runtime

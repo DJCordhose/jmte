@@ -159,7 +159,7 @@ descent interpreter and new process listener concept
 is the only test that benefits from the caching as all other tests
 create a fresh engine with each run - see compiled caliper test for real
 speedup of caching
-(svn tag 2.0-rc2 / rev xxx)
+(svn tag 2.0-rc2 / rev 138)
 ===================================================================
                              benchmark      ns logarithmic runtime
                 StringBuilderReference   484,9 ==============
