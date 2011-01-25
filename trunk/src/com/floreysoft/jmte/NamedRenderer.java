@@ -1,9 +1,10 @@
-package com.floreysoft.jmte.renderer;
+package com.floreysoft.jmte;
 
 /**
  * A renderer addressed by its name, not by its type.
  * 
  * @see Renderer
+ * @see RenderFormatInfo
  */
 public interface NamedRenderer {
 	/**

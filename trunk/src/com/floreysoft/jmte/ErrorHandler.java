@@ -1,8 +1,8 @@
-package com.floreysoft.jmte.message;
+package com.floreysoft.jmte;
 
 import java.util.Map;
 
-import com.floreysoft.jmte.Engine;
+import com.floreysoft.jmte.message.ParseException;
 import com.floreysoft.jmte.token.Lexer;
 import com.floreysoft.jmte.token.Token;
 

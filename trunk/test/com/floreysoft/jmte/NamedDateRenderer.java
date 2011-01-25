@@ -5,8 +5,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import com.floreysoft.jmte.renderer.NamedRenderer;
-import com.floreysoft.jmte.renderer.RenderFormatInfo;
 
 public class NamedDateRenderer implements NamedRenderer {
 

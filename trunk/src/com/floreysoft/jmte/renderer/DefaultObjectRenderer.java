@@ -2,6 +2,7 @@ package com.floreysoft.jmte.renderer;
 
 import java.util.List;
 
+import com.floreysoft.jmte.Renderer;
 import com.floreysoft.jmte.util.Util;
 
 public class DefaultObjectRenderer implements Renderer<Object> {

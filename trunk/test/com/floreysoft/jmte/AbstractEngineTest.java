@@ -26,10 +26,7 @@ import org.junit.Test;
 import org.objectweb.asm.ClassWriter;
 
 import com.floreysoft.jmte.message.ParseException;
-import com.floreysoft.jmte.renderer.NamedRenderer;
 import com.floreysoft.jmte.renderer.OptionRenderFormatInfo;
-import com.floreysoft.jmte.renderer.RenderFormatInfo;
-import com.floreysoft.jmte.renderer.Renderer;
 import com.floreysoft.jmte.token.ForEachToken;
 import com.floreysoft.jmte.util.Util;
 

@@ -5,6 +5,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Convenience class for simple model creation.
+ * 
+ * <p>
+ * Sample usage
+ * 
+ * <pre>
+ * Map&lt;String, Object&gt; model = new ModelBuilder(&quot;1&quot;, &quot;arg1&quot;, &quot;2&quot;, &quot;arg2&quot;).build();
+ * </pre>
+ * 
+ * </p>
+ */
 public final class ModelBuilder {
 	private final Map<String, Object> model = new HashMap<String, Object>();
 
@@ -19,7 +31,6 @@ public final class ModelBuilder {
 
 	public ModelBuilder(String name1, Object value1, String name2,
 			Object value2, String name3, Object value3) {
-		Map<String, Object> model = new HashMap<String, Object>();
 		model.put(name1, value1);
 		model.put(name2, value2);
 		model.put(name3, value3);
@@ -28,7 +39,6 @@ public final class ModelBuilder {
 	public ModelBuilder(String name1, Object value1, String name2,
 			Object value2, String name3, Object value3, String name4,
 			Object value4) {
-		Map<String, Object> model = new HashMap<String, Object>();
 		model.put(name1, value1);
 		model.put(name2, value2);
 		model.put(name3, value3);
@@ -38,7 +48,6 @@ public final class ModelBuilder {
 	public ModelBuilder(String name1, Object value1, String name2,
 			Object value2, String name3, Object value3, String name4,
 			Object value4, String name5, Object value5) {
-		Map<String, Object> model = new HashMap<String, Object>();
 		model.put(name1, value1);
 		model.put(name2, value2);
 		model.put(name3, value3);
@@ -114,5 +123,4 @@ public final class ModelBuilder {
 	public Map<String, Object> build() {
 		return model;
 	}
-
 }

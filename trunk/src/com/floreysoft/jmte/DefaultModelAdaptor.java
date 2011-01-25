@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import com.floreysoft.jmte.message.ErrorHandler;
 import com.floreysoft.jmte.token.Token;
 import com.floreysoft.jmte.util.Util;
 
