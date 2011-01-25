@@ -1,11 +1,11 @@
-package com.floreysoft.jmte;
+package com.floreysoft.jmte.template;
 
 import java.util.Map;
 import java.util.Set;
 
 import com.floreysoft.jmte.token.ForEachToken;
 
-abstract class Template {
+public abstract class Template {
 
 	public static final String ODD_PREFIX = "odd_";
 	public static final String EVEN_PREFIX = "even_";

@@ -1,4 +1,4 @@
-package com.floreysoft.jmte;
+package com.floreysoft.jmte.template;
 
 import java.util.Collections;
 import java.util.List;
@@ -6,6 +6,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.floreysoft.jmte.Engine;
+import com.floreysoft.jmte.ProcessListener;
+import com.floreysoft.jmte.ScopedMap;
+import com.floreysoft.jmte.StartEndPair;
+import com.floreysoft.jmte.TemplateContext;
 import com.floreysoft.jmte.ProcessListener.Action;
 import com.floreysoft.jmte.token.ElseToken;
 import com.floreysoft.jmte.token.EndToken;
@@ -18,7 +23,7 @@ import com.floreysoft.jmte.token.Token;
 import com.floreysoft.jmte.token.TokenStream;
 import com.floreysoft.jmte.util.Util;
 
-class InterpretedTemplate extends Template {
+public class InterpretedTemplate extends Template {
 
 	protected final String template;
 	protected final Engine engine;
@@ -38,10 +43,10 @@ class InterpretedTemplate extends Template {
 	public Set<String> getUsedVariables() {
 		final Set<String> usedVariables = new TreeSet<String>();
 
-		final List<ProcessListener> oldListeners = engine.listeners;
-		engine.listeners.clear();
+		final Engine engine = new Engine();
 
-		final List<StartEndPair> scan = engine.scan(template);
+		final List<StartEndPair> scan = Util.scan(template, engine
+				.getExprStartToken(), engine.getExprEndToken(), true);
 		final ScopedMap scopedMap = new ScopedMap(Collections.EMPTY_MAP);
 
 		context = new TemplateContext(template, sourceName, scopedMap, engine);
@@ -78,14 +83,13 @@ class InterpretedTemplate extends Template {
 
 		transformPure(context, scan);
 
-		engine.listeners.addAll(oldListeners);
-
 		return usedVariables;
 	}
 
 	@Override
 	public String transform(Map<String, Object> model) {
-		List<StartEndPair> scan = engine.scan(template);
+		final List<StartEndPair> scan = Util.scan(template, engine
+				.getExprStartToken(), engine.getExprEndToken(), true);
 		context = new TemplateContext(template, sourceName,
 				new ScopedMap(model), engine);
 		String transformed = transformPure(context, scan);
@@ -132,7 +136,7 @@ class InterpretedTemplate extends Template {
 					engine.getErrorHandler().error("missing-end", feToken);
 				} else {
 					tokenStream.consume();
-					engine.notifyProcessListeners(contentToken, Action.END);
+					context.notifyProcessListeners(contentToken, Action.END);
 				}
 			} else {
 
@@ -153,7 +157,7 @@ class InterpretedTemplate extends Template {
 						engine.getErrorHandler().error("missing-end", feToken);
 					} else {
 						tokenStream.consume();
-						engine.notifyProcessListeners(contentToken, Action.END);
+						context.notifyProcessListeners(contentToken, Action.END);
 					}
 					if (!feToken.isLast()) {
 						output.append(feToken.getSeparator());
@@ -170,7 +174,7 @@ class InterpretedTemplate extends Template {
 	private void condition(boolean inheritedSkip) {
 		IfToken ifToken = (IfToken) tokenStream.currentToken();
 		tokenStream.consume();
-		
+
 		context.push(ifToken);
 		try {
 			boolean localSkip;
@@ -193,7 +197,8 @@ class InterpretedTemplate extends Template {
 				if (!inheritedSkip) {
 					localSkip = !localSkip;
 				}
-				engine.notifyProcessListeners(contentToken, inheritedSkip ? Action.SKIP : Action.EVAL);
+				context.notifyProcessListeners(contentToken,
+						inheritedSkip ? Action.SKIP : Action.EVAL);
 
 				while ((contentToken = tokenStream.currentToken()) != null
 						&& !(contentToken instanceof EndToken)) {
@@ -206,7 +211,7 @@ class InterpretedTemplate extends Template {
 				engine.getErrorHandler().error("missing-end", ifToken);
 			} else {
 				tokenStream.consume();
-				engine.notifyProcessListeners(contentToken, Action.END);
+				context.notifyProcessListeners(contentToken, Action.END);
 			}
 		} finally {
 			context.pop();
@@ -215,7 +220,7 @@ class InterpretedTemplate extends Template {
 
 	private void content(boolean skip) {
 		Token token = tokenStream.currentToken();
-		engine.notifyProcessListeners(token, skip ? Action.SKIP : Action.EVAL);
+		context.notifyProcessListeners(token, skip ? Action.SKIP : Action.EVAL);
 		if (token instanceof PlainTextToken) {
 			tokenStream.consume();
 			if (!skip) {

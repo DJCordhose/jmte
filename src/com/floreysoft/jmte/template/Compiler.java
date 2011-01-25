@@ -1,4 +1,4 @@
-package com.floreysoft.jmte;
+package com.floreysoft.jmte.template;
 
 import static org.objectweb.asm.Opcodes.*;
 
@@ -19,6 +19,8 @@ import org.objectweb.asm.Opcodes;
 //import org.objectweb.asm.util.CheckClassAdapter;
 //import org.objectweb.asm.util.TraceClassVisitor;
 
+import com.floreysoft.jmte.Engine;
+import com.floreysoft.jmte.StartEndPair;
 import com.floreysoft.jmte.token.ElseToken;
 import com.floreysoft.jmte.token.EndToken;
 import com.floreysoft.jmte.token.ForEachToken;
@@ -30,6 +32,7 @@ import com.floreysoft.jmte.token.StringToken;
 import com.floreysoft.jmte.token.Token;
 import com.floreysoft.jmte.token.TokenStream;
 import com.floreysoft.jmte.util.UniqueNameGenerator;
+import com.floreysoft.jmte.util.Util;
 
 /**
  * 
@@ -42,7 +45,7 @@ import com.floreysoft.jmte.util.UniqueNameGenerator;
  *      ://java.sun.com/docs/books/jvms/second_edition/html/Instructions.doc.
  *      html
  */
-class Compiler {
+public class Compiler {
 
 	@SuppressWarnings("unchecked")
 	protected static <T> Class<T> loadClass(byte[] b, Class<T> type) {
@@ -75,7 +78,7 @@ class Compiler {
 
 	// make sure we are in the same package as context to have access to its
 	// protected parts
-	private final static String COMPILED_TEMPLATE_NAME_PREFIX = "com/floreysoft/jmte/compiled/Template";
+	private final static String COMPILED_TEMPLATE_NAME_PREFIX = "com/floreysoft/jmte/template/CompiledTemplate";
 
 	// must be globally unique
 	private final static UniqueNameGenerator<String, String> uniqueNameGenerator = new UniqueNameGenerator<String, String>(
@@ -94,7 +97,7 @@ class Compiler {
 	protected final List<String> localVarStack = new LinkedList<String>();
 	protected transient ClassVisitor classVisitor;
 	protected transient ClassWriter classWriter;
-	protected final String superClassName = "com/floreysoft/jmte/AbstractCompiledTemplate";
+	protected final String superClassName = "com/floreysoft/jmte/template/AbstractCompiledTemplate";
 	protected transient String className;
 	protected transient String typeDescriptor;
 	protected transient StringWriter writer;
@@ -237,8 +240,8 @@ class Compiler {
 		initCompilation();
 
 		openCompilation();
-
-		List<StartEndPair> scan = engine.scan(template);
+			
+		List<StartEndPair> scan = Util.scan(template, engine.getExprStartToken(), engine.getExprEndToken(), true);
 		tokenStream = new TokenStream(sourceName, template, scan, lexer, engine
 				.getExprStartToken(), engine.getExprEndToken());
 		tokenStream.nextToken();

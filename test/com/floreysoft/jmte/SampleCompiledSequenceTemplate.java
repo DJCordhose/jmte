@@ -3,10 +3,10 @@ package com.floreysoft.jmte;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.floreysoft.jmte.template.AbstractCompiledTemplate;
 import com.floreysoft.jmte.token.StringToken;
 
-public class SampleCompiledSequenceTemplate extends
-		AbstractCompiledTemplate {
+public class SampleCompiledSequenceTemplate extends AbstractCompiledTemplate {
 
 	public SampleCompiledSequenceTemplate(Engine engine) {
 		super(engine);
@@ -24,12 +24,12 @@ public class SampleCompiledSequenceTemplate extends
 		StringBuilder buffer = new StringBuilder();
 
 		buffer.append("PREFIX");
-		
+
 		buffer.append(new StringToken("address", "address", "NIX", "<h1>",
 				"</h1>", "long", "full").evaluate(context));
 
 		buffer.append("SUFFIX");
-		
+
 		return buffer.toString();
 	}
 

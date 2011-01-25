@@ -2,6 +2,7 @@ package com.floreysoft.jmte;
 
 import java.util.Arrays;
 
+import com.floreysoft.jmte.template.AbstractCompiledTemplate;
 import com.floreysoft.jmte.token.ForEachToken;
 import com.floreysoft.jmte.token.IfToken;
 import com.floreysoft.jmte.token.StringToken;
@@ -37,7 +38,8 @@ public class SampleNestedExpressionCompiledTemplate extends
 
 				// ${foreach item.list item2}
 				ForEachToken token2 = new ForEachToken(Arrays
-						.asList(new String[] { "item", "list" }), "item.list", "item2", "");
+						.asList(new String[] { "item", "list" }), "item.list",
+						"item2", "");
 				token2.setIterable((Iterable) token2.evaluate(context));
 				context.model.enterScope();
 				context.push(token2);
@@ -61,7 +63,7 @@ public class SampleNestedExpressionCompiledTemplate extends
 										.asList(new String[] { "item2",
 												"property1" }),
 										"item.property1").evaluate(context));
-								
+
 								// INNER_SUFFIX
 								buffer.append("INNER_SUFFIX");
 
