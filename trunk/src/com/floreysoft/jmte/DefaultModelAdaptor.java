@@ -79,8 +79,8 @@ public class DefaultModelAdaptor implements ModelAdaptor {
 			ErrorHandler errorHandler, Token token) {
 		Object result;
 		if (o instanceof String) {
-			errorHandler.error("no-call-on-string", token, Engine.toModel(
-					"receiver", o.toString()));
+			errorHandler.error("no-call-on-string", token, new ModelBuilder(
+					"receiver", o.toString()).build());
 			return o;
 		} else if (o instanceof Map) {
 			Map map = (Map) o;
@@ -89,9 +89,8 @@ public class DefaultModelAdaptor implements ModelAdaptor {
 			try {
 				result = Util.getPropertyValue(o, attributeName);
 			} catch (Exception e) {
-				errorHandler.error("property-access-error", token, Engine
-						.toModel("property", attributeName, "object", o,
-								"exception", e));
+				errorHandler.error("property-access-error", token, new ModelBuilder("property", attributeName, "object", o,
+								"exception", e).build());
 				result = "";
 			}
 		}

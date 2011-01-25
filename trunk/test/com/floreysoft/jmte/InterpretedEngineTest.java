@@ -21,6 +21,7 @@ import com.floreysoft.jmte.renderer.NamedRenderer;
 import com.floreysoft.jmte.renderer.OptionRenderFormatInfo;
 import com.floreysoft.jmte.renderer.RenderFormatInfo;
 import com.floreysoft.jmte.token.Token;
+import com.floreysoft.jmte.util.StartEndPair;
 import com.floreysoft.jmte.util.Util;
 
 public final class InterpretedEngineTest extends AbstractEngineTest {
@@ -59,7 +60,7 @@ public final class InterpretedEngineTest extends AbstractEngineTest {
 		List price = Arrays.asList(3.6, 2, 3.0);
 		List total = Arrays.asList("3.6", "4", "9");
 
-		List<Map<String, Object>> mergedLists = Engine.mergeLists(new String[] {
+		List<Map<String, Object>> mergedLists = ModelBuilder.mergeLists(new String[] {
 				"amount", "price", "total" }, amount, price, total);
 		Map<String, Object> model = new HashMap<String, Object>();
 		model.put("mergedLists", mergedLists);
@@ -99,26 +100,9 @@ public final class InterpretedEngineTest extends AbstractEngineTest {
 	}
 
 	@Test
-	public void format() throws Exception {
-		String output = Engine.format("${if 1}${1}${else}${2}${end}", "arg1",
-				"arg2");
-		assertEquals("arg1", output);
-		// just to prove that shortcut for false-branch works
-		Engine.format("${if 1}${1}${else}${2}${end}", "arg1");
-
-		// check for null values
-		output = Engine.format("${if 1}${1}${else}${2}${end}", null, "arg2");
-		assertEquals("arg2", output);
-
-		// check for boolean values
-		output = Engine.format("${if 1}${1}${else}${2}${end}", false, "arg2");
-		assertEquals("arg2", output);
-	}
-
-	@Test
 	public void formatNamed() throws Exception {
-		String output = Engine.formatNamed("${if 1}${2}${else}broken${end}",
-				"1", "arg1", "2", "arg2");
+		String output = newEngine().transform("${if 1}${2}${else}broken${end}",
+				new ModelBuilder("1", "arg1", "2", "arg2").build());
 		assertEquals("arg2", output);
 	}
 

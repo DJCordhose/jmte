@@ -22,6 +22,7 @@ import com.floreysoft.jmte.template.Compiler;
 import com.floreysoft.jmte.template.InterpretedTemplate;
 import com.floreysoft.jmte.template.Template;
 import com.floreysoft.jmte.token.Token;
+import com.floreysoft.jmte.util.Tool;
 import com.floreysoft.jmte.util.Util;
 
 /**
@@ -64,180 +65,16 @@ import com.floreysoft.jmte.util.Util;
  * @see ProcessListener
  */
 public final class Engine {
-	/**
-	 * Replacement for {@link java.lang.String.format}. All arguments will be
-	 * put into the model having their index starting from 1 as their name.
-	 * 
-	 * @param pattern
-	 *            the template
-	 * @param args
-	 *            any number of arguments
-	 * @return the expanded template
-	 */
-	public static String format(String pattern, Object... args) {
-		Map<String, Object> model = arrayToModel(null, args);
-		Engine engine = new Engine();
-		String output = engine.transform(pattern, model);
-		return output;
-	}
-
-	public static String formatNamed(String pattern, String name1, Object value1) {
-		Map<String, Object> model = new HashMap<String, Object>();
-		model.put(name1, value1);
-		Engine engine = new Engine();
-		String output = engine.transform(pattern, model);
-		return output;
-	}
-
-	public static String formatNamed(String pattern, String name1,
-			Object value1, String name2, Object value2) {
-		Map<String, Object> model = new HashMap<String, Object>();
-		model.put(name1, value1);
-		model.put(name2, value2);
-		Engine engine = new Engine();
-		String output = engine.transform(pattern, model);
-		return output;
-	}
-
-	public static String formatNamed(String pattern, String name1,
-			Object value1, String name2, Object value2, String name3,
-			Object value3) {
-		Map<String, Object> model = new HashMap<String, Object>();
-		model.put(name1, value1);
-		model.put(name2, value2);
-		model.put(name3, value3);
-		Engine engine = new Engine();
-		String output = engine.transform(pattern, model);
-		return output;
-	}
-
-	public static String formatNamed(String pattern, String name1,
-			Object value1, String name2, Object value2, String name3,
-			Object value3, String name4, Object value4) {
-		Map<String, Object> model = new HashMap<String, Object>();
-		model.put(name1, value1);
-		model.put(name2, value2);
-		model.put(name3, value3);
-		model.put(name4, value4);
-		Engine engine = new Engine();
-		String output = engine.transform(pattern, model);
-		return output;
-	}
-
-	public static String formatNamed(String pattern, String name1,
-			Object value1, String name2, Object value2, String name3,
-			Object value3, String name4, Object value4, String name5,
-			Object value5) {
-		Map<String, Object> model = new HashMap<String, Object>();
-		model.put(name1, value1);
-		model.put(name2, value2);
-		model.put(name3, value3);
-		model.put(name4, value4);
-		model.put(name5, value4);
-		Engine engine = new Engine();
-		String output = engine.transform(pattern, model);
-		return output;
-	}
-
-	/**
-	 * Transforms an array to a model using the index of the elements (starting
-	 * from 1) in the array and a prefix to form their names.
-	 * 
-	 * @param prefix
-	 *            the prefix to add to the index or <code>null</code> if none
-	 *            shall be applied
-	 * @param args
-	 *            the array to be transformed into the model
-	 * @return the model containing the arguments
-	 */
-	public static Map<String, Object> arrayToModel(String prefix,
-			Object... args) {
-		Map<String, Object> model = new HashMap<String, Object>();
-		if (prefix == null) {
-			prefix = "";
-		}
-		for (int i = 0; i < args.length; i++) {
-			Object value = args[i];
-			String name = prefix + (i + 1);
-			model.put(name, value);
-		}
-		return model;
-	}
-
-	public static Map<String, Object> toModel(String name1, Object value1) {
-		Map<String, Object> model = new HashMap<String, Object>();
-		model.put(name1, value1);
-		return model;
-	}
-
-	public static Map<String, Object> toModel(String name1, Object value1,
-			String name2, Object value2) {
-		Map<String, Object> model = toModel(name1, value1);
-		model.put(name2, value2);
-		return model;
-	}
-
-	public static Map<String, Object> toModel(String name1, Object value1,
-			String name2, Object value2, String name3, Object value3) {
-		Map<String, Object> model = toModel(name1, value1, name2, value2);
-		model.put(name3, value3);
-		return model;
-	}
-
-	/**
-	 * Merges any number of named lists into a single one containing their
-	 * combined values. Can be very handy in case of a servlet request which
-	 * might contain several lists of parameters that you want to iterate over
-	 * in a combined way.
-	 * 
-	 * @param names
-	 *            the names of the variables in the following lists
-	 * @param lists
-	 *            the lists containing the values for the named variables
-	 * @return a merge list containing the combined values of the lists
-	 */
-	public static List<Map<String, Object>> mergeLists(String[] names,
-			List<Object>... lists) {
-		List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
-		if (lists.length != 0) {
-
-			// first check if all looks good
-			int expectedSize = lists[0].size();
-			for (int i = 1; i < lists.length; i++) {
-				List<Object> list = lists[i];
-				if (list.size() != expectedSize) {
-					throw new IllegalArgumentException(
-							"All lists and array of names must have the same size!");
-				}
-			}
-
-			// yes, things are ok
-			List<Object> masterList = lists[0];
-			for (int i = 0; i < masterList.size(); i++) {
-				Map<String, Object> map = new HashMap<String, Object>();
-				for (int j = 0; j < lists.length; j++) {
-					String name = names[j];
-					List<Object> list = lists[j];
-					Object value = list.get(i);
-					map.put(name, value);
-				}
-				resultList.add(map);
-			}
-		}
-		return resultList;
-	}
-
 	private String exprStartToken = "${";
 	private String exprEndToken = "}";
 	private double expansionSizeFactor = 2;
 	private ErrorHandler errorHandler = new DefaultErrorHandler();
-	private Locale locale = new Locale("en");
 	private boolean useCompilation = false;
 	private ModelAdaptor modelAdaptor = new DefaultModelAdaptor();
-	
-	// will be kept as long as the engine lives
-	// TODO: As classes will never be unloaded it might be a good idea to have the templates in a static, shared location?
-	private final Map<String, Template> compiledTemplates = new HashMap<String, Template>();
+
+	// As classes will never be unloaded and are thus global, it might be a good idea to have
+	// the templates in a static, shared location as well
+	private final static Map<String, Template> compiledTemplates = new HashMap<String, Template>();
 
 	private final Map<Class<?>, Renderer<?>> renderers = new HashMap<Class<?>, Renderer<?>>();
 	private final Map<Class<?>, Renderer<?>> resolvedRendererCache = new HashMap<Class<?>, Renderer<?>>();
@@ -267,29 +104,39 @@ public final class Engine {
 	 * 
 	 * @param template
 	 *            the template to expand
+	 * @param sourceName
+	 *            the name of the current template (if there is anything like
+	 *            that)
 	 * @param model
 	 *            the model used to evaluate expressions inside the template
 	 * @return the expanded output
 	 */
-	public String transform(String template, String sourceName, Map<String, Object> model) {
+	public String transform(String template, String sourceName,
+			Map<String, Object> model) {
 		Template templateImpl = getTemplate(template, sourceName);
 		String output = templateImpl.transform(model);
 		return output;
 	}
 
+	/**
+	 * Transforms a template into an expanded output using the given model.
+	 * 
+	 * @param template
+	 *            the template to expand
+	 * @param model
+	 *            the model used to evaluate expressions inside the template
+	 * @return the expanded output
+	 */
 	public String transform(String template, Map<String, Object> model) {
 		return transform(template, null, model);
 	}
-	
+
 	/**
-	 * Sets the error handler to be used in this engine
-	 * 
-	 * @param errorHandler
-	 *            the new error handler
+	 * Gets all variables used in the given template.
 	 */
-	public void setErrorHandler(ErrorHandler errorHandler) {
-		this.errorHandler = errorHandler;
-		this.errorHandler.setLocale(locale);
+	public Set<String> getUsedVariables(String template) {
+		Template templateImpl = getTemplate(template, null);
+		return templateImpl.getUsedVariables();
 	}
 
 	public Engine registerNamedRenderer(NamedRenderer renderer) {
@@ -400,11 +247,10 @@ public final class Engine {
 		}
 	}
 
-	/**
-	 * Gets the currently used error handler
-	 * 
-	 * @return the error handler
-	 */
+	public void setErrorHandler(ErrorHandler errorHandler) {
+		this.errorHandler = errorHandler;
+	}
+
 	public ErrorHandler getErrorHandler() {
 		return errorHandler;
 	}
@@ -433,42 +279,12 @@ public final class Engine {
 		return expansionSizeFactor;
 	}
 
-	public void setLocale(Locale locale) {
-		this.locale = locale;
-		if (this.errorHandler != null) {
-			this.errorHandler.setLocale(locale);
-		}
-	}
-
-	public Locale getLocale() {
-		return locale;
-	}
-
-	public Set<String> getUsedVariables(String template) {
-		Template templateImpl = getTemplate(template, null);
-		return templateImpl.getUsedVariables();
-	}
-
 	public boolean isUseCompilation() {
 		return useCompilation;
 	}
 
 	public void setUseCompilation(boolean useCompilation) {
 		this.useCompilation = useCompilation;
-	}
-
-	private Template getTemplate(String template, String sourceName) {
-		if (useCompilation) {
-			Template templateImpl = compiledTemplates.get(template);
-			if (templateImpl == null) {
-				templateImpl = new Compiler(template, sourceName, this).compile();
-				compiledTemplates.put(template, templateImpl);
-			}
-			return templateImpl;
-		} else {
-			return new InterpretedTemplate(template, sourceName, this);
-
-		}
 	}
 
 	public void setModelAdaptor(ModelAdaptor modelAdaptor) {
@@ -478,4 +294,20 @@ public final class Engine {
 	public ModelAdaptor getModelAdaptor() {
 		return modelAdaptor;
 	}
+
+	private Template getTemplate(String template, String sourceName) {
+		if (useCompilation) {
+			Template templateImpl = compiledTemplates.get(template);
+			if (templateImpl == null) {
+				templateImpl = new Compiler(template, sourceName, this)
+						.compile();
+				compiledTemplates.put(template, templateImpl);
+			}
+			return templateImpl;
+		} else {
+			return new InterpretedTemplate(template, sourceName, this);
+
+		}
+	}
+
 }

@@ -30,10 +30,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import com.floreysoft.jmte.StartEndPair;
-
-
-
 /**
  * Assorted static utility methods.
  * 
@@ -41,7 +37,8 @@ import com.floreysoft.jmte.StartEndPair;
 public class Util {
 
 	public final static MiniParser MINI_PARSER = MiniParser.defaultInstance();
-	public final static MiniParser RAW_MINI_PARSER = MiniParser.fullRawInstance();
+	public final static MiniParser RAW_MINI_PARSER = MiniParser
+			.fullRawInstance();
 	public final static MiniParser NO_QUOTE_MINI_PARSER = new MiniParser(
 			MiniParser.DEFAULT_ESCAPE_CHAR, (char) -1, false, false, false);
 
@@ -359,8 +356,7 @@ public class Util {
 	}
 
 	@SuppressWarnings("unchecked")
-	public
-	static <T> Set<T> asSet(T... a) {
+	public static <T> Set<T> asSet(T... a) {
 		return a != null ? new HashSet(Arrays.asList(a)) : Collections
 				.emptySet();
 	}
