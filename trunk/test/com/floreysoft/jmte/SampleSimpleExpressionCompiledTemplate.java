@@ -1,5 +1,6 @@
 package com.floreysoft.jmte;
 
+import com.floreysoft.jmte.template.AbstractCompiledTemplate;
 import com.floreysoft.jmte.token.StringToken;
 
 // ${address}
@@ -18,8 +19,8 @@ public class SampleSimpleExpressionCompiledTemplate extends
 	protected String transformCompiled(TemplateContext context) {
 		StringBuilder buffer = new StringBuilder();
 
-		buffer.append(new StringToken("address", "address", null,
-				null, null, null, null).evaluate(context));
+		buffer.append(new StringToken("address", "address", null, null, null,
+				null, null).evaluate(context));
 
 		return buffer.toString();
 	}

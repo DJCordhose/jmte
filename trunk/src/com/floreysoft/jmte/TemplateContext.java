@@ -3,6 +3,7 @@ package com.floreysoft.jmte;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.floreysoft.jmte.ProcessListener.Action;
 import com.floreysoft.jmte.token.Lexer;
 import com.floreysoft.jmte.token.Token;
 
@@ -82,4 +83,7 @@ public class TemplateContext {
 		return null;
 	}
 
+	public void notifyProcessListeners(Token token, Action action) {
+		engine.notifyProcessListeners(token, action);
+	}
 }

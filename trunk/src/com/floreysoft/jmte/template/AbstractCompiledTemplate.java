@@ -1,9 +1,12 @@
-package com.floreysoft.jmte;
+package com.floreysoft.jmte.template;
 
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.floreysoft.jmte.Engine;
+import com.floreysoft.jmte.ScopedMap;
+import com.floreysoft.jmte.TemplateContext;
 import com.floreysoft.jmte.util.Util;
 
 public abstract class AbstractCompiledTemplate extends Template {

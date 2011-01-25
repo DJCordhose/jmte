@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.floreysoft.jmte.template.AbstractCompiledTemplate;
 import com.floreysoft.jmte.token.IfToken;
 import com.floreysoft.jmte.token.StringToken;
 
@@ -32,8 +33,8 @@ public class SampleIfEmptyFalseExpressionCompiledTemplate extends
 		context.push(token1);
 		try {
 			if ((Boolean) token1.evaluate(context)) {
-				buffer.append(new StringToken("address", "address",
-						null, null, null, null, null).evaluate(context));
+				buffer.append(new StringToken("address", "address", null, null,
+						null, null, null).evaluate(context));
 			} else {
 				buffer.append("NIX");
 			}

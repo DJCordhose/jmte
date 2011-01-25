@@ -295,6 +295,14 @@ public class Util {
 		return null;
 	}
 
+	/**
+	 * Scans the input and spits out begin/end pairs telling you where
+	 * expressions can be found.
+	 * 
+	 * @param input
+	 *            the input
+	 * @return the begin/end pairs telling you where expressions can be found
+	 */
 	public static List<StartEndPair> scan(String input, String splitStart,
 			String splitEnd, boolean useEscaping) {
 		List<StartEndPair> result = new ArrayList<StartEndPair>();

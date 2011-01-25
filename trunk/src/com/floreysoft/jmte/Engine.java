@@ -18,6 +18,9 @@ import com.floreysoft.jmte.renderer.DefaultMapRenderer;
 import com.floreysoft.jmte.renderer.DefaultObjectRenderer;
 import com.floreysoft.jmte.renderer.NamedRenderer;
 import com.floreysoft.jmte.renderer.Renderer;
+import com.floreysoft.jmte.template.Compiler;
+import com.floreysoft.jmte.template.InterpretedTemplate;
+import com.floreysoft.jmte.template.Template;
 import com.floreysoft.jmte.token.Token;
 import com.floreysoft.jmte.util.Util;
 
@@ -452,18 +455,6 @@ public final class Engine {
 
 	public void setUseCompilation(boolean useCompilation) {
 		this.useCompilation = useCompilation;
-	}
-
-	/**
-	 * Scans the input and spits out begin/end pairs telling you where
-	 * expressions can be found.
-	 * 
-	 * @param input
-	 *            the input
-	 * @return the begin/end pairs telling you where expressions can be found
-	 */
-	protected List<StartEndPair> scan(String input) {
-		return Util.scan(input, getExprStartToken(), getExprEndToken(), true);
 	}
 
 	private Template getTemplate(String template, String sourceName) {

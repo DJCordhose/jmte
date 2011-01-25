@@ -3,6 +3,7 @@ package com.floreysoft.jmte;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.floreysoft.jmte.template.AbstractCompiledTemplate;
 import com.floreysoft.jmte.token.StringToken;
 
 // ${<h1>,address(NIX),</h1>;long(full)}
