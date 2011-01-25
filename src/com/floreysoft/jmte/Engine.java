@@ -53,6 +53,14 @@ import com.floreysoft.jmte.util.Util;
  * where <code>input</code> contains the template and <code>model</code> the
  * model. <br>
  * 
+ * <p>
+ * Use {@link #setUseCompilation(boolean)} to switch on compilation mode. This
+ * will compile the template into Java byte code before execution. Especially when the template
+ * is used often this will speed up the execution by a factor between 2 and
+ * 10. However, each compiled template results in a new class definition and a
+ * new globally cached singleton instance of it.
+ * </p>
+ * 
  * @see ErrorHandler
  * @see Tool
  * @see Renderer
@@ -68,7 +76,8 @@ public final class Engine {
 	private boolean useCompilation = false;
 	private ModelAdaptor modelAdaptor = new DefaultModelAdaptor();
 
-	// As classes will never be unloaded and are thus global, it might be a good idea to have
+	// As classes will never be unloaded and are thus global, it might be a good
+	// idea to have
 	// the templates in a static, shared location as well
 	private final static Map<String, Template> compiledTemplates = new HashMap<String, Template>();
 
