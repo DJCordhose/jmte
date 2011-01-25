@@ -31,3 +31,20 @@ Dell Latitude E5510, i5 M520@2.4GHz, 4,00 GB, Windows 7 Professional, 32 bit, JD
                     ForeachCompiled  5275 ====================
  PrototypeCompiledForeachExpression  8485 =========================
  
+25.01.2011 rc1 (svn rev 135)
+==========================================
+
+                          benchmark    ns logarithmic runtime
+          SimpleExpressionReference  3404 ===============
+           SimpleExpressionCompiled   973 ==
+  PrototypeCompiledSimpleExpression  3955 =================
+         ComplexExpressionReference  7316 =======================
+          ComplexExpressionCompiled  1356 ======
+ PrototypeCompiledComplexExpression  3857 ================
+                                 If  7328 =======================
+                         IfCompiled   836 =
+      PrototypeCompiledIfExpression  2681 =============
+                            Foreach 13629 ==============================
+                    ForeachCompiled  5849 =====================
+ PrototypeCompiledForeachExpression  8508 =========================
+ 
