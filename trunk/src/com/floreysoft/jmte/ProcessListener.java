@@ -2,21 +2,31 @@ package com.floreysoft.jmte;
 
 import com.floreysoft.jmte.token.Token;
 
+/**
+ * Callback for execution steps of the engine. Reports in interpreted mode only.
+ *
+ */
 public interface ProcessListener {
 	public static enum Action {
 		/**
-		 * Expression being executed. Not reported in compiled mode.
+		 * Expression being executed.
 		 */
 		EVAL,
 		/**
-		 * Expression being skipped. Not reported in compiled mode.
+		 * Expression being skipped. 
 		 */
 		SKIP,
 		/**
-		 * End of control structure. Not reported in compiled mode.
+		 * End of control structure. 
 		 */
 		END
 	}
 
+	/**
+	 * Reports a step executed by the engine
+	 * 
+	 * @param token the token that is handled
+	 * @param action the action that is executed on the action
+	 */
 	void log(Token token, Action action);
 }

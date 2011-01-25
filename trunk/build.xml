@@ -145,7 +145,7 @@
  	  <zipfileset dir="${test.dir}" prefix="${final.name}/test"/>
       <zipfileset dir="${src.dir}" prefix="${final.name}/src"/>
  	  <zipfileset dir="${doc.dir}" prefix="${final.name}/doc" />
- 	  <zipfileset dir="${dist.dir}" includes="${jar.name}" prefix="${final.name}"/>
+ 	  <zipfileset dir="${dist.dir}" includes="${jar.name}, ${nocompiler.jar.name}" prefix="${final.name}"/>
  	  <zipfileset dir="${basedir}" includes="Releasenotes.txt" prefix="${final.name}"/>
     </zip>
   </target>
