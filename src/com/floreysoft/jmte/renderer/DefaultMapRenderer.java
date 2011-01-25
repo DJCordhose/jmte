@@ -2,6 +2,8 @@ package com.floreysoft.jmte.renderer;
 
 import java.util.Map;
 
+import com.floreysoft.jmte.Renderer;
+
 
 @SuppressWarnings("unchecked")
 public class DefaultMapRenderer implements Renderer<Map> {

@@ -3,6 +3,7 @@ package com.floreysoft.jmte.message;
 import java.util.Locale;
 import java.util.logging.Logger;
 
+import com.floreysoft.jmte.ErrorHandler;
 import com.floreysoft.jmte.token.Token;
 
 public abstract class AbstractErrorHandler implements ErrorHandler {

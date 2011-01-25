@@ -17,9 +17,7 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import com.floreysoft.jmte.renderer.NamedRenderer;
 import com.floreysoft.jmte.renderer.OptionRenderFormatInfo;
-import com.floreysoft.jmte.renderer.RenderFormatInfo;
 import com.floreysoft.jmte.token.Token;
 import com.floreysoft.jmte.util.StartEndPair;
 import com.floreysoft.jmte.util.Util;

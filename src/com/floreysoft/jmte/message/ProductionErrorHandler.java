@@ -2,6 +2,7 @@ package com.floreysoft.jmte.message;
 
 import java.util.Map;
 
+import com.floreysoft.jmte.ErrorHandler;
 import com.floreysoft.jmte.token.Token;
 
 public class ProductionErrorHandler extends AbstractErrorHandler implements

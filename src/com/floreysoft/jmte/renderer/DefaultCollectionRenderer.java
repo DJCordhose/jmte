@@ -2,6 +2,8 @@ package com.floreysoft.jmte.renderer;
 
 import java.util.Collection;
 
+import com.floreysoft.jmte.Renderer;
+
 
 @SuppressWarnings("unchecked")
 public class DefaultCollectionRenderer implements Renderer<Collection> {

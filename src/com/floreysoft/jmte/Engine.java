@@ -5,19 +5,15 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
 import com.floreysoft.jmte.ProcessListener.Action;
 import com.floreysoft.jmte.message.DefaultErrorHandler;
-import com.floreysoft.jmte.message.ErrorHandler;
 import com.floreysoft.jmte.renderer.DefaultCollectionRenderer;
 import com.floreysoft.jmte.renderer.DefaultIterableRenderer;
 import com.floreysoft.jmte.renderer.DefaultMapRenderer;
 import com.floreysoft.jmte.renderer.DefaultObjectRenderer;
-import com.floreysoft.jmte.renderer.NamedRenderer;
-import com.floreysoft.jmte.renderer.Renderer;
 import com.floreysoft.jmte.template.Compiler;
 import com.floreysoft.jmte.template.InterpretedTemplate;
 import com.floreysoft.jmte.template.Template;
@@ -27,7 +23,7 @@ import com.floreysoft.jmte.util.Util;
 
 /**
  * <p>
- * The template engine.
+ * The template engine - <b>THIS IS WHERE YOU START LOOKING</b>.
  * </p>
  * 
  * <p>

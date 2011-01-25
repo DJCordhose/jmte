@@ -2,9 +2,9 @@ package com.floreysoft.jmte.token;
 
 import java.util.List;
 
+import com.floreysoft.jmte.NamedRenderer;
+import com.floreysoft.jmte.Renderer;
 import com.floreysoft.jmte.TemplateContext;
-import com.floreysoft.jmte.renderer.NamedRenderer;
-import com.floreysoft.jmte.renderer.Renderer;
 
 public class StringToken extends ExpressionToken {
 	// ${<h1>,address(NIX),</h1>;long(full)}

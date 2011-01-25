@@ -1,4 +1,4 @@
-package com.floreysoft.jmte.renderer;
+package com.floreysoft.jmte;
 
 /**
  * Renderer for a certain type.
