@@ -42,7 +42,7 @@ import com.floreysoft.jmte.util.UniqueNameGenerator;
  *      ://java.sun.com/docs/books/jvms/second_edition/html/Instructions.doc.
  *      html
  */
-public class Compiler {
+class Compiler {
 
 	@SuppressWarnings("unchecked")
 	protected static <T> Class<T> loadClass(byte[] b, Class<T> type) {

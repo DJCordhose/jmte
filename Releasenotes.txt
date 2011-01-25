@@ -6,15 +6,13 @@ First complete public release
 Release 2.0
 ===========
 
-Second complete public release mainly fixing design flaws and providing better API. Template language unchanged.
+Second complete public release mainly fixing design flaws and providing better API. Template language slightly extended.
 
 *Cleaner lexing allowing for better analysis of templates*
 - Lexer now only does the job of a scanner without using evaluation. Evaluation is done on token when needed. 
 
 *New error reporting using properties mechanism*
 - We now have i18n error messages that can be formatted with any locale in a lazy style
-
-*Engine now configurable using literate programming*
 
 *More helper functions*
 - You can now merge multiple lists into a single one allowing to iterate them in parallel using the engine
