@@ -6,6 +6,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
+/**
+ * A map implementation that serves as the internal model.
+ * <p>
+ * Special feature of this implementation are that you can open and close scopes
+ * of local variables.
+ * </p>
+ * 
+ */
 public class ScopedMap implements Map<String, Object> {
 	private final Map<String, Object> rawModel;
 	private final Stack<Map<String, Object>> scopes = new Stack<Map<String, Object>>();
@@ -65,6 +73,12 @@ public class ScopedMap implements Map<String, Object> {
 		throw new UnsupportedOperationException();
 	}
 
+	/**
+	 * Creates a new scoped map.
+	 * 
+	 * @param rawModel
+	 *            the raw model backing this scoped map
+	 */
 	public ScopedMap(Map<String, Object> rawModel) {
 		if (rawModel == null) {
 			throw new IllegalArgumentException("Model must not be null");
@@ -72,18 +86,32 @@ public class ScopedMap implements Map<String, Object> {
 		this.rawModel = rawModel;
 	}
 
+	/**
+	 * Gets the raw model backing this scoped map
+	 * 
+	 * @return the raw model backing this scoped map
+	 */
 	public Map<String, Object> getRawModel() {
 		return rawModel;
 	}
 
-	public boolean isLocal(String key) {
-		return !rawModel.containsKey(key);
+	/**
+	 * Checks if a given variable is local.
+	 */
+	public boolean isLocal(String variable) {
+		return containsKey(variable) && !rawModel.containsKey(variable);
 	}
 
+	/**
+	 * Creates a new local scope and sets it as the current one.
+	 */
 	public void enterScope() {
 		scopes.push(createScope());
 	}
 
+	/**
+	 * Discards the current local scope.
+	 */
 	public void exitScope() {
 		if (scopes.size() == 0) {
 			throw new IllegalStateException("There is no state to exit");
@@ -108,5 +136,5 @@ public class ScopedMap implements Map<String, Object> {
 	public String toString() {
 		return rawModel.toString() + scopes.toString();
 	}
-	
+
 }

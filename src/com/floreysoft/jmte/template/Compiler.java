@@ -15,12 +15,10 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-//import org.objectweb.asm.util.CheckClassAdapter;
+import org.objectweb.asm.Opcodes; //import org.objectweb.asm.util.CheckClassAdapter;
 //import org.objectweb.asm.util.TraceClassVisitor;
 
 import com.floreysoft.jmte.Engine;
-import com.floreysoft.jmte.StartEndPair;
 import com.floreysoft.jmte.token.ElseToken;
 import com.floreysoft.jmte.token.EndToken;
 import com.floreysoft.jmte.token.ForEachToken;
@@ -31,6 +29,7 @@ import com.floreysoft.jmte.token.PlainTextToken;
 import com.floreysoft.jmte.token.StringToken;
 import com.floreysoft.jmte.token.Token;
 import com.floreysoft.jmte.token.TokenStream;
+import com.floreysoft.jmte.util.StartEndPair;
 import com.floreysoft.jmte.util.UniqueNameGenerator;
 import com.floreysoft.jmte.util.Util;
 
@@ -59,7 +58,7 @@ public class Compiler {
 	@SuppressWarnings("unchecked")
 	private static class DelegatingClassLoader extends ClassLoader {
 		private final ClassLoader parentClassLoader;
-		
+
 		public DelegatingClassLoader(ClassLoader parentClassLoader) {
 			this.parentClassLoader = parentClassLoader;
 		}
@@ -67,14 +66,15 @@ public class Compiler {
 		public Class defineClass(String name, byte[] b) {
 			return defineClass(name, b, 0, b.length);
 		}
-		
+
 		@Override
 		public Class<?> loadClass(String name) throws ClassNotFoundException {
 			return parentClassLoader.loadClass(name);
 		}
 	};
 
-	private final static DelegatingClassLoader MY_CLASS_LOADER = new DelegatingClassLoader(Compiler.class.getClassLoader());
+	private final static DelegatingClassLoader MY_CLASS_LOADER = new DelegatingClassLoader(
+			Compiler.class.getClassLoader());
 
 	// make sure we are in the same package as context to have access to its
 	// protected parts
@@ -92,7 +92,6 @@ public class Compiler {
 
 	protected final String template;
 	protected final Engine engine;
-	protected final Lexer lexer = new Lexer();
 	protected final Set<String> usedVariables = new HashSet<String>();
 	protected final List<String> localVarStack = new LinkedList<String>();
 	protected transient ClassVisitor classVisitor;
@@ -124,11 +123,11 @@ public class Compiler {
 		typeDescriptor = "L" + className + ";";
 		classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
 		// only for debugging
-//		writer = new StringWriter();
-//		TraceClassVisitor traceClassVisitor = new TraceClassVisitor(
-//				classWriter, new PrintWriter(writer));
+		// writer = new StringWriter();
+		// TraceClassVisitor traceClassVisitor = new TraceClassVisitor(
+		// classWriter, new PrintWriter(writer));
 		// classVisitor = new CheckClassAdapter(traceClassVisitor);
-//		classVisitor = traceClassVisitor;
+		// classVisitor = traceClassVisitor;
 		classVisitor = classWriter;
 	}
 
@@ -137,13 +136,13 @@ public class Compiler {
 			usedVariables.add(variableName);
 		}
 	}
-	
+
 	private void foreach() {
 		ForEachToken feToken = (ForEachToken) tokenStream.currentToken();
 		tokenStream.consume();
 
 		localVarStack.add(0, feToken.getVarName());
-		
+
 		Label loopStart = new Label();
 		Label loopEnd = new Label();
 		Label tryEndLabel = new Label();
@@ -162,7 +161,7 @@ public class Compiler {
 			tokenStream.consume();
 		}
 		codeGenerateForeachBlockEnd(loopStart, loopEnd, tryEndLabel);
-		
+
 		localVarStack.remove(0);
 	}
 
@@ -240,9 +239,8 @@ public class Compiler {
 		initCompilation();
 
 		openCompilation();
-			
-		List<StartEndPair> scan = Util.scan(template, engine.getExprStartToken(), engine.getExprEndToken(), true);
-		tokenStream = new TokenStream(sourceName, template, scan, lexer, engine
+
+		tokenStream = new TokenStream(sourceName, template, engine
 				.getExprStartToken(), engine.getExprEndToken());
 		tokenStream.nextToken();
 		while (tokenStream.currentToken() != null) {
@@ -255,7 +253,7 @@ public class Compiler {
 		classVisitor.visitEnd();
 
 		// FIXME: Only for debugging
-//		System.out.println(writer.toString());
+		// System.out.println(writer.toString());
 		byte[] byteArray = classWriter.toByteArray();
 		Class<?> myClass = Compiler.loadClass(byteArray);
 		try {
@@ -366,8 +364,8 @@ public class Compiler {
 						"(Ljava/lang/String;Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
 
 		mv.visitVarInsn(ALOAD, CONTEXT);
-		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/token/StringToken",
-				"evaluate",
+		mv.visitMethodInsn(INVOKEVIRTUAL,
+				"com/floreysoft/jmte/token/StringToken", "evaluate",
 				"(Lcom/floreysoft/jmte/TemplateContext;)Ljava/lang/Object;");
 		mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Object", "toString",
 				"()Ljava/lang/String;");
@@ -408,7 +406,7 @@ public class Compiler {
 	}
 
 	private void codeGenerateIfBlockEnd(Label tryEndLabel, Label finalLabel) {
-		
+
 		tokenLocalVarIndex--;
 
 		// try end block rethrowing exception
@@ -441,8 +439,8 @@ public class Compiler {
 			pushConstant(ifToken.getExpression());
 			pushConstant(((IfCmpToken) ifToken).getOperand());
 			mv.visitInsn(ifToken.isNegated() ? ICONST_1 : ICONST_0);
-			mv.visitMethodInsn(INVOKESPECIAL, "com/floreysoft/jmte/token/IfCmpToken",
-					"<init>",
+			mv.visitMethodInsn(INVOKESPECIAL,
+					"com/floreysoft/jmte/token/IfCmpToken", "<init>",
 					"(Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Z)V");
 
 		} else {
@@ -454,8 +452,9 @@ public class Compiler {
 			pushList(ifToken.getSegments());
 			pushConstant(ifToken.getExpression());
 			mv.visitInsn(ifToken.isNegated() ? ICONST_1 : ICONST_0);
-			mv.visitMethodInsn(INVOKESPECIAL, "com/floreysoft/jmte/token/IfToken",
-					"<init>", "(Ljava/util/List;Ljava/lang/String;Z)V");
+			mv.visitMethodInsn(INVOKESPECIAL,
+					"com/floreysoft/jmte/token/IfToken", "<init>",
+					"(Ljava/util/List;Ljava/lang/String;Z)V");
 
 		}
 		mv.visitVarInsn(ASTORE, tokenLocalVarIndex);
@@ -534,13 +533,14 @@ public class Compiler {
 		// buffer.append(token1.getSeparator());
 		// }
 		mv.visitVarInsn(ALOAD, this.tokenLocalVarIndex);
-		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/token/ForEachToken",
-				"isLast", "()Z");
+		mv.visitMethodInsn(INVOKEVIRTUAL,
+				"com/floreysoft/jmte/token/ForEachToken", "isLast", "()Z");
 		mv.visitJumpInsn(IFNE, loopEnd);
 		mv.visitVarInsn(ALOAD, BUFFER);
 		mv.visitVarInsn(ALOAD, this.tokenLocalVarIndex);
-		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/token/ForEachToken",
-				"getSeparator", "()Ljava/lang/String;");
+		mv.visitMethodInsn(INVOKEVIRTUAL,
+				"com/floreysoft/jmte/token/ForEachToken", "getSeparator",
+				"()Ljava/lang/String;");
 		mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append",
 				"(Ljava/lang/String;)Ljava/lang/StringBuilder;");
 		mv.visitInsn(POP);
@@ -548,8 +548,9 @@ public class Compiler {
 		// while (token1.iterator().hasNext()) {
 		mv.visitLabel(loopEnd);
 		mv.visitVarInsn(ALOAD, this.tokenLocalVarIndex);
-		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/token/ForEachToken",
-				"iterator", "()Ljava/util/Iterator;");
+		mv.visitMethodInsn(INVOKEVIRTUAL,
+				"com/floreysoft/jmte/token/ForEachToken", "iterator",
+				"()Ljava/util/Iterator;");
 		mv.visitMethodInsn(INVOKEINTERFACE, "java/util/Iterator", "hasNext",
 				"()Z");
 		mv.visitJumpInsn(IFNE, loopStart);
@@ -592,12 +593,13 @@ public class Compiler {
 		mv.visitVarInsn(ALOAD, this.tokenLocalVarIndex);
 		mv.visitVarInsn(ALOAD, this.tokenLocalVarIndex);
 		mv.visitVarInsn(ALOAD, CONTEXT);
-		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/token/ForEachToken",
-				"evaluate",
+		mv.visitMethodInsn(INVOKEVIRTUAL,
+				"com/floreysoft/jmte/token/ForEachToken", "evaluate",
 				"(Lcom/floreysoft/jmte/TemplateContext;)Ljava/lang/Object;");
 		mv.visitTypeInsn(CHECKCAST, "java/lang/Iterable");
-		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/token/ForEachToken",
-				"setIterable", "(Ljava/lang/Iterable;)V");
+		mv.visitMethodInsn(INVOKEVIRTUAL,
+				"com/floreysoft/jmte/token/ForEachToken", "setIterable",
+				"(Ljava/lang/Iterable;)V");
 
 	}
 
@@ -635,11 +637,13 @@ public class Compiler {
 		mv.visitFieldInsn(GETFIELD, "com/floreysoft/jmte/TemplateContext",
 				"model", "Lcom/floreysoft/jmte/ScopedMap;");
 		mv.visitVarInsn(ALOAD, this.tokenLocalVarIndex);
-		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/token/ForEachToken",
-				"getVarName", "()Ljava/lang/String;");
+		mv.visitMethodInsn(INVOKEVIRTUAL,
+				"com/floreysoft/jmte/token/ForEachToken", "getVarName",
+				"()Ljava/lang/String;");
 		mv.visitVarInsn(ALOAD, this.tokenLocalVarIndex);
-		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/token/ForEachToken",
-				"advance", "()Ljava/lang/Object;");
+		mv.visitMethodInsn(INVOKEVIRTUAL,
+				"com/floreysoft/jmte/token/ForEachToken", "advance",
+				"()Ljava/lang/Object;");
 		mv.visitMethodInsn(INVOKEVIRTUAL, "com/floreysoft/jmte/ScopedMap",
 				"put",
 				"(Ljava/lang/String;Ljava/lang/Object;)Ljava/lang/Object;");
@@ -651,12 +655,8 @@ public class Compiler {
 		mv.visitVarInsn(ALOAD, CONTEXT);
 		mv.visitFieldInsn(GETFIELD, "com/floreysoft/jmte/TemplateContext",
 				"model", "Lcom/floreysoft/jmte/ScopedMap;");
-		mv
-				.visitMethodInsn(
-						INVOKEVIRTUAL,
-						className,
-						"addSpecialVariables",
-						"(Lcom/floreysoft/jmte/token/ForEachToken;Ljava/util/Map;)V");
+		mv.visitMethodInsn(INVOKEVIRTUAL, className, "addSpecialVariables",
+				"(Lcom/floreysoft/jmte/token/ForEachToken;Ljava/util/Map;)V");
 
 		this.tokenLocalVarIndex++;
 	}

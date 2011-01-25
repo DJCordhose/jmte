@@ -1,4 +1,4 @@
-package com.floreysoft.jmte;
+package com.floreysoft.jmte.util;
 
 /**
  * Pairs of begin/end.

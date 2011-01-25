@@ -9,7 +9,6 @@ import java.util.TreeSet;
 import com.floreysoft.jmte.Engine;
 import com.floreysoft.jmte.ProcessListener;
 import com.floreysoft.jmte.ScopedMap;
-import com.floreysoft.jmte.StartEndPair;
 import com.floreysoft.jmte.TemplateContext;
 import com.floreysoft.jmte.ProcessListener.Action;
 import com.floreysoft.jmte.token.ElseToken;
@@ -21,6 +20,7 @@ import com.floreysoft.jmte.token.PlainTextToken;
 import com.floreysoft.jmte.token.StringToken;
 import com.floreysoft.jmte.token.Token;
 import com.floreysoft.jmte.token.TokenStream;
+import com.floreysoft.jmte.util.StartEndPair;
 import com.floreysoft.jmte.util.Util;
 
 public class InterpretedTemplate extends Template {
@@ -36,6 +36,8 @@ public class InterpretedTemplate extends Template {
 		this.template = template;
 		this.engine = engine;
 		this.sourceName = sourceName;
+		tokenStream = new TokenStream(sourceName, template, engine
+				.getExprStartToken(), engine.getExprEndToken());
 	}
 
 	@Override
@@ -45,8 +47,6 @@ public class InterpretedTemplate extends Template {
 
 		final Engine engine = new Engine();
 
-		final List<StartEndPair> scan = Util.scan(template, engine
-				.getExprStartToken(), engine.getExprEndToken(), true);
 		final ScopedMap scopedMap = new ScopedMap(Collections.EMPTY_MAP);
 
 		context = new TemplateContext(template, sourceName, scopedMap, engine);
@@ -81,29 +81,23 @@ public class InterpretedTemplate extends Template {
 
 		});
 
-		transformPure(context, scan);
+		transformPure(context);
 
 		return usedVariables;
 	}
 
 	@Override
 	public String transform(Map<String, Object> model) {
-		final List<StartEndPair> scan = Util.scan(template, engine
-				.getExprStartToken(), engine.getExprEndToken(), true);
 		context = new TemplateContext(template, sourceName,
 				new ScopedMap(model), engine);
-		String transformed = transformPure(context, scan);
+		String transformed = transformPure(context);
 		String unescaped = Util.NO_QUOTE_MINI_PARSER.unescape(transformed);
 		return unescaped;
 
 	}
 
-	protected String transformPure(TemplateContext context,
-			List<StartEndPair> scan) {
+	protected String transformPure(TemplateContext context) {
 
-		tokenStream = new TokenStream(context.sourceName, context.template,
-				scan, context.lexer, context.engine.getExprStartToken(),
-				context.engine.getExprEndToken());
 		output = new StringBuilder(
 				(int) (context.template.length() * context.engine
 						.getExpansionSizeFactor()));
@@ -114,6 +108,7 @@ public class InterpretedTemplate extends Template {
 		return output.toString();
 	}
 
+	@SuppressWarnings("unchecked")
 	private void foreach(boolean inheritedSkip) {
 		ForEachToken feToken = (ForEachToken) tokenStream.currentToken();
 		Iterable iterable = (Iterable) feToken.evaluate(context);
@@ -157,7 +152,9 @@ public class InterpretedTemplate extends Template {
 						engine.getErrorHandler().error("missing-end", feToken);
 					} else {
 						tokenStream.consume();
-						context.notifyProcessListeners(contentToken, Action.END);
+						context
+								.notifyProcessListeners(contentToken,
+										Action.END);
 					}
 					if (!feToken.isLast()) {
 						output.append(feToken.getSeparator());

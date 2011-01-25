@@ -3,30 +3,28 @@ package com.floreysoft.jmte.token;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.floreysoft.jmte.StartEndPair;
-
+import com.floreysoft.jmte.util.StartEndPair;
+import com.floreysoft.jmte.util.Util;
 
 public class TokenStream {
+	private final Lexer lexer = new Lexer();
 	private final String sourceName;
 	private final String input;
 	private final List<StartEndPair> scan;
-	private final Lexer lexer;
 	private final String splitStart;
 	private final String splitEnd;
 
 	private transient List<Token> tokens = null;
 	private transient int currentTokenIndex = -1;
 	private transient Token currentToken = null;
-	
-	public TokenStream(String sourceName, String input,
-			List<StartEndPair> scan, Lexer lexer, String splitStart,
+
+	public TokenStream(String sourceName, String input, String splitStart,
 			String splitEnd) {
 		this.sourceName = sourceName;
 		this.input = input;
-		this.scan = scan;
-		this.lexer = lexer;
 		this.splitStart = splitStart;
 		this.splitEnd = splitEnd;
+		this.scan = Util.scan(input, splitStart, splitEnd, true);
 	}
 
 	private void fillTokens() {
@@ -80,11 +78,11 @@ public class TokenStream {
 		}
 		return currentToken;
 	}
-	
+
 	public void consume() {
 		nextToken();
 	}
-	
+
 	public Token currentToken() {
 		return currentToken;
 	}
@@ -94,11 +92,10 @@ public class TokenStream {
 		this.currentTokenIndex = tokenToRewindTo.getTokenIndex() + 1;
 		consume();
 	}
-	
+
 	public List<Token> getAllTokens() {
 		initTokens();
 		return this.tokens;
 	}
 
-	
 }

@@ -7,11 +7,18 @@ import com.floreysoft.jmte.ProcessListener.Action;
 import com.floreysoft.jmte.token.Lexer;
 import com.floreysoft.jmte.token.Token;
 
+/**
+ * Holds the combined current state of a template during evaluation.
+ * 
+ * @author olli
+ *
+ */
 public class TemplateContext {
 
-	// it is stateless, so we only need one
-	public static final Lexer lexer = new Lexer();
 	public final ScopedMap model;
+	/**
+	 * Stack like hierarchy of structure giving tokens (if  and foreach)
+	 */
 	public final List<Token> scopes;
 	public final String template;
 	public final Engine engine;
@@ -26,34 +33,16 @@ public class TemplateContext {
 		this.sourceName = sourceName;
 	}
 
-	public ScopedMap getModel() {
-		return model;
-	}
-
-	public List<Token> getScopes() {
-		return scopes;
-	}
-
-	public String getTemplate() {
-		return template;
-	}
-
-	public Engine getEngine() {
-		return engine;
-	}
-
-	public Lexer getLexer() {
-		return lexer;
-	}
-
-	public String getSourceName() {
-		return sourceName;
-	}
-
+	/**
+	 * Pushes a token on the scope stack.
+	 */
 	public void push(Token token) {
 		scopes.add(token);
 	}
 
+	/**
+	 * Pops a token from the scope stack.
+	 */
 	public Token pop() {
 		if (scopes.isEmpty()) {
 			return null;
@@ -63,6 +52,9 @@ public class TemplateContext {
 		}
 	}
 
+	/**
+	 * Gets the top element from the stack without removing it.
+	 */
 	public Token peek() {
 		if (scopes.isEmpty()) {
 			return null;
@@ -73,6 +65,9 @@ public class TemplateContext {
 	}
 
 	@SuppressWarnings("unchecked")
+	/**
+	 * Gets the first element of the given type from the stack without removing it.
+	 */
 	public <T extends Token> T peek(Class<T> type) {
 		for (int i = scopes.size() - 1; i >= 0; i--) {
 			Token token = scopes.get(i);
@@ -83,6 +78,12 @@ public class TemplateContext {
 		return null;
 	}
 
+	/**
+	 * Allows you to send additional notifications of executed processing steps. 
+	 * 
+	 * @param token the token that is handled
+	 * @param action the action that is executed on the action
+	 */
 	public void notifyProcessListeners(Token token, Action action) {
 		engine.notifyProcessListeners(token, action);
 	}
