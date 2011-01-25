@@ -58,8 +58,9 @@ public final class InterpretedEngineTest extends AbstractEngineTest {
 		List price = Arrays.asList(3.6, 2, 3.0);
 		List total = Arrays.asList("3.6", "4", "9");
 
-		List<Map<String, Object>> mergedLists = ModelBuilder.mergeLists(new String[] {
-				"amount", "price", "total" }, amount, price, total);
+		List<Map<String, Object>> mergedLists = ModelBuilder.mergeLists(
+				new String[] { "amount", "price", "total" }, amount, price,
+				total);
 		Map<String, Object> model = new HashMap<String, Object>();
 		model.put("mergedLists", mergedLists);
 		String output = newEngine()
@@ -158,6 +159,17 @@ public final class InterpretedEngineTest extends AbstractEngineTest {
 				ProcessListener.Action.SKIP, ProcessListener.Action.END },
 				actions.toArray());
 
+	}
+
+	@Test
+	public void reentrantCache() throws Exception {
+		Engine engine = newEngine();
+		engine.setEnabledInterpretedTemplateCache(true);
+		String template = "${foreach list item}${foreach item.list item2}${if item}${item2.property1}${end}${end}\n${end}";
+		String output1 = engine.transform(template, DEFAULT_MODEL);
+		assertEquals("1.12.1\n" + "1.12.1\n", output1);
+		String output2 = engine.transform(template, DEFAULT_MODEL);
+		assertEquals("1.12.1\n" + "1.12.1\n", output2);
 	}
 
 }

@@ -3,8 +3,8 @@ Release 1.0
 
 First complete public release
 
-Release 2.0
-===========
+Release 2.0 rc1
+===============
 
 Second complete public release mainly fixing design flaws and providing better API. Template language slightly extended.
 
@@ -28,3 +28,10 @@ Second complete public release mainly fixing design flaws and providing better A
 *Introduced compiled mode
 
 *Introduced dynamic expressions and a configurable model adaptor
+
+Release 2.0 rc2
+===============
+
+* Samples classes stripped from jars
+
+* Added cached interpreted mode that features speedup close to compiled version (switched on as default)

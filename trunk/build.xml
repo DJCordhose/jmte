@@ -101,7 +101,7 @@
 			<attribute name="Version" value="${version}"/>
 			<attribute name="Build-Date" value="${today}"/>
 		</manifest>
-		<fileset dir="${build.dir}" excludes="**/*Test*.class,tmp/**"/>
+		<fileset dir="${build.dir}" excludes="**/*Test*.class,**/*Tests*.class,**/sample/**,tmp/**"/>
 	</jar>
 	
     <taskdef name="jarjar"

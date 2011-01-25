@@ -55,10 +55,10 @@ import com.floreysoft.jmte.util.Util;
  * 
  * <p>
  * Use {@link #setUseCompilation(boolean)} to switch on compilation mode. This
- * will compile the template into Java byte code before execution. Especially when the template
- * is used often this will speed up the execution by a factor between 2 and
- * 10. However, each compiled template results in a new class definition and a
- * new globally cached singleton instance of it.
+ * will compile the template into Java byte code before execution. Especially
+ * when the template is used often this will speed up the execution by a factor
+ * between 2 and 10. However, each compiled template results in a new class
+ * definition and a new globally cached singleton instance of it.
  * </p>
  * 
  * @see ErrorHandler
@@ -74,12 +74,16 @@ public final class Engine {
 	private double expansionSizeFactor = 2;
 	private ErrorHandler errorHandler = new DefaultErrorHandler();
 	private boolean useCompilation = false;
+	private boolean enabledInterpretedTemplateCache = true;
 	private ModelAdaptor modelAdaptor = new DefaultModelAdaptor();
 
 	// As classes will never be unloaded and are thus global, it might be a good
 	// idea to have
 	// the templates in a static, shared location as well
 	private final static Map<String, Template> compiledTemplates = new HashMap<String, Template>();
+
+	// interpreted templates cache lives as long as this engine
+	private final Map<String, Template> interpretedTemplates = new HashMap<String, Template>();
 
 	private final Map<Class<?>, Renderer<?>> renderers = new HashMap<Class<?>, Renderer<?>>();
 	private final Map<Class<?>, Renderer<?>> resolvedRendererCache = new HashMap<Class<?>, Renderer<?>>();
@@ -300,9 +304,19 @@ public final class Engine {
 		return modelAdaptor;
 	}
 
+	public boolean isEnabledInterpretedTemplateCache() {
+		return enabledInterpretedTemplateCache;
+	}
+
+	public void setEnabledInterpretedTemplateCache(
+			boolean enabledInterpretedTemplateCache) {
+		this.enabledInterpretedTemplateCache = enabledInterpretedTemplateCache;
+	}
+
 	private Template getTemplate(String template, String sourceName) {
+		Template templateImpl;
 		if (useCompilation) {
-			Template templateImpl = compiledTemplates.get(template);
+			templateImpl = compiledTemplates.get(template);
 			if (templateImpl == null) {
 				templateImpl = new Compiler(template, sourceName, this)
 						.compile();
@@ -310,9 +324,19 @@ public final class Engine {
 			}
 			return templateImpl;
 		} else {
-			return new InterpretedTemplate(template, sourceName, this);
-
+			if (enabledInterpretedTemplateCache) {
+				templateImpl = interpretedTemplates.get(template);
+				if (templateImpl == null) {
+					templateImpl = new InterpretedTemplate(template,
+							sourceName, this);
+					interpretedTemplates.put(template, templateImpl);
+				}
+			} else {
+				templateImpl = new InterpretedTemplate(template, sourceName,
+						this);
+			}
 		}
+		return templateImpl;
 	}
 
 }

@@ -98,4 +98,11 @@ public class TokenStream {
 		return this.tokens;
 	}
 
+	public void prefill() {
+		initTokens();
+	}
+
+	public void reset() {
+		currentTokenIndex = 0;		
+	}
 }

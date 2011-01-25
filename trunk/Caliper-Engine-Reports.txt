@@ -140,7 +140,7 @@ descent interpreter and new process listener concept
                                Foreach 16663,3 =============================
                               Renderer 20393,9 ==============================
 
-25.01.2011 rc1 (svn rev 135)
+25.01.2011 (svn tag 2.0-rc1 / rev 135)
 =========================================================
                              benchmark      ns logarithmic runtime
                 StringBuilderReference   512,4 ==============
@@ -153,4 +153,24 @@ descent interpreter and new process listener concept
  NativeForeachNoStringBuilderReference   531,0 ==============
                                Foreach 17395,7 =============================
                               Renderer 20914,9 ==============================
- 
+
+                               
+25.01.2011 after token stream caching for interpreter - render
+is the only test that benefits from the caching as all other tests
+create a fresh engine with each run - see compiled caliper test for real
+speedup of caching
+(svn tag 2.0-rc2 / rev xxx)
+===================================================================
+                             benchmark      ns logarithmic runtime
+                StringBuilderReference   484,9 ==============
+                 StringConcatReference   425,0 =============
+                       PrintfReference  3160,6 ======================
+                            Expression  7453,9 ==========================
+                     NativeIfReference    22,9 =
+                                    If  8883,9 ===========================
+                NativeForeachReference   346,8 ============
+ NativeForeachNoStringBuilderReference   566,0 ===============
+                               Foreach 16898,1 ==============================
+                              Renderer  4472,6 ========================
+
+                              

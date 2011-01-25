@@ -1,7 +1,9 @@
-package com.floreysoft.jmte;
+package com.floreysoft.jmte.sample;
 
 import java.util.Arrays;
 
+import com.floreysoft.jmte.Engine;
+import com.floreysoft.jmte.TemplateContext;
 import com.floreysoft.jmte.template.AbstractCompiledTemplate;
 import com.floreysoft.jmte.token.ForEachToken;
 import com.floreysoft.jmte.token.IfToken;

@@ -1,7 +1,6 @@
 package com.floreysoft.jmte.template;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -20,7 +19,6 @@ import com.floreysoft.jmte.token.PlainTextToken;
 import com.floreysoft.jmte.token.StringToken;
 import com.floreysoft.jmte.token.Token;
 import com.floreysoft.jmte.token.TokenStream;
-import com.floreysoft.jmte.util.StartEndPair;
 import com.floreysoft.jmte.util.Util;
 
 public class InterpretedTemplate extends Template {
@@ -38,17 +36,15 @@ public class InterpretedTemplate extends Template {
 		this.sourceName = sourceName;
 		tokenStream = new TokenStream(sourceName, template, engine
 				.getExprStartToken(), engine.getExprEndToken());
+		tokenStream.prefill();
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public Set<String> getUsedVariables() {
 		final Set<String> usedVariables = new TreeSet<String>();
-
 		final Engine engine = new Engine();
-
 		final ScopedMap scopedMap = new ScopedMap(Collections.EMPTY_MAP);
-
 		context = new TemplateContext(template, sourceName, scopedMap, engine);
 
 		engine.addProcessListener(new ProcessListener() {
@@ -82,7 +78,6 @@ public class InterpretedTemplate extends Template {
 		});
 
 		transformPure(context);
-
 		return usedVariables;
 	}
 
@@ -97,7 +92,7 @@ public class InterpretedTemplate extends Template {
 	}
 
 	protected String transformPure(TemplateContext context) {
-
+		tokenStream.reset();
 		output = new StringBuilder(
 				(int) (context.template.length() * context.engine
 						.getExpansionSizeFactor()));

@@ -1,18 +1,19 @@
-package com.floreysoft.jmte;
+package com.floreysoft.jmte.sample;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.floreysoft.jmte.Engine;
+import com.floreysoft.jmte.TemplateContext;
 import com.floreysoft.jmte.template.AbstractCompiledTemplate;
-import com.floreysoft.jmte.token.IfToken;
+import com.floreysoft.jmte.token.IfCmpToken;
 import com.floreysoft.jmte.token.StringToken;
 
-// ${if !bean.trueCond}${address}${else}NIX${end}
-public class SampleIfEmptyFalseExpressionCompiledTemplate extends
-		AbstractCompiledTemplate {
+// ${if address='Fillbert'}${address}${else}NIX${end}
+public class SampleIfCmpCompiledTemplate extends AbstractCompiledTemplate {
 
-	public SampleIfEmptyFalseExpressionCompiledTemplate(Engine engine) {
+	public SampleIfCmpCompiledTemplate(Engine engine) {
 		super(engine);
 	}
 
@@ -27,8 +28,9 @@ public class SampleIfEmptyFalseExpressionCompiledTemplate extends
 	protected String transformCompiled(TemplateContext context) {
 		StringBuilder buffer = new StringBuilder();
 
-		IfToken token1 = new IfToken(Arrays.asList(new String[] { "bean",
-				"trueCond" }), "bean.trueCond", true);
+		IfCmpToken token1 = new IfCmpToken(Arrays
+				.asList(new String[] { "address" }), "address", "Fillbert",
+				false);
 
 		context.push(token1);
 		try {
