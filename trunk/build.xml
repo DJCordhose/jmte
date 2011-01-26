@@ -191,25 +191,11 @@
      </junit>
   </target>
 
-  <target name="caliper" depends="build" description="Exectutes Caliper MicroBenchmark tests">
+  <target name="caliper" depends="caliper-miniparser, caliper-basic, caliper-compiler" description="Exectutes Caliper MicroBenchmark tests">
+  </target>
+
+  <target name="caliper-miniparser" depends="build" description="Exectutes Caliper MicroBenchmark tests for MiniParser">
     <mkdir dir="${tmp.dir}"/>
-  	<!--
-    <java classname="com.google.caliper.Runner" dir="${tmp.dir}" fork="true">
-     <arg value="com.floreysoft.jmte.CompiledCaliperTest.PortfolioBenchmark"/>
-     <classpath>
-       <path refid="classpath"/>
-       <pathelement path="${build.dir}"/>
-     </classpath>
-    </java>
-  	-->
-    <java classname="com.google.caliper.Runner" dir="${tmp.dir}" fork="true">
-     <arg value="com.floreysoft.jmte.EngineCaliperTest.PortfolioBenchmark"/>
-     <classpath>
-       <path refid="classpath"/>
-       <pathelement path="${build.dir}"/>
-     </classpath>
-    </java>
-  	<!--
     <java classname="com.google.caliper.Runner" dir="${tmp.dir}" fork="true">
      <arg value="com.floreysoft.jmte.MiniParserCaliperTest.PortfolioBenchmark"/>
      <classpath>
@@ -217,7 +203,28 @@
        <pathelement path="${build.dir}"/>
      </classpath>
     </java>
-  	-->
+  </target>
+
+  <target name="caliper-basic" depends="build" description="Exectutes basic Caliper MicroBenchmark tests">
+    <mkdir dir="${tmp.dir}"/>
+    <java classname="com.google.caliper.Runner" dir="${tmp.dir}" fork="true">
+     <arg value="com.floreysoft.jmte.EngineCaliperTest.PortfolioBenchmark"/>
+     <classpath>
+       <path refid="classpath"/>
+       <pathelement path="${build.dir}"/>
+     </classpath>
+    </java>
+  </target>
+
+  <target name="caliper-compiler" depends="build" description="Exectutes Caliper MicroBenchmark tests for compilation">
+    <mkdir dir="${tmp.dir}"/>
+    <java classname="com.google.caliper.Runner" dir="${tmp.dir}" fork="true">
+     <arg value="com.floreysoft.jmte.CompiledCaliperTest.PortfolioBenchmark"/>
+     <classpath>
+       <path refid="classpath"/>
+       <pathelement path="${build.dir}"/>
+     </classpath>
+    </java>
   </target>
 
 </project>
