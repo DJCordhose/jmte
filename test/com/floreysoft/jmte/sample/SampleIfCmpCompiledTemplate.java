@@ -29,7 +29,7 @@ public class SampleIfCmpCompiledTemplate extends AbstractCompiledTemplate {
 		StringBuilder buffer = new StringBuilder();
 
 		IfCmpToken token1 = new IfCmpToken(Arrays
-				.asList(new String[] { "address" }), "address", "Fillbert",
+				.asList(new String[] { "address" }), "address", "Filbert",
 				false);
 
 		context.push(token1);

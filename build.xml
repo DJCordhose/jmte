@@ -179,7 +179,7 @@
 		</junit>
 	</target>
 
-	<target name="caliper" depends="caliper-miniparser, caliper-basic, caliper-compiler" description="Exectutes Caliper MicroBenchmark tests">
+	<target name="caliper" depends="caliper-basic, caliper-miniparser, caliper-compiler, caliper-compiler-large" description="Exectutes Caliper MicroBenchmark tests">
 	</target>
 
 	<target name="caliper-miniparser" depends="build" description="Exectutes Caliper MicroBenchmark tests for MiniParser">
@@ -208,6 +208,17 @@
 		<mkdir dir="${tmp.dir}" />
 		<java classname="com.google.caliper.Runner" dir="${tmp.dir}" fork="true">
 			<arg value="com.floreysoft.jmte.CompiledCaliperTest.PortfolioBenchmark" />
+			<classpath>
+				<path refid="classpath" />
+				<pathelement path="${build.dir}" />
+			</classpath>
+		</java>
+	</target>
+
+	<target name="caliper-compiler-large" depends="build" description="Exectutes Caliper MicroBenchmark tests for compilation">
+		<mkdir dir="${tmp.dir}" />
+		<java classname="com.google.caliper.Runner" dir="${tmp.dir}" fork="true">
+			<arg value="com.floreysoft.jmte.LargeScaleCaliperTest.PortfolioBenchmark" />
 			<classpath>
 				<path refid="classpath" />
 				<pathelement path="${build.dir}" />

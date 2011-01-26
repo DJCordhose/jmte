@@ -44,6 +44,32 @@ import static org.objectweb.asm.Opcodes.*;
 @SuppressWarnings("unchecked")
 public abstract class AbstractEngineTest {
 
+	public static final String LONG_TEMPLATE_MANY_ITERATIONS = "${foreach longList item}"
+			+ "SOME TEXT"
+			+ "${if address='Filbert'}${address}${else}NIX${end}"
+			+ "${foreach strings string}${if string='String2'}${string}${end}${end}"
+			+ "${if bean.trueCond}${address}${else}NIX${end}"
+			+ "${if bean.trueCondObj}${address}${else}NIX${end}"
+			+ "${if map}${address}${else}NIX${end}"
+			+ "MORE TEXT"
+			+ "${if hugo}${address}${else}${if address}${address}${else}NIX${end}${end}"
+			+ "${if nix}Something${if address}${address}${end}${end}"
+			+ "${if something}${else}${if something}${else}Something${if address}${address}${end}${end}${end}"
+			+ "\n${end}"
+			+ "${foreach list item}${foreach item.list item2}${if item}${item2.property1}${end}${end}\n${end}";
+	public static final String LONG_TEMPLATE = "SOME TEXT"
+			+ "${if address='Filbert'}${address}${else}NIX${end}"
+			+ "${foreach strings string}${if string='String2'}${string}${end}${end}"
+			+ "${if bean.trueCond}${address}${else}NIX${end}"
+			+ "${if bean.trueCondObj}${address}${else}NIX${end}"
+			+ "${if map}${address}${else}NIX${end}"
+			+ "MORE TEXT"
+			+ "${if hugo}${address}${else}${if address}${address}${else}NIX${end}${end}"
+			+ "${if nix}Something${if address}${address}${end}${end}"
+			+ "${if something}${else}${if something}${else}Something${if address}${address}${end}${end}${end}"
+			+ "${foreach list item}${foreach item.list item2}${if item}${item2.property1}${end}${end}\n${end}";
+	private static final int SIZE_LONG_LIST = 1000;
+
 	protected abstract Engine newEngine();
 
 	final Engine ENGINE_WITH_CUSTOM_RENDERERS = newEngine().registerRenderer(
@@ -139,6 +165,13 @@ public abstract class AbstractEngineTest {
 		LIST.add(MyBean2);
 	}
 
+	private final static List<String> LONG_LIST = new ArrayList<String>();
+	static {
+		for (int i = 0; i < SIZE_LONG_LIST; i++) {
+			LONG_LIST.add("list_entry_" + i);
+		}
+	}
+
 	private final static MyBean[] ARRAY = new MyBean[2];
 	static {
 		ARRAY[0] = MyBean1;
@@ -162,9 +195,10 @@ public abstract class AbstractEngineTest {
 	final static Map<String, Object> DEFAULT_MODEL = new HashMap<String, Object>();
 	static {
 		DEFAULT_MODEL.put("something", "something");
-		DEFAULT_MODEL.put("address", "Fillbert");
+		DEFAULT_MODEL.put("address", "Filbert");
 		DEFAULT_MODEL.put("map", MAP);
 		DEFAULT_MODEL.put("list", LIST);
+		DEFAULT_MODEL.put("longList", LONG_LIST);
 		DEFAULT_MODEL.put("iterable", ITERABLE);
 		DEFAULT_MODEL.put("array", ARRAY);
 		DEFAULT_MODEL.put("intArray", INT_ARRAY);
@@ -178,6 +212,7 @@ public abstract class AbstractEngineTest {
 		DEFAULT_MODEL.put("strings", STRINGS);
 		DEFAULT_MODEL.put("date", new Date(0));
 		DEFAULT_MODEL.put("int", 0);
+
 	}
 
 	@Test
@@ -390,21 +425,21 @@ public abstract class AbstractEngineTest {
 	public void wrapNoPre() throws Exception {
 		String shortCut = newEngine().transform("${,address,</h1>}",
 				DEFAULT_MODEL);
-		assertEquals("Fillbert</h1>", shortCut);
+		assertEquals("Filbert</h1>", shortCut);
 	}
 
 	@Test
 	public void wrapKeepWS() throws Exception {
 		String shortCut = newEngine().transform("${   ,address,  }",
 				DEFAULT_MODEL);
-		assertEquals("   Fillbert  ", shortCut);
+		assertEquals("   Filbert  ", shortCut);
 	}
 
 	@Test
 	public void wrapNoPost() throws Exception {
 		String shortCut = newEngine().transform("${<h1>,address,}",
 				DEFAULT_MODEL);
-		assertEquals("<h1>Fillbert", shortCut);
+		assertEquals("<h1>Filbert", shortCut);
 	}
 
 	@Test
@@ -424,7 +459,7 @@ public abstract class AbstractEngineTest {
 	@Test
 	public void stringEq() throws Exception {
 		String output = newEngine().transform(
-				"${if address='Fillbert'}${address}${else}NIX${end}",
+				"${if address='Filbert'}${address}${else}NIX${end}",
 				DEFAULT_MODEL);
 		assertEquals(DEFAULT_MODEL.get("address"), output);
 	}
@@ -432,7 +467,7 @@ public abstract class AbstractEngineTest {
 	@Test
 	public void stringEqNotElse() throws Exception {
 		String output = newEngine().transform(
-				"${if !address='Fillbert'}${address}${else}NIX${end}",
+				"${if !address='Filbert'}${address}${else}NIX${end}",
 				DEFAULT_MODEL);
 		assertEquals("NIX", output);
 	}
@@ -793,7 +828,7 @@ public abstract class AbstractEngineTest {
 						"${bean} and ${bean;long} and ${address;this is the format(no matter what I type; - this is part of the format)}",
 						DEFAULT_MODEL);
 		assertEquals(
-				"Render=propertyValue1 and Render=propertyValue1 and Object=Fillbert",
+				"Render=propertyValue1 and Render=propertyValue1 and Object=Filbert",
 				output);
 	}
 
@@ -824,7 +859,7 @@ public abstract class AbstractEngineTest {
 						"\"${date;date(yyyy.MM.dd HH:mm:ss z)}\" and \"${int;date}\" and ${bean;date(long)} and ${address;string(this is the format(no matter what I type; - this is part of the format))}",
 						DEFAULT_MODEL);
 		assertEquals(
-				"\"1970.01.01 01:00:00 MEZ\" and \"01.01.1970 01:00:00 +0100\" and Render=propertyValue1 and String=Fillbert(this is the format(no matter what I type; - this is part of the format))",
+				"\"1970.01.01 01:00:00 MEZ\" and \"01.01.1970 01:00:00 +0100\" and Render=propertyValue1 and String=Filbert(this is the format(no matter what I type; - this is part of the format))",
 				output);
 	}
 
@@ -945,18 +980,65 @@ public abstract class AbstractEngineTest {
 	public void compiledNestedSample() throws Exception {
 		String input = "${foreach list item}${foreach item.list item2}OUTER_PRFIX${if item}${item2.property1}INNER_SUFFIX${end}${end}\n${end}";
 		String interpretedOutput = newEngine().transform(input, DEFAULT_MODEL);
-		String compiledOutput = new SampleNestedExpressionCompiledTemplate(newEngine())
-				.transform(DEFAULT_MODEL);
+		String compiledOutput = new SampleNestedExpressionCompiledTemplate(
+				newEngine()).transform(DEFAULT_MODEL);
 		assertEquals(interpretedOutput, compiledOutput);
 	}
 
 	@Test
 	public void compiledIfEqSample() throws Exception {
-		String input = "${if address='Fillbert'}${address}${else}NIX${end}";
+		String input = "${if address='Filbert'}${address}${else}NIX${end}";
 		String interpretedOutput = newEngine().transform(input, DEFAULT_MODEL);
 		String compiledOutput = new SampleIfCmpCompiledTemplate(newEngine())
 				.transform(DEFAULT_MODEL);
 		assertEquals(interpretedOutput, compiledOutput);
+	}
+
+	@Test
+	public void longList() throws Exception {
+		String output = newEngine()
+				.transform(
+						"${foreach longList item}STUFF${item}MORE_STUFF${item}\n${end}",
+						DEFAULT_MODEL);
+		StringBuilder expected = new StringBuilder();
+		for (int i = 0; i < SIZE_LONG_LIST; i++) {
+			String item = "list_entry_" + i;
+			expected.append("STUFF").append(item).append("MORE_STUFF").append(
+					item).append("\n");
+		}
+		assertEquals(expected.toString(), output);
+	}
+
+	@Test
+	public void largeTemplateManyIterations() throws Exception {
+		String template = LONG_TEMPLATE_MANY_ITERATIONS;
+		final String expectedLine = "SOME TEXT" + "Filbert" + "String2"
+				+ "Filbert" + "Filbert" + "Filbert" + "MORE TEXT" + "Filbert"
+				+ "\n";
+
+		String output = newEngine().transform(template, DEFAULT_MODEL);
+
+		StringBuilder expected = new StringBuilder();
+		for (int i = 0; i < SIZE_LONG_LIST; i++) {
+			expected.append(expectedLine);
+		}
+		expected.append("1.12.1\n" + "1.12.1\n");
+
+		assertEquals(expected.toString(), output);
+
+	}
+
+	@Test
+	public void largeTemplate() throws Exception {
+		String template = LONG_TEMPLATE;
+
+		final String expected = "SOME TEXT" + "Filbert" + "String2" + "Filbert"
+				+ "Filbert" + "Filbert" + "MORE TEXT" + "Filbert" + "1.12.1\n"
+				+ "1.12.1\n";
+
+		String output = newEngine().transform(template, DEFAULT_MODEL);
+		assertEquals(expected.toString(), output);
+
 	}
 
 }

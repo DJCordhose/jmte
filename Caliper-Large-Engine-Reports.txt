@@ -1,0 +1,31 @@
+Dell Latitude E5510, i5 M520@2.4GHz, 4,00 GB, Windows 7 Professional, 32 bit, JDK 1.6.0_20
+
+26.01.2011 introduction of large tests
+Shows that caching does not bring anything when using
+a large number of iterations (long). Compiling helps a little
+but much less than with few iterations.
+Having a bigger (and more realistic) template, both 
+compiler and cached versions again show a speedup
+which backs the decision to make caching a default
+in engine
+ (svn rev 142)
+=====================================================
+
+                          benchmark       ns logarithmic runtime
+                    SimpleReference     3245 ====
+              SimpleCachedReference      912 =
+            SimpleCompiledReference      923 =
+                               Long  3641951 ========================
+                         LongCached  3619811 ========================
+                       LongCompiled  3332425 ========================
+                           LongText  1447678 =====================
+                     LongTextCached  1439558 =====================
+                   LongTextCompiled  1212149 =====================
+                       LongTemplate   172395 ===============
+                 LongTemplateCached    43713 ============
+               LongTemplateCompiled    45744 ============
+         LongTemplateManyIterations 24116407 =============================
+   LongTemplateManyIterationsCached 23869270 =============================
+ LongTemplateManyIterationsCompiled 18409995 =============================
+
+ 

@@ -70,7 +70,7 @@ Dell Latitude E5510, i5 M520@2.4GHz, 4,00 GB, Windows 7 Professional, 32 bit, JD
  PrototypeCompiledForeachExpression  8353 =========================
 
 26.01.2011 only caliper test changed now avoiding multiple
-creation of prototype template do make comparison more fair (svn rev 141)
+creation of engines and templates to make comparison more fair (svn rev 141)
 =============================================================================
 
                           benchmark    ns logarithmic runtime

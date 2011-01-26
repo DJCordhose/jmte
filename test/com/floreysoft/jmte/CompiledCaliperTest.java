@@ -6,6 +6,18 @@ import com.floreysoft.jmte.sample.SampleSimpleExpressionCompiledTemplate;
 import com.google.caliper.SimpleBenchmark;
 
 public class CompiledCaliperTest {
+	static final Engine cachingEngine = new Engine();
+	static {
+		cachingEngine.setEnabledInterpretedTemplateCache(true);
+	}
+	static final Engine referenceEngine = new Engine();
+	static {
+		referenceEngine.setEnabledInterpretedTemplateCache(false);
+	}
+	static final Engine compilingEngine = new Engine();
+	static {
+		compilingEngine.setUseCompilation(true);
+	}
 
 	/**
 	 * Tests a selection of scripts supposed to be the most frequently used
@@ -14,16 +26,8 @@ public class CompiledCaliperTest {
 	 * 
 	 */
 	public static class PortfolioBenchmark extends SimpleBenchmark {
-		InterpretedEngineTest engineTest = new InterpretedEngineTest();
-		Engine cachingEngine = new Engine();
-		{
-			cachingEngine.setEnabledInterpretedTemplateCache(true);
-		}
-		CompiledEngineTest compiledEngineTest = new CompiledEngineTest();
-
 		public void timeSimpleExpressionReference(int reps) throws Exception {
-			Engine engine = engineTest.newEngine();
-			engine.setEnabledInterpretedTemplateCache(false);
+			Engine engine = referenceEngine;
 			for (int i = 0; i < reps; i++) {
 				engine.transform("${address}",
 						InterpretedEngineTest.DEFAULT_MODEL);
@@ -39,7 +43,7 @@ public class CompiledCaliperTest {
 		}
 
 		public void timeSimpleExpressionCompiled(int reps) throws Exception {
-			Engine engine = compiledEngineTest.newEngine();
+			Engine engine = compilingEngine;
 			for (int i = 0; i < reps; i++) {
 				engine.transform("${address}",
 						InterpretedEngineTest.DEFAULT_MODEL);
@@ -48,16 +52,15 @@ public class CompiledCaliperTest {
 
 		public void timePrototypeCompiledSimpleExpression(int reps)
 				throws Exception {
-			SampleSimpleExpressionCompiledTemplate template = new SampleSimpleExpressionCompiledTemplate(new Engine());
+			SampleSimpleExpressionCompiledTemplate template = new SampleSimpleExpressionCompiledTemplate(
+					new Engine());
 			for (int i = 0; i < reps; i++) {
-				template
-						.transform(InterpretedEngineTest.DEFAULT_MODEL);
+				template.transform(InterpretedEngineTest.DEFAULT_MODEL);
 			}
 		}
 
 		public void timeComplexExpressionReference(int reps) throws Exception {
-			Engine engine = engineTest.newEngine();
-			engine.setEnabledInterpretedTemplateCache(false);
+			Engine engine = referenceEngine;
 			for (int i = 0; i < reps; i++) {
 				engine.transform("${<h1>,address(NIX),</h1>;long(full)}",
 						InterpretedEngineTest.DEFAULT_MODEL);
@@ -73,7 +76,7 @@ public class CompiledCaliperTest {
 		}
 
 		public void timeComplexExpressionCompiled(int reps) throws Exception {
-			Engine engine = compiledEngineTest.newEngine();
+			Engine engine = compilingEngine;
 			for (int i = 0; i < reps; i++) {
 				engine.transform("${<h1>,address(NIX),</h1>;long(full)}",
 						InterpretedEngineTest.DEFAULT_MODEL);
@@ -82,22 +85,20 @@ public class CompiledCaliperTest {
 
 		public void timePrototypeCompiledComplexExpression(int reps)
 				throws Exception {
-			SampleSimpleExpressionCompiledTemplate template = new SampleSimpleExpressionCompiledTemplate(new Engine());
+			SampleSimpleExpressionCompiledTemplate template = new SampleSimpleExpressionCompiledTemplate(
+					new Engine());
 			for (int i = 0; i < reps; i++) {
-				template
-						.transform(InterpretedEngineTest.DEFAULT_MODEL);
+				template.transform(InterpretedEngineTest.DEFAULT_MODEL);
 			}
 		}
 
 		public void timeIf(int reps) throws Exception {
-			Engine engine = engineTest.newEngine();
-			engine.setEnabledInterpretedTemplateCache(false);
+			Engine engine = referenceEngine;
 			for (int i = 0; i < reps; i++) {
 				engine.transform("${if empty}${address}${else}NIX${end}",
 						InterpretedEngineTest.DEFAULT_MODEL);
 			}
 		}
-
 
 		public void timeIfCached(int reps) throws Exception {
 			Engine engine = cachingEngine;
@@ -108,7 +109,7 @@ public class CompiledCaliperTest {
 		}
 
 		public void timeIfCompiled(int reps) throws Exception {
-			Engine engine = compiledEngineTest.newEngine();
+			Engine engine = compilingEngine;
 			for (int i = 0; i < reps; i++) {
 				engine.transform("${if empty}${address}${else}NIX${end}",
 						InterpretedEngineTest.DEFAULT_MODEL);
@@ -117,16 +118,15 @@ public class CompiledCaliperTest {
 
 		public void timePrototypeCompiledIfExpression(int reps)
 				throws Exception {
-			SampleIfEmptyFalseExpressionCompiledTemplate template = new SampleIfEmptyFalseExpressionCompiledTemplate(new Engine());
+			SampleIfEmptyFalseExpressionCompiledTemplate template = new SampleIfEmptyFalseExpressionCompiledTemplate(
+					new Engine());
 			for (int i = 0; i < reps; i++) {
-				template
-						.transform(InterpretedEngineTest.DEFAULT_MODEL);
+				template.transform(InterpretedEngineTest.DEFAULT_MODEL);
 			}
 		}
 
 		public void timeForeach(int reps) throws Exception {
-			Engine engine = engineTest.newEngine();
-			engine.setEnabledInterpretedTemplateCache(false);
+			Engine engine = referenceEngine;
 			for (int i = 0; i < reps; i++) {
 				engine.transform(
 						"${ foreach list item \n}${item.property1}${end}",
@@ -144,7 +144,7 @@ public class CompiledCaliperTest {
 		}
 
 		public void timeForeachCompiled(int reps) throws Exception {
-			Engine engine = compiledEngineTest.newEngine();
+			Engine engine = compilingEngine;
 			for (int i = 0; i < reps; i++) {
 				engine.transform(
 						"${ foreach list item \n}${item.property1}${end}",
@@ -154,10 +154,10 @@ public class CompiledCaliperTest {
 
 		public void timePrototypeCompiledForeachExpression(int reps)
 				throws Exception {
-			SampleNewlineForeachSeparatorCompiledTemplate template = new SampleNewlineForeachSeparatorCompiledTemplate(new Engine());
+			SampleNewlineForeachSeparatorCompiledTemplate template = new SampleNewlineForeachSeparatorCompiledTemplate(
+					new Engine());
 			for (int i = 0; i < reps; i++) {
-				template
-						.transform(InterpretedEngineTest.DEFAULT_MODEL);
+				template.transform(InterpretedEngineTest.DEFAULT_MODEL);
 			}
 		}
 	}
