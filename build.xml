@@ -1,29 +1,29 @@
 <?xml version="1.0"?>
-<project name="${name}" default="jar" basedir=".">
+<project name="jmte" default="jar" basedir=".">
 
-  <!-- 
+	<!-- 
   ===================================================================
   Set build properties
   =================================================================== 
   -->
 
-  <property file="${basedir}/common.properties"/>
-  <property file="${basedir}/local.properties"/>
+	<property file="${basedir}/common.properties" />
+	<property file="${basedir}/local.properties" />
 
-  <property name="creator" value="floreysoft GmbH"/>
-  <property name="final.name" value="${name}-${version}"/>
-  <property name="nocompiler.name" value="${name}-unbundled-${version}"/>
-  <property name="dist.name" value="${name}-${version}-full.zip"/>
-  <property name="jar.name" value="${final.name}.jar"/>
-  <property name="nocompiler.jar.name" value="${nocompiler.name}.jar"/>
-  <property name="asm" value="lib/asm-3.3.1.jar"/>
+	<property name="creator" value="floreysoft GmbH" />
+	<property name="final.name" value="${name}-${version}" />
+	<property name="nocompiler.name" value="${name}-unbundled-${version}" />
+	<property name="dist.name" value="${name}-${version}-full.zip" />
+	<property name="jar.name" value="${final.name}.jar" />
+	<property name="nocompiler.jar.name" value="${nocompiler.name}.jar" />
+	<property name="asm" value="lib/asm-3.3.1.jar" />
 
-  <tstamp>
-	<format property="TODAY.DATE" pattern="yyyy-MM-dd" locale="us" />
-	<format property="TODAY.TIME" pattern="HH:mm:ss" locale="us" />
-  </tstamp>
+	<tstamp>
+		<format property="TODAY.DATE" pattern="yyyy-MM-dd" locale="us" />
+		<format property="TODAY.TIME" pattern="HH:mm:ss" locale="us" />
+	</tstamp>
 
-  <property name="today" value="${TODAY.DATE} ${TODAY.TIME}" />
+	<property name="today" value="${TODAY.DATE} ${TODAY.TIME}" />
 
 	<!-- 
   ===================================================================
@@ -31,200 +31,188 @@
   =================================================================== 
   -->
 
-  <property name="src.dir" value="${basedir}/src"/>
-  <property name="java.dir" value="${src.dir}"/>
-  <property name="test.dir" value="${basedir}/test"/>
-  <property name="example.dir" value="${basedir}/example"/>
-	
-  <!-- 
+	<property name="src.dir" value="${basedir}/src" />
+	<property name="java.dir" value="${src.dir}" />
+	<property name="test.dir" value="${basedir}/test" />
+	<property name="example.dir" value="${basedir}/example" />
+
+	<!-- 
   ===================================================================
   Set the properties for the build area
   =================================================================== 
   -->
-  	<property name="build.dir" value="${basedir}/bin"/>
-  	<property name="lib.dir" value="${basedir}/lib"/>
-	<property name="manifest.file.name" value="MANIFST.MF"/>
- 	<property name="dist.dir" value="${basedir}/dist"/>
- 	<property name="tmp.dir" value="${build.dir}/tmp"/>
- 	<property name="doc.dir" value="${basedir}/doc"/>
- 	<property name="api.dir" value="${doc.dir}/api"/>
+	<property name="build.dir" value="${basedir}/bin" />
+	<property name="lib.dir" value="${basedir}/lib" />
+	<property name="manifest.file.name" value="MANIFST.MF" />
+	<property name="dist.dir" value="${basedir}/dist" />
+	<property name="tmp.dir" value="${build.dir}/tmp" />
+	<property name="doc.dir" value="${basedir}/doc" />
+	<property name="api.dir" value="${doc.dir}/api" />
 
-	  <path id="classpath">
-	    <pathelement location="${build.dir}" />
-	    <fileset dir="${lib.dir}"/>
-	  </path>
+	<path id="classpath">
+		<pathelement location="${build.dir}" />
+		<fileset dir="${lib.dir}" />
+	</path>
 
-  <!-- 
+	<!-- 
   ===================================================================
   Prepare the build              
   =================================================================== 
   -->
 
-  <target name="prepare">
-    <tstamp />
-    <mkdir dir="${build.dir}"/>
-    <mkdir dir="${dist.dir}"/>
-  </target>
+	<target name="prepare">
+		<tstamp />
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${dist.dir}" />
+	</target>
 
-  <!-- 
+	<!-- 
   ===================================================================
   Build the code           
   =================================================================== 
   -->
 
-  <target name="build" depends="prepare" description="Compiles the main classes">
-    <javac destdir="${build.dir}"
-      source="${compile.source}"
-      target="${compile.target}"
-      debug="${compile.debug}"
-      deprecation="${compile.deprecation}"
-      optimize="${compile.optimize}" >
-	      <src path="${src.dir}" />
-          <src path="${test.dir}"/>
-	      <classpath refid="classpath" />
-    </javac>
-  	<copy todir="${build.dir}" >
-  		<fileset dir="${src.dir}" includes="**/*.properties" />
-    </copy>
-  </target>
-	
-<!-- 
+	<target name="build" depends="prepare" description="Compiles the main classes">
+		<javac destdir="${build.dir}" source="${compile.source}" target="${compile.target}" debug="${compile.debug}" deprecation="${compile.deprecation}" optimize="${compile.optimize}">
+			<src path="${src.dir}" />
+			<src path="${test.dir}" />
+			<classpath refid="classpath" />
+		</javac>
+		<copy todir="${build.dir}">
+			<fileset dir="${src.dir}" includes="**/*.properties" />
+		</copy>
+	</target>
+
+	<!-- 
   ===================================================================
   Archive the code           
   =================================================================== 
-  -->	
-<target name="archive-jars" depends="build" description="Builds the exectutable jar-archives">
-	<jar destfile="${dist.dir}/${nocompiler.jar.name}" filesetmanifest="skip">
-		<manifest>
-			<attribute name="Built-By" value="${creator}"/>
-			<attribute name="Main-Class" value="${main-class}"/>
-			<attribute name="Version" value="${version}"/>
-			<attribute name="Build-Date" value="${today}"/>
-		</manifest>
-		<fileset dir="${build.dir}" excludes="**/*Test*.class,**/*Tests*.class,**/sample/**,tmp/**"/>
-	</jar>
-	
-    <taskdef name="jarjar"
-             classname="com.tonicsystems.jarjar.JarJarTask"
-             classpath="lib/jarjar-1.0.jar"/>
+  -->
+	<target name="archive-jars" depends="build" description="Builds the exectutable jar-archives">
+		<jar destfile="${dist.dir}/${nocompiler.jar.name}" filesetmanifest="skip">
+			<manifest>
+				<attribute name="Built-By" value="${creator}" />
+				<attribute name="Main-Class" value="${main-class}" />
+				<attribute name="Version" value="${version}" />
+				<attribute name="Build-Date" value="${today}" />
+			</manifest>
+			<fileset dir="${build.dir}" excludes="**/*Test*.class,**/*Tests*.class,**/sample/**,tmp/**" />
+		</jar>
 
-    <jarjar jarfile="${dist.dir}/${jar.name}">
-		<manifest>
-			<attribute name="Built-By" value="${creator}"/>
-			<attribute name="Main-Class" value="${main-class}"/>
-			<attribute name="Version" value="${version}"/>
-			<attribute name="Build-Date" value="${today}"/>
-		</manifest>
-        <zipfileset src="${dist.dir}/${nocompiler.jar.name}"/>
-        <zipfileset src="${asm}"/>
-        <rule pattern="org.objectweb.asm.**" result="com.floreysoft.jmte.internal.asm.@1"/>
-        <keep pattern="com.floreysoft.jmte.**"/>
-    </jarjar>
+		<taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="lib/jarjar-1.0.jar" />
 
-</target>
-  
-  <!--
+		<jarjar jarfile="${dist.dir}/${jar.name}">
+			<manifest>
+				<attribute name="Built-By" value="${creator}" />
+				<attribute name="Main-Class" value="${main-class}" />
+				<attribute name="Version" value="${version}" />
+				<attribute name="Build-Date" value="${today}" />
+			</manifest>
+			<zipfileset src="${dist.dir}/${nocompiler.jar.name}" />
+			<zipfileset src="${asm}" />
+			<rule pattern="org.objectweb.asm.**" result="com.floreysoft.jmte.internal.asm.@1" />
+			<keep pattern="com.floreysoft.jmte.**" />
+		</jarjar>
+
+	</target>
+
+	<!--
   ===================================================================
   Distribute the code
   ===================================================================
   -->
-	
-  <target name="all" depends="full-dist" description="Creates all distributions" />
-	
-  <target name="jar" depends="clean,build,test,archive-jars" description="Creates the testet release jar" />
 
-  <target name="deploy" description="Deploys jar" if="deploy.dir">
-  	<copy todir="${deploy.dir}" >
-  		<fileset file="${dist.dir}/${jar.name}" />
-    </copy>
-  </target>
-	
-  <target name="full-dist" depends="jar,javadoc" description="Source distribution">
- 	<zip destfile="${dist.dir}/${dist.name}" >
- 	  <zipfileset dir="${example.dir}" prefix="${final.name}/example"/>
- 	  <zipfileset dir="${test.dir}" prefix="${final.name}/test"/>
-      <zipfileset dir="${src.dir}" prefix="${final.name}/src"/>
- 	  <zipfileset dir="${doc.dir}" prefix="${final.name}/doc" />
- 	  <zipfileset dir="${dist.dir}" includes="${jar.name}, ${nocompiler.jar.name}" prefix="${final.name}"/>
- 	  <zipfileset dir="${basedir}" includes="Releasenotes.txt" prefix="${final.name}"/>
-    </zip>
-  </target>
-		
-  <target name="javadoc" depends="build" description="Generates the public API">
-  	<delete dir="${api.dir}" />
-	 <javadoc
-	           destdir="${api.dir}"
-	           author="true"
-	           version="true"
-	           use="true"
-	 	access="public"
-	           windowtitle="${full.name} - Public API">
+	<target name="all" depends="full-dist" description="Creates all distributions" />
 
-	    <packageset dir="src" defaultexcludes="yes">
-	    	<exclude name="**/token/**"/>
-	    </packageset>
-	 	<link href="http://java.sun.com/javase/6/docs/api/"/>
-	  </javadoc>
-    </target>
-	
-  <!--
+	<target name="jar" depends="clean,build,test,archive-jars" description="Creates the testet release jar" />
+
+	<target name="deploy" description="Deploys jar" if="deploy.dir">
+		<copy todir="${deploy.dir}">
+			<fileset file="${dist.dir}/${jar.name}" />
+		</copy>
+	</target>
+
+	<target name="full-dist" depends="jar,javadoc" description="Source distribution">
+		<zip destfile="${dist.dir}/${dist.name}">
+			<zipfileset dir="${example.dir}" prefix="${final.name}/example" />
+			<zipfileset dir="${test.dir}" prefix="${final.name}/test" />
+			<zipfileset dir="${src.dir}" prefix="${final.name}/src" />
+			<zipfileset dir="${doc.dir}" prefix="${final.name}/doc" />
+			<zipfileset dir="${lib.dir}" prefix="${final.name}/lib" />
+			<zipfileset dir="${dist.dir}" includes="${jar.name}, ${nocompiler.jar.name}" prefix="${final.name}" />
+			<zipfileset dir="${basedir}" includes="build.xml, Caliper*, common.properties, COPYING, local.properties.sample, Releasenotes.txt" prefix="${final.name}" />
+		</zip>
+	</target>
+
+	<target name="javadoc" depends="build" description="Generates the public API">
+		<delete dir="${api.dir}" />
+		<javadoc destdir="${api.dir}" author="true" version="true" use="true" access="public" windowtitle="${full.name} - Public API">
+
+			<packageset dir="src" defaultexcludes="yes">
+				<exclude name="**/token/**" />
+			</packageset>
+			<link href="http://java.sun.com/javase/6/docs/api/" />
+		</javadoc>
+	</target>
+
+	<!--
   ===================================================================
   Cleans up build directories
   ===================================================================
   -->
-  <target name="clean" description="Removes temporaray files">
-  	<delete dir="${build.dir}" />
-  </target> 
+	<target name="clean" description="Removes temporaray files">
+		<delete dir="${build.dir}" />
+	</target>
 
-  <!-- 
+	<!-- 
   ===================================================================
   Do tests
   =================================================================== 
   -->
-  
-  <target name="test" depends="build" description="Exectutes JUnit tests">
-    <mkdir dir="${tmp.dir}"/>
-    <junit printsummary="yes" haltonfailure="yes">
-      <classpath refid="classpath" />
-      <formatter type="plain" />
-      <test name="${test.class}" haltonfailure="yes" todir="${tmp.dir}"/>
-     </junit>
-  </target>
 
-  <target name="caliper" depends="caliper-miniparser, caliper-basic, caliper-compiler" description="Exectutes Caliper MicroBenchmark tests">
-  </target>
+	<target name="test" depends="build" description="Exectutes JUnit tests">
+		<mkdir dir="${tmp.dir}" />
+		<junit printsummary="yes" haltonfailure="yes">
+			<classpath refid="classpath" />
+			<formatter type="plain" />
+			<test name="${test.class}" haltonfailure="yes" todir="${tmp.dir}" />
+		</junit>
+	</target>
 
-  <target name="caliper-miniparser" depends="build" description="Exectutes Caliper MicroBenchmark tests for MiniParser">
-    <mkdir dir="${tmp.dir}"/>
-    <java classname="com.google.caliper.Runner" dir="${tmp.dir}" fork="true">
-     <arg value="com.floreysoft.jmte.MiniParserCaliperTest.PortfolioBenchmark"/>
-     <classpath>
-       <path refid="classpath"/>
-       <pathelement path="${build.dir}"/>
-     </classpath>
-    </java>
-  </target>
+	<target name="caliper" depends="caliper-miniparser, caliper-basic, caliper-compiler" description="Exectutes Caliper MicroBenchmark tests">
+	</target>
 
-  <target name="caliper-basic" depends="build" description="Exectutes basic Caliper MicroBenchmark tests">
-    <mkdir dir="${tmp.dir}"/>
-    <java classname="com.google.caliper.Runner" dir="${tmp.dir}" fork="true">
-     <arg value="com.floreysoft.jmte.EngineCaliperTest.PortfolioBenchmark"/>
-     <classpath>
-       <path refid="classpath"/>
-       <pathelement path="${build.dir}"/>
-     </classpath>
-    </java>
-  </target>
+	<target name="caliper-miniparser" depends="build" description="Exectutes Caliper MicroBenchmark tests for MiniParser">
+		<mkdir dir="${tmp.dir}" />
+		<java classname="com.google.caliper.Runner" dir="${tmp.dir}" fork="true">
+			<arg value="com.floreysoft.jmte.MiniParserCaliperTest.PortfolioBenchmark" />
+			<classpath>
+				<path refid="classpath" />
+				<pathelement path="${build.dir}" />
+			</classpath>
+		</java>
+	</target>
 
-  <target name="caliper-compiler" depends="build" description="Exectutes Caliper MicroBenchmark tests for compilation">
-    <mkdir dir="${tmp.dir}"/>
-    <java classname="com.google.caliper.Runner" dir="${tmp.dir}" fork="true">
-     <arg value="com.floreysoft.jmte.CompiledCaliperTest.PortfolioBenchmark"/>
-     <classpath>
-       <path refid="classpath"/>
-       <pathelement path="${build.dir}"/>
-     </classpath>
-    </java>
-  </target>
+	<target name="caliper-basic" depends="build" description="Exectutes basic Caliper MicroBenchmark tests">
+		<mkdir dir="${tmp.dir}" />
+		<java classname="com.google.caliper.Runner" dir="${tmp.dir}" fork="true">
+			<arg value="com.floreysoft.jmte.EngineCaliperTest.PortfolioBenchmark" />
+			<classpath>
+				<path refid="classpath" />
+				<pathelement path="${build.dir}" />
+			</classpath>
+		</java>
+	</target>
+
+	<target name="caliper-compiler" depends="build" description="Exectutes Caliper MicroBenchmark tests for compilation">
+		<mkdir dir="${tmp.dir}" />
+		<java classname="com.google.caliper.Runner" dir="${tmp.dir}" fork="true">
+			<arg value="com.floreysoft.jmte.CompiledCaliperTest.PortfolioBenchmark" />
+			<classpath>
+				<path refid="classpath" />
+				<pathelement path="${build.dir}" />
+			</classpath>
+		</java>
+	</target>
 
 </project>
