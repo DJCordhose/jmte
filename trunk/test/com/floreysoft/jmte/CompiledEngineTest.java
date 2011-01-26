@@ -1,6 +1,6 @@
 package com.floreysoft.jmte;
 
-public final class CompiledEngineTest extends AbstractEngineTest {
+public class CompiledEngineTest extends AbstractEngineTest {
 
 	protected Engine newEngine() {
 		Engine engine = new Engine();

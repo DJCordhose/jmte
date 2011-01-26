@@ -22,10 +22,12 @@ import com.floreysoft.jmte.token.Token;
 import com.floreysoft.jmte.util.StartEndPair;
 import com.floreysoft.jmte.util.Util;
 
-public final class InterpretedEngineTest extends AbstractEngineTest {
+public class InterpretedEngineTest extends AbstractEngineTest {
 
 	protected Engine newEngine() {
-		return new Engine();
+		Engine engine = new Engine();
+		engine.setEnabledInterpretedTemplateCache(false);
+		return engine;
 	}
 
 	@Test
@@ -160,16 +162,4 @@ public final class InterpretedEngineTest extends AbstractEngineTest {
 				actions.toArray());
 
 	}
-
-	@Test
-	public void reentrantCache() throws Exception {
-		Engine engine = newEngine();
-		engine.setEnabledInterpretedTemplateCache(true);
-		String template = "${foreach list item}${foreach item.list item2}${if item}${item2.property1}${end}${end}\n${end}";
-		String output1 = engine.transform(template, DEFAULT_MODEL);
-		assertEquals("1.12.1\n" + "1.12.1\n", output1);
-		String output2 = engine.transform(template, DEFAULT_MODEL);
-		assertEquals("1.12.1\n" + "1.12.1\n", output2);
-	}
-
 }
