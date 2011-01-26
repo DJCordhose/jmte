@@ -43,3 +43,5 @@ Release 2.0 rc3
 * Cleaned caliper tests
 
 * Fixed source release (missing libs and build files)
+
+* Reintroduced Engine.format as a non-static high performance version

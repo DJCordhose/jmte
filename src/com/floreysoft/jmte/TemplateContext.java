@@ -23,14 +23,16 @@ public class TemplateContext {
 	public final String template;
 	public final Engine engine;
 	public final String sourceName;
+	public final ModelAdaptor modelAdaptor;
 
 	public TemplateContext(String template, String sourceName, ScopedMap model,
-			Engine engine) {
+			ModelAdaptor modelAdaptor, Engine engine) {
 		this.model = model;
 		this.template = template;
 		this.engine = engine;
 		this.scopes = new LinkedList<Token>();
 		this.sourceName = sourceName;
+		this.modelAdaptor = modelAdaptor;
 	}
 
 	/**

@@ -3,6 +3,7 @@ package com.floreysoft.jmte.template;
 import java.util.Map;
 import java.util.Set;
 
+import com.floreysoft.jmte.ModelAdaptor;
 import com.floreysoft.jmte.token.ForEachToken;
 
 public abstract class Template {
@@ -26,9 +27,13 @@ public abstract class Template {
 	 * 
 	 * @param model
 	 *            the model used to evaluate expressions inside the template
+	 * @param modelAdaptor
+	 *            adaptor used for this transformation to look up values from
+	 *            model
 	 * @return the expanded output
 	 */
-	public abstract String transform(Map<String, Object> model);
+	public abstract String transform(Map<String, Object> model,
+			ModelAdaptor modelAdaptor);
 
 	public abstract Set<String> getUsedVariables();
 

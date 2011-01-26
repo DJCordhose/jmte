@@ -101,13 +101,6 @@ public class InterpretedEngineTest extends AbstractEngineTest {
 	}
 
 	@Test
-	public void formatNamed() throws Exception {
-		String output = newEngine().transform("${if 1}${2}${else}broken${end}",
-				new ModelBuilder("1", "arg1", "2", "arg2").build());
-		assertEquals("arg2", output);
-	}
-
-	@Test
 	public void namedRendererRegistry() throws Exception {
 		NamedRenderer stringRenderer = ENGINE_WITH_NAMED_RENDERERS
 				.resolveNamedRenderer("string");

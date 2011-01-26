@@ -11,6 +11,8 @@ import com.google.caliper.SimpleBenchmark;
 
 public class EngineCaliperTest {
 
+	private static Engine cachingEngine = Engine.createCachingEngine();
+	
 	/**
 	 * Tests a selection of scripts supposed to be the most frequently used
 	 * 
@@ -44,6 +46,15 @@ public class EngineCaliperTest {
 		public void timePrintfReference(int reps) throws Exception {
 			for (int i = 0; i < reps; i++) {
 				String output = String.format("PREFIX%sSUFFIX",
+						InterpretedEngineTest.DEFAULT_MODEL.get("address").toString());
+				assertEquals("PREFIX" + InterpretedEngineTest.DEFAULT_MODEL.get("address")
+						+ "SUFFIX", output);
+			}
+		}
+
+		public void timeEngineFormatReference(int reps) throws Exception {
+			for (int i = 0; i < reps; i++) {
+				String output = cachingEngine.format("PREFIX${1}SUFFIX",
 						InterpretedEngineTest.DEFAULT_MODEL.get("address").toString());
 				assertEquals("PREFIX" + InterpretedEngineTest.DEFAULT_MODEL.get("address")
 						+ "SUFFIX", output);

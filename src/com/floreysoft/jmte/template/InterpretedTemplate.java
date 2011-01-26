@@ -5,7 +5,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.floreysoft.jmte.DefaultModelAdaptor;
 import com.floreysoft.jmte.Engine;
+import com.floreysoft.jmte.ModelAdaptor;
 import com.floreysoft.jmte.ProcessListener;
 import com.floreysoft.jmte.ScopedMap;
 import com.floreysoft.jmte.TemplateContext;
@@ -45,7 +47,8 @@ public class InterpretedTemplate extends Template {
 		final Set<String> usedVariables = new TreeSet<String>();
 		final Engine engine = new Engine();
 		final ScopedMap scopedMap = new ScopedMap(Collections.EMPTY_MAP);
-		context = new TemplateContext(template, sourceName, scopedMap, engine);
+		context = new TemplateContext(template, sourceName, scopedMap,
+				new DefaultModelAdaptor(), engine);
 
 		engine.addProcessListener(new ProcessListener() {
 
@@ -82,9 +85,9 @@ public class InterpretedTemplate extends Template {
 	}
 
 	@Override
-	public String transform(Map<String, Object> model) {
+	public String transform(Map<String, Object> model, ModelAdaptor modelAdaptor) {
 		context = new TemplateContext(template, sourceName,
-				new ScopedMap(model), engine);
+				new ScopedMap(model), modelAdaptor, engine);
 		String transformed = transformPure(context);
 		String unescaped = Util.NO_QUOTE_MINI_PARSER.unescape(transformed);
 		return unescaped;

@@ -2,6 +2,7 @@ package com.floreysoft.jmte;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -69,6 +70,30 @@ import com.floreysoft.jmte.util.Util;
  * @see ProcessListener
  */
 public final class Engine {
+
+	public static Engine createCachingEngine() {
+		Engine engine = new Engine();
+		engine.setEnabledInterpretedTemplateCache(true);
+		return engine;
+	}
+
+	public static Engine createNonCachingEngine() {
+		Engine engine = new Engine();
+		engine.setEnabledInterpretedTemplateCache(false);
+		return engine;
+	}
+
+	public static Engine createCompilingEngine() {
+		Engine engine = new Engine();
+		engine.setUseCompilation(true);
+		return engine;
+	}
+
+	public static Engine createDefaultEngine() {
+		Engine engine = new Engine();
+		return engine;
+	}
+
 	private String exprStartToken = "${";
 	private String exprEndToken = "}";
 	private double expansionSizeFactor = 2;
@@ -122,8 +147,28 @@ public final class Engine {
 	 */
 	public String transform(String template, String sourceName,
 			Map<String, Object> model) {
+		return transform(template, sourceName, model, getModelAdaptor());
+	}
+
+	/**
+	 * Transforms a template into an expanded output using the given model.
+	 * 
+	 * @param template
+	 *            the template to expand
+	 * @param sourceName
+	 *            the name of the current template (if there is anything like
+	 *            that)
+	 * @param model
+	 *            the model used to evaluate expressions inside the template
+	 * @param modelAdaptor
+	 *            adaptor used for this transformation to look up values from
+	 *            model
+	 * @return the expanded output
+	 */
+	public String transform(String template, String sourceName,
+			Map<String, Object> model, ModelAdaptor modelAdaptor) {
 		Template templateImpl = getTemplate(template, sourceName);
-		String output = templateImpl.transform(model);
+		String output = templateImpl.transform(model, modelAdaptor);
 		return output;
 	}
 
@@ -138,6 +183,33 @@ public final class Engine {
 	 */
 	public String transform(String template, Map<String, Object> model) {
 		return transform(template, null, model);
+	}
+
+	/**
+	 * Replacement for {@link java.lang.String.format}. All arguments will be
+	 * put into the model having their index starting from 1 as their name.
+	 * 
+	 * @param pattern
+	 *            the template
+	 * @param args
+	 *            any number of arguments
+	 * @return the expanded template
+	 */
+	public String format(final String pattern, final Object... args) {
+		Map<String, Object> model = Collections.emptyMap();
+		ModelAdaptor modelAdaptor = new ModelAdaptor() {
+
+			@Override
+			public Object getValue(TemplateContext context, Token token,
+					List<String> segments, String expression) {
+				int index = Integer.parseInt(expression) - 1;
+				return args[index];
+			}
+
+		};
+
+		String output = transform(pattern, null, model, modelAdaptor);
+		return output;
 	}
 
 	/**
