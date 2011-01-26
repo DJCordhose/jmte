@@ -107,7 +107,7 @@ public abstract class ExpressionToken extends AbstractToken {
 	public abstract Object evaluate(TemplateContext context);
 
 	protected Object evaluatePlain(TemplateContext context) {
-		final Object value = context.engine.getModelAdaptor().getValue(context, this, getSegments(), getExpression());
+		final Object value = context.modelAdaptor.getValue(context, this, getSegments(), getExpression());
 		return value;
 	}
 

@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import com.floreysoft.jmte.Engine;
+import com.floreysoft.jmte.ModelAdaptor;
 import com.floreysoft.jmte.ScopedMap;
 import com.floreysoft.jmte.TemplateContext;
 import com.floreysoft.jmte.util.Util;
@@ -28,9 +29,9 @@ public abstract class AbstractCompiledTemplate extends Template {
 	}
 
 	@Override
-	public String transform(Map<String, Object> model) {
+	public String transform(Map<String, Object> model, ModelAdaptor modelAdaptor) {
 		TemplateContext context = new TemplateContext(template, sourceName,
-				new ScopedMap(model), engine);
+				new ScopedMap(model), modelAdaptor, engine);
 
 		String transformed = transformCompiled(context);
 		String unescaped = Util.NO_QUOTE_MINI_PARSER.unescape(transformed);

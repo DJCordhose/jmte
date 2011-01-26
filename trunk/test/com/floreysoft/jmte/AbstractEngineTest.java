@@ -44,6 +44,7 @@ import static org.objectweb.asm.Opcodes.*;
 @SuppressWarnings("unchecked")
 public abstract class AbstractEngineTest {
 
+	static final DefaultModelAdaptor MODEL_ADAPTOR = new DefaultModelAdaptor();
 	public static final String LONG_TEMPLATE_MANY_ITERATIONS = "${foreach longList item}"
 			+ "SOME TEXT"
 			+ "${if address='Filbert'}${address}${else}NIX${end}"
@@ -232,6 +233,32 @@ public abstract class AbstractEngineTest {
 						"${if http://www\\.google\\.com/m8/feeds/groups/daniel\\.florey%40gmail\\.com/base/16e7715c8a9e5849}works${else}does not work${end}",
 						simpleModel);
 		assertEquals("works", output);
+	}
+
+	@Test
+	public void format() throws Exception {
+		String output = newEngine().format("${if 1}${1}${else}${2}${end}",
+				"arg1", "arg2");
+		assertEquals("arg1", output);
+		// just to prove that shortcut for false-branch works
+		newEngine().format("${if 1}${1}${else}${2}${end}", "arg1");
+
+		// check for null values
+		output = newEngine().format("${if 1}${1}${else}${2}${end}", null,
+				"arg2");
+		assertEquals("arg2", output);
+
+		// check for boolean values
+		output = newEngine().format("${if 1}${1}${else}${2}${end}", false,
+				"arg2");
+		assertEquals("arg2", output);
+	}
+
+	@Test
+	public void formatNamed() throws Exception {
+		String output = newEngine().transform("${if 1}${2}${else}broken${end}",
+				new ModelBuilder("1", "arg1", "2", "arg2").build());
+		assertEquals("arg2", output);
 	}
 
 	@Test
@@ -935,7 +962,7 @@ public abstract class AbstractEngineTest {
 		String input = "${address}";
 		String interpretedOutput = newEngine().transform(input, DEFAULT_MODEL);
 		String compiledOutput = new SampleSimpleExpressionCompiledTemplate(
-				newEngine()).transform(DEFAULT_MODEL);
+				newEngine()).transform(DEFAULT_MODEL, MODEL_ADAPTOR);
 		assertEquals(interpretedOutput, compiledOutput);
 	}
 
@@ -945,7 +972,8 @@ public abstract class AbstractEngineTest {
 		String interpretedOutput = ENGINE_WITH_CUSTOM_RENDERERS.transform(
 				input, DEFAULT_MODEL);
 		String compiledOutput = new SampleComplexExpressionCompiledTemplate(
-				ENGINE_WITH_CUSTOM_RENDERERS).transform(DEFAULT_MODEL);
+				ENGINE_WITH_CUSTOM_RENDERERS).transform(DEFAULT_MODEL,
+				MODEL_ADAPTOR);
 		assertEquals(interpretedOutput, compiledOutput);
 	}
 
@@ -954,7 +982,7 @@ public abstract class AbstractEngineTest {
 		String input = "${if !bean.trueCond}${address}${else}NIX${end}";
 		String interpretedOutput = newEngine().transform(input, DEFAULT_MODEL);
 		String compiledOutput = new SampleIfEmptyFalseExpressionCompiledTemplate(
-				newEngine()).transform(DEFAULT_MODEL);
+				newEngine()).transform(DEFAULT_MODEL, MODEL_ADAPTOR);
 		assertEquals(interpretedOutput, compiledOutput);
 	}
 
@@ -963,7 +991,7 @@ public abstract class AbstractEngineTest {
 		String input = "${ foreach list item \n}${item.property1}${end}";
 		String interpretedOutput = newEngine().transform(input, DEFAULT_MODEL);
 		String compiledOutput = new SampleNewlineForeachSeparatorCompiledTemplate(
-				newEngine()).transform(DEFAULT_MODEL);
+				newEngine()).transform(DEFAULT_MODEL, MODEL_ADAPTOR);
 		assertEquals(interpretedOutput, compiledOutput);
 	}
 
@@ -972,7 +1000,7 @@ public abstract class AbstractEngineTest {
 		String input = "PREFIX${<h1>,address(NIX),</h1>;long(full)}SUFFIX";
 		String interpretedOutput = newEngine().transform(input, DEFAULT_MODEL);
 		String compiledOutput = new SampleCompiledSequenceTemplate(newEngine())
-				.transform(DEFAULT_MODEL);
+				.transform(DEFAULT_MODEL, MODEL_ADAPTOR);
 		assertEquals(interpretedOutput, compiledOutput);
 	}
 
@@ -981,7 +1009,7 @@ public abstract class AbstractEngineTest {
 		String input = "${foreach list item}${foreach item.list item2}OUTER_PRFIX${if item}${item2.property1}INNER_SUFFIX${end}${end}\n${end}";
 		String interpretedOutput = newEngine().transform(input, DEFAULT_MODEL);
 		String compiledOutput = new SampleNestedExpressionCompiledTemplate(
-				newEngine()).transform(DEFAULT_MODEL);
+				newEngine()).transform(DEFAULT_MODEL, MODEL_ADAPTOR);
 		assertEquals(interpretedOutput, compiledOutput);
 	}
 
@@ -990,7 +1018,7 @@ public abstract class AbstractEngineTest {
 		String input = "${if address='Filbert'}${address}${else}NIX${end}";
 		String interpretedOutput = newEngine().transform(input, DEFAULT_MODEL);
 		String compiledOutput = new SampleIfCmpCompiledTemplate(newEngine())
-				.transform(DEFAULT_MODEL);
+				.transform(DEFAULT_MODEL, MODEL_ADAPTOR);
 		assertEquals(interpretedOutput, compiledOutput);
 	}
 
