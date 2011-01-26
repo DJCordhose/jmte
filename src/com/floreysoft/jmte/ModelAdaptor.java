@@ -18,7 +18,7 @@ public interface ModelAdaptor {
 	 *            the token that asks for this value (e.g. used for error
 	 *            reporting)
 	 * @param segments
-	 *            and already split version of the expression for faster
+	 *            an already split version of the expression for faster
 	 *            processing
 	 * @param expression
 	 *            the expression describing the desired value

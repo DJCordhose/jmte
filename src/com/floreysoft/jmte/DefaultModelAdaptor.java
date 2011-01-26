@@ -19,7 +19,7 @@ import com.floreysoft.jmte.util.Util;
  * 
  * <p>
  * Inherit from this adapter if you want a slight change of this behavior and
- * set you new adator on the engine {@link Engine#setModelAdaptor(ModelAdaptor)}
+ * set your new adaptor on the engine {@link Engine#setModelAdaptor(ModelAdaptor)}
  * .
  * </p>
  */

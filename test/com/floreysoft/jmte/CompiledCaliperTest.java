@@ -1,5 +1,6 @@
 package com.floreysoft.jmte;
 
+import com.floreysoft.jmte.sample.SampleComplexExpressionCompiledTemplate;
 import com.floreysoft.jmte.sample.SampleIfEmptyFalseExpressionCompiledTemplate;
 import com.floreysoft.jmte.sample.SampleNewlineForeachSeparatorCompiledTemplate;
 import com.floreysoft.jmte.sample.SampleSimpleExpressionCompiledTemplate;
@@ -18,6 +19,15 @@ public class CompiledCaliperTest {
 	static {
 		compilingEngine.setUseCompilation(true);
 	}
+
+	static final SampleSimpleExpressionCompiledTemplate simpleExpressiontemplate = new SampleSimpleExpressionCompiledTemplate(
+			new Engine());
+	static final SampleNewlineForeachSeparatorCompiledTemplate foreachTemplate = new SampleNewlineForeachSeparatorCompiledTemplate(
+			new Engine());
+	static final SampleIfEmptyFalseExpressionCompiledTemplate ifTemplate = new SampleIfEmptyFalseExpressionCompiledTemplate(
+			new Engine());
+	static final SampleComplexExpressionCompiledTemplate complexTemplate = new SampleComplexExpressionCompiledTemplate(
+			new Engine());
 
 	/**
 	 * Tests a selection of scripts supposed to be the most frequently used
@@ -52,10 +62,9 @@ public class CompiledCaliperTest {
 
 		public void timePrototypeCompiledSimpleExpression(int reps)
 				throws Exception {
-			SampleSimpleExpressionCompiledTemplate template = new SampleSimpleExpressionCompiledTemplate(
-					new Engine());
 			for (int i = 0; i < reps; i++) {
-				template.transform(InterpretedEngineTest.DEFAULT_MODEL);
+				simpleExpressiontemplate
+						.transform(InterpretedEngineTest.DEFAULT_MODEL);
 			}
 		}
 
@@ -85,10 +94,8 @@ public class CompiledCaliperTest {
 
 		public void timePrototypeCompiledComplexExpression(int reps)
 				throws Exception {
-			SampleSimpleExpressionCompiledTemplate template = new SampleSimpleExpressionCompiledTemplate(
-					new Engine());
 			for (int i = 0; i < reps; i++) {
-				template.transform(InterpretedEngineTest.DEFAULT_MODEL);
+				complexTemplate.transform(InterpretedEngineTest.DEFAULT_MODEL);
 			}
 		}
 
@@ -118,10 +125,8 @@ public class CompiledCaliperTest {
 
 		public void timePrototypeCompiledIfExpression(int reps)
 				throws Exception {
-			SampleIfEmptyFalseExpressionCompiledTemplate template = new SampleIfEmptyFalseExpressionCompiledTemplate(
-					new Engine());
 			for (int i = 0; i < reps; i++) {
-				template.transform(InterpretedEngineTest.DEFAULT_MODEL);
+				ifTemplate.transform(InterpretedEngineTest.DEFAULT_MODEL);
 			}
 		}
 
@@ -154,10 +159,8 @@ public class CompiledCaliperTest {
 
 		public void timePrototypeCompiledForeachExpression(int reps)
 				throws Exception {
-			SampleNewlineForeachSeparatorCompiledTemplate template = new SampleNewlineForeachSeparatorCompiledTemplate(
-					new Engine());
 			for (int i = 0; i < reps; i++) {
-				template.transform(InterpretedEngineTest.DEFAULT_MODEL);
+				foreachTemplate.transform(InterpretedEngineTest.DEFAULT_MODEL);
 			}
 		}
 	}
