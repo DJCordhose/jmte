@@ -35,3 +35,11 @@ Release 2.0 rc2
 * Samples classes stripped from jars
 
 * Added cached interpreted mode that features speedup close to compiled version (switched on as default)
+
+
+Release 2.0 rc3
+===============
+
+* Cleaned caliper tests
+
+* Fixed source release (missing libs and build files)
