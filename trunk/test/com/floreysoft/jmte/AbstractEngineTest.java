@@ -1,18 +1,13 @@
 package com.floreysoft.jmte;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.StringReader;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -21,12 +16,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
-import org.junit.Ignore;
 import org.junit.Test;
-import org.objectweb.asm.ClassWriter;
 
 import com.floreysoft.jmte.message.ParseException;
-import com.floreysoft.jmte.renderer.OptionRenderFormatInfo;
 import com.floreysoft.jmte.sample.NamedDateRenderer;
 import com.floreysoft.jmte.sample.NamedStringRenderer;
 import com.floreysoft.jmte.sample.SampleCompiledSequenceTemplate;
@@ -38,8 +30,6 @@ import com.floreysoft.jmte.sample.SampleNewlineForeachSeparatorCompiledTemplate;
 import com.floreysoft.jmte.sample.SampleSimpleExpressionCompiledTemplate;
 import com.floreysoft.jmte.token.ForEachToken;
 import com.floreysoft.jmte.util.Util;
-
-import static org.objectweb.asm.Opcodes.*;
 
 @SuppressWarnings("unchecked")
 public abstract class AbstractEngineTest {
@@ -213,7 +203,8 @@ public abstract class AbstractEngineTest {
 		DEFAULT_MODEL.put("strings", STRINGS);
 		DEFAULT_MODEL.put("date", new Date(0));
 		DEFAULT_MODEL.put("int", 0);
-
+		DEFAULT_MODEL.put("bigDecimal0", new BigDecimal("0"));
+		DEFAULT_MODEL.put("bigDecimal1", new BigDecimal("1.0"));
 	}
 
 	@Test
@@ -489,6 +480,22 @@ public abstract class AbstractEngineTest {
 				"${if address='Filbert'}${address}${else}NIX${end}",
 				DEFAULT_MODEL);
 		assertEquals(DEFAULT_MODEL.get("address"), output);
+	}
+
+	@Test
+	public void objectNeq() throws Exception {
+		String output = newEngine().transform(
+				"${if !bigDecimal0=0}${bigDecimal0}${else}NIX${end}",
+				DEFAULT_MODEL);
+		assertEquals("NIX", output);
+	}
+
+	@Test
+	public void objectEq() throws Exception {
+		String output = newEngine().transform(
+				"${if bigDecimal1='1.0'}${bigDecimal1}${else}NIX${end}",
+				DEFAULT_MODEL);
+		assertEquals(DEFAULT_MODEL.get("bigDecimal1").toString(), output);
 	}
 
 	@Test
