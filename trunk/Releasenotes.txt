@@ -46,4 +46,8 @@ Release 2.0 rc3
 
 * Reintroduced Engine.format as a non-static high performance version
 
+* Fixed infinite loop on certain parsing errors
+
+* Suppressed error messages on stderr when executing tests
+
 * Added a real world example/test

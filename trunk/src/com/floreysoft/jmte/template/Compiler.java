@@ -24,6 +24,7 @@ import com.floreysoft.jmte.token.EndToken;
 import com.floreysoft.jmte.token.ForEachToken;
 import com.floreysoft.jmte.token.IfCmpToken;
 import com.floreysoft.jmte.token.IfToken;
+import com.floreysoft.jmte.token.InvalidToken;
 import com.floreysoft.jmte.token.Lexer;
 import com.floreysoft.jmte.token.PlainTextToken;
 import com.floreysoft.jmte.token.StringToken;
@@ -231,6 +232,9 @@ public class Compiler {
 		} else if (token instanceof EndToken) {
 			tokenStream.consume();
 			engine.getErrorHandler().error("unmatched-end", token, null);
+		} else if (token instanceof InvalidToken) {
+			tokenStream.consume();
+			engine.getErrorHandler().error("invalid-expression", token, null);
 		}
 
 	}
