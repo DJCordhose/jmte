@@ -51,3 +51,5 @@ Release 2.0 rc3
 * Suppressed error messages on stderr when executing tests
 
 * Added a real world example/test
+
+* Added comment token ${-- comment}
