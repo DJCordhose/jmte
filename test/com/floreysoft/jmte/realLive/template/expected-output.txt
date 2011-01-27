@@ -1,0 +1,16 @@
+Hello${ \,, order.customer.firstName,}!
+
+On ${order.date} we received the following order:
+
+Shipping address:
+${, order.customer.firstName, }${order.customer.lastName}
+${customer.address}
+
+${foreach order.items item}
+${item.amount}x ${item.article.name} à ${item.article.price;currency} = ${item.subTotal;currency}${
+}${end}
+${if order.shipping}plus shipping = ${order.shipping;currency}${end}
+${separator}
+Total = ${order.total;currency}
+
+Thank you for ordering!

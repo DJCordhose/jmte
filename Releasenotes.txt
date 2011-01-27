@@ -45,3 +45,5 @@ Release 2.0 rc3
 * Fixed source release (missing libs and build files)
 
 * Reintroduced Engine.format as a non-static high performance version
+
+* Added a real world example/test

@@ -134,6 +134,25 @@ public class Util {
 	}
 
 	/**
+	 * Loads a stream from the classpath and transforms it into a string.
+	 * 
+	 * @param resourceName
+	 *            the name of the resource to be transformed
+	 * @param charsetName
+	 *            encoding of the resource
+	 * @return the string containing the content of the resource
+	 * @see ClassLoader#getResourceAsStream(String)
+	 */
+	public static String resourceToString(String resourceName,
+			String charsetName) throws UnsupportedEncodingException,
+			IOException {
+		InputStream templateStream = Thread.currentThread()
+				.getContextClassLoader().getResourceAsStream(resourceName);
+		String template = Util.streamToString(templateStream, "UTF-8");
+		return template;
+	}
+
+	/**
 	 * Transforms a reader into a string.
 	 * 
 	 * @param reader

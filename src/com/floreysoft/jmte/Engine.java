@@ -165,7 +165,7 @@ public final class Engine {
 	 *            model
 	 * @return the expanded output
 	 */
-	public String transform(String template, String sourceName,
+	protected String transform(String template, String sourceName,
 			Map<String, Object> model, ModelAdaptor modelAdaptor) {
 		Template templateImpl = getTemplate(template, sourceName);
 		String output = templateImpl.transform(model, modelAdaptor);
