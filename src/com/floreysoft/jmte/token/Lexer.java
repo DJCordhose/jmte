@@ -11,7 +11,10 @@ public class Lexer {
 	public AbstractToken nextToken(final char[] template, final int start,
 			final int end) {
 		String input = new String(template, start, end - start);
-
+		if (input.startsWith("--")) {
+			// comment
+			return null;
+		}
 		AbstractToken token = innerNextToken(input);
 		token.setText(template, start, end);
 		token.setLine(template, start, end);

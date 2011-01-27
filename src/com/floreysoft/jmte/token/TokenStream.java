@@ -45,6 +45,10 @@ public class TokenStream {
 
 			AbstractToken token = lexer.nextToken(inputChars,
 					startEndPair.start, startEndPair.end);
+			// == null means this is a comment or other skipable stuff
+			if (token == null) {
+				continue;
+			}
 			token.setSourceName(sourceName);
 			token.setTokenIndex(index++);
 			tokens.add(token);

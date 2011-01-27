@@ -1129,5 +1129,12 @@ public abstract class AbstractEngineTest {
 	public void realLife() throws Exception {
 		new RealLiveTest().shopTest(newEngine());
 	}
+	
+	@Test
+	public void comment() throws Exception {
+		String input = "${-- comment}${address}";
+		String output = newEngine().transform(input, DEFAULT_MODEL);
+		assertEquals("Filbert", output);
+	}
 
 }
