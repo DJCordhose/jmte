@@ -42,26 +42,9 @@ public final class NestedParser {
 	private final static MiniParser MINI_PARSER = MiniParser.rawOutputInstance();
 	private final static MiniParser INNER_MINI_PARSER = MiniParser.trimmedInstance();
 
-	public static List<String> greedyScan(final String input, final String splitStart,
-			final String splitEnd) {
-		if (input == null) {
-			return null;
-		}
-		return MINI_PARSER.scan(input, splitStart, splitEnd, true);
-	}
-
-	public static List<String> split(final String input, final char separator,
-			final int maxSegments) {
-		if (input == null) {
-			return null;
-		}
-		return MINI_PARSER.split(input, separator, maxSegments);
-	}
-
 	public static String access(final List<? extends Object> ast,
 			final int index) {
 		return access(ast, index, null);
-
 	}
 
 	public static String access(final List<? extends Object> ast,

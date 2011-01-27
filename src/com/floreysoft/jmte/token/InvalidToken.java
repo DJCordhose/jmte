@@ -9,9 +9,4 @@ public class InvalidToken extends AbstractToken {
 		context.engine.getErrorHandler().error("invalid-expression", this);
 		return "";
 	}
-
-	public Token dup() {
-		return this;
-	}
-
 }

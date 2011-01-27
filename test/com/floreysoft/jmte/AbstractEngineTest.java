@@ -18,7 +18,10 @@ import java.util.concurrent.Callable;
 
 import org.junit.Test;
 
+import com.floreysoft.jmte.message.AbstractErrorHandler;
+import com.floreysoft.jmte.message.Message;
 import com.floreysoft.jmte.message.ParseException;
+import com.floreysoft.jmte.message.ResourceBundleMessage;
 import com.floreysoft.jmte.sample.NamedDateRenderer;
 import com.floreysoft.jmte.sample.NamedStringRenderer;
 import com.floreysoft.jmte.sample.SampleCompiledSequenceTemplate;
@@ -29,6 +32,7 @@ import com.floreysoft.jmte.sample.SampleNestedExpressionCompiledTemplate;
 import com.floreysoft.jmte.sample.SampleNewlineForeachSeparatorCompiledTemplate;
 import com.floreysoft.jmte.sample.SampleSimpleExpressionCompiledTemplate;
 import com.floreysoft.jmte.token.ForEachToken;
+import com.floreysoft.jmte.token.Token;
 import com.floreysoft.jmte.util.Util;
 
 @SuppressWarnings("unchecked")
@@ -62,6 +66,20 @@ public abstract class AbstractEngineTest {
 	private static final int SIZE_LONG_LIST = 1000;
 
 	protected abstract Engine newEngine();
+
+	// used to suppress error messages on stderr
+	protected ErrorHandler getTestErrorHandler() {
+		return new AbstractErrorHandler() {
+
+			@Override
+			public void error(String messageKey, Token token,
+					Map<String, Object> parameters) throws ParseException {
+				Message message = new ResourceBundleMessage(messageKey)
+						.withModel(parameters).onToken(token);
+				throw new ParseException(message);
+			}
+		};
+	}
 
 	final Engine ENGINE_WITH_CUSTOM_RENDERERS = newEngine().registerRenderer(
 			Object.class, new Renderer<Object>() {
@@ -282,7 +300,9 @@ public abstract class AbstractEngineTest {
 	public void errorPosition() throws Exception {
 		boolean foundPosition = false;
 		try {
-			newEngine().transform("\n${address}\n     ${else}NIX${end}",
+			Engine newEngine = newEngine();
+			newEngine.setErrorHandler(getTestErrorHandler());
+			newEngine.transform("\n${address}\n     ${else}NIX${end}",
 					DEFAULT_MODEL);
 		} catch (ParseException e) {
 			String message = e.getMessage();
@@ -386,12 +406,24 @@ public abstract class AbstractEngineTest {
 
 	@Test(expected = ParseException.class)
 	public void elseWithoutIfError() throws Exception {
-		newEngine().transform("${address}${else}NIX${end}", DEFAULT_MODEL);
+		Engine newEngine = newEngine();
+		newEngine.setErrorHandler(getTestErrorHandler());
+		newEngine.transform("${address}${else}NIX${end}", DEFAULT_MODEL);
 	}
 
 	@Test(expected = ParseException.class)
 	public void endWithoutBlockError() throws Exception {
-		newEngine().transform("${address}${end}", DEFAULT_MODEL);
+		Engine newEngine = newEngine();
+		newEngine.setErrorHandler(getTestErrorHandler());
+		newEngine.transform("${address}${end}", DEFAULT_MODEL);
+	}
+
+	@Test(expected = ParseException.class)
+	public void invalidExpressionError() throws Exception {
+		Engine newEngine = newEngine();
+		newEngine.setErrorHandler(getTestErrorHandler());
+		String output = newEngine.transform("${loop does not exist}", DEFAULT_MODEL);
+		
 	}
 
 	@Test
@@ -458,6 +490,20 @@ public abstract class AbstractEngineTest {
 		String shortCut = newEngine().transform("${<h1>,address,}",
 				DEFAULT_MODEL);
 		assertEquals("<h1>Filbert", shortCut);
+	}
+
+	@Test
+	public void wrapEscaping() throws Exception {
+		String template = "${ \\,,address,, }";
+		String shortCut = newEngine().transform(template, DEFAULT_MODEL);
+		assertEquals(" ,Filbert, ", shortCut);
+	}
+
+	@Test
+	public void wrapSkipWS() throws Exception {
+		String template = "${, address,}";
+		String shortCut = newEngine().transform(template, DEFAULT_MODEL);
+		assertEquals("Filbert", shortCut);
 	}
 
 	@Test

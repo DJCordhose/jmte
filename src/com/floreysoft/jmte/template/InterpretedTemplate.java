@@ -17,6 +17,7 @@ import com.floreysoft.jmte.token.EndToken;
 import com.floreysoft.jmte.token.ExpressionToken;
 import com.floreysoft.jmte.token.ForEachToken;
 import com.floreysoft.jmte.token.IfToken;
+import com.floreysoft.jmte.token.InvalidToken;
 import com.floreysoft.jmte.token.PlainTextToken;
 import com.floreysoft.jmte.token.StringToken;
 import com.floreysoft.jmte.token.Token;
@@ -236,7 +237,10 @@ public class InterpretedTemplate extends Template {
 			engine.getErrorHandler().error("else-out-of-scope", token);
 		} else if (token instanceof EndToken) {
 			tokenStream.consume();
-			engine.getErrorHandler().error("unmatched-end", token, null);
+			engine.getErrorHandler().error("unmatched-end", token);
+		} else if (token instanceof InvalidToken) {
+			tokenStream.consume();
+			engine.getErrorHandler().error("invalid-expression", token);
 		}
 
 	}

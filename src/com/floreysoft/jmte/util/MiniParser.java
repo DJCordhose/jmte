@@ -139,6 +139,9 @@ public final class MiniParser {
 	private List<String> splitInternal(final String input,
 			final boolean splitOnWhitespace, final char separator,
 			final String separatorSet, final int maxSegments) {
+		if (input == null) {
+			return null;
+		}
 		try {
 			final List<String> segments = new ArrayList<String>();
 			StringBuilder buffer = new StringBuilder();
@@ -215,8 +218,16 @@ public final class MiniParser {
 		return scan(input, splitStart, splitEnd, false);
 	}
 
+	public List<String> greedyScan(final String input, final String splitStart,
+			final String splitEnd) {
+		return scan(input, splitStart, splitEnd, true);
+	}
+
 	public List<String> scan(final String input, final String splitStart,
 			final String splitEnd, boolean greedy) {
+		if (input == null) {
+			return null;
+		}
 		try {
 			final List<String> segments = new ArrayList<String>();
 			StringBuilder buffer = new StringBuilder();

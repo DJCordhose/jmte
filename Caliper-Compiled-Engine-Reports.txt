@@ -91,3 +91,26 @@ creation of engines and templates to make comparison more fair (svn rev 141)
                     ForeachCompiled  5452 ====================
  PrototypeCompiledForeachExpression  5201 ====================
  
+27.01.2011 internal lexer change for more accurate expr parsing
+(as a side effect seems to speed up parsing of if an foreach) (svn rev 147)
+=============================================================================
+
+                           benchmark    ns logarithmic runtime
+           SimpleExpressionReference  3245 ===============
+              SimpleExpressionCached   982 ===
+            SimpleExpressionCompiled   916 ==
+   PrototypeCompiledSimpleExpression  1217 =====
+          ComplexExpressionReference  6565 =======================
+             ComplexExpressionCached  1179 =====
+           ComplexExpressionCompiled  1173 =====
+  PrototypeCompiledComplexExpression  1495 =======
+                                  If  6340 =======================
+                            IfCached  1210 =====
+                          IfCompiled   799 =
+       PrototypeCompiledIfExpression  1231 =====
+                             Foreach 12161 ==============================
+                       ForeachCached  5826 ======================
+                     ForeachCompiled  5645 =====================
+  PrototypeCompiledForeachExpression  5462 =====================
+ 
+ 

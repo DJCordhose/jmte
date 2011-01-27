@@ -1,4 +1,4 @@
-Hello${ \,, order.customer.firstName,}!
+Hello${ \,,order.customer.firstName,}!
 
 On ${order.date} we received the following order:
 
