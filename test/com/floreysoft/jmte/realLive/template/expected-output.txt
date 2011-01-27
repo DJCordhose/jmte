@@ -1,16 +1,18 @@
-Hello${ \,, order.customer.firstName,}!
+Hello, Oliver!
 
-On ${order.date} we received the following order:
+On Thu Jan 27 17:55:30 CET 2011 we received the following order:
 
 Shipping address:
-${, order.customer.firstName, }${order.customer.lastName}
-${customer.address}
+Oliver Zeigermann
+Gaußstraße 180
+22765 Hamburg
+GERMANY
 
-${foreach order.items item}
-${item.amount}x ${item.article.name} à ${item.article.price;currency} = ${item.subTotal;currency}${
-}${end}
-${if order.shipping}plus shipping = ${order.shipping;currency}${end}
-${separator}
-Total = ${order.total;currency}
+
+1x How to become famous à 17,80 € = 17,80 €
+2x Cool stuff à 1,00 € = 2,00 €
+plus shipping = 3,00 €
+
+Total = 22,80 €
 
 Thank you for ordering!

@@ -37,7 +37,8 @@ public class RealLiveTest {
 
 		Map<String, Object> model = new HashMap<String, Object>();
 		model.put("order", order);
-
+		model.put("separator", "----------------");
+		
 		String output = Engine.createDefaultEngine().transform(template, model);
 		String expected = Util.resourceToString(
 				"com/floreysoft/jmte/realLive/template/expected-output.txt",

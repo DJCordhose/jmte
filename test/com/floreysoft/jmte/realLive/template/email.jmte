@@ -1,10 +1,10 @@
-Hello${ \,,order.customer.firstName,}!
+Hello${\, ,order.customer.firstName,}!
 
-On ${order.date} we received the following order:
+On ${order.orderDate} we received the following order:
 
 Shipping address:
 ${, order.customer.firstName, }${order.customer.lastName}
-${customer.address}
+${order.customer.address}
 
 ${foreach order.items item}
 ${item.amount}x ${item.article.name} à ${item.article.price;currency} = ${item.subTotal;currency}${

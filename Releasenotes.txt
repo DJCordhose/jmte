@@ -8,20 +8,20 @@ Release 2.0 rc1
 
 Second complete public release mainly fixing design flaws and providing better API. Template language slightly extended.
 
-*Cleaner lexing allowing for better analysis of templates*
+*Cleaner lexing allowing for better analysis of templates
 - Lexer now only does the job of a scanner without using evaluation. Evaluation is done on token when needed. 
 
-*New error reporting using properties mechanism*
+*New error reporting using properties mechanism
 - We now have i18n error messages that can be formatted with any locale in a lazy style
 
-*More helper functions*
+*More helper functions
 - You can now merge multiple lists into a single one allowing to iterate them in parallel using the engine
 
-*Generally more graceful reactions to expressions that might seem inappropriate*
+*Generally more graceful reactions to expressions that might seem inappropriate
 - If and foreach now try to make sense of any type of object being passed in as an expression parameter
 - Even a string expression tries to spit out any kind of object
 
-*Lots of internal refactoring and bug fixing*
+*Lots of internal refactoring and bug fixing
 
 *Introduced renderers
 
