@@ -1,5 +1,6 @@
 package com.floreysoft.jmte;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -22,6 +23,7 @@ import com.floreysoft.jmte.message.AbstractErrorHandler;
 import com.floreysoft.jmte.message.Message;
 import com.floreysoft.jmte.message.ParseException;
 import com.floreysoft.jmte.message.ResourceBundleMessage;
+import com.floreysoft.jmte.realLive.RealLiveTest;
 import com.floreysoft.jmte.sample.NamedDateRenderer;
 import com.floreysoft.jmte.sample.NamedStringRenderer;
 import com.floreysoft.jmte.sample.SampleCompiledSequenceTemplate;
@@ -1120,6 +1122,12 @@ public abstract class AbstractEngineTest {
 		String output = newEngine().transform(template, DEFAULT_MODEL);
 		assertEquals(expected.toString(), output);
 
+	}
+	
+	@Test
+	// need to call it from here to have it executed in all three engine versions
+	public void realLife() throws Exception {
+		new RealLiveTest().shopTest(newEngine());
 	}
 
 }

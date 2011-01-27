@@ -8,7 +8,7 @@ Having a bigger (and more realistic) template, both
 compiler and cached versions again show a speedup
 which backs the decision to make caching a default
 in engine
- (svn rev 142)
+(svn rev 142)
 =====================================================
 
                           benchmark       ns logarithmic runtime
@@ -28,4 +28,25 @@ in engine
    LongTemplateManyIterationsCached 23869270 =============================
  LongTemplateManyIterationsCompiled 18409995 =============================
 
- 
+27.01.2011 added real life example (svn rev 148)
+=====================================================
+
+                          benchmark       ns logarithmic runtime
+                    SimpleReference     3265 ====
+              SimpleCachedReference      967 =
+            SimpleCompiledReference      925 =
+                               Long  3730623 ========================
+                         LongCached  3695319 ========================
+                       LongCompiled  3301543 ========================
+                           LongText  1492679 ======================
+                     LongTextCached  1457202 =====================
+                   LongTextCompiled  1266020 =====================
+                       LongTemplate   153805 ===============
+                 LongTemplateCached    44545 ============
+               LongTemplateCompiled    37878 ===========
+         LongTemplateManyIterations 24398180 ==============================
+   LongTemplateManyIterationsCached 24136802 =============================
+ LongTemplateManyIterationsCompiled 18699238 =============================
+                           RealLife   180144 ================
+                     RealLifeCached    87823 =============
+                   RealLifeCompiled    84166 =============

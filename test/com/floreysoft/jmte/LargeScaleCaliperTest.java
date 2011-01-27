@@ -1,5 +1,6 @@
 package com.floreysoft.jmte;
 
+import com.floreysoft.jmte.realLive.RealLiveTest;
 import com.google.caliper.SimpleBenchmark;
 
 public class LargeScaleCaliperTest {
@@ -26,6 +27,8 @@ public class LargeScaleCaliperTest {
 	 * 
 	 */
 	public static class PortfolioBenchmark extends SimpleBenchmark {
+
+		private static final RealLiveTest REAL_LIVE_TEST = new RealLiveTest();
 
 		public void timeSimpleReference(int reps) throws Exception {
 			Engine engine = referenceEngine;
@@ -156,6 +159,25 @@ public class LargeScaleCaliperTest {
 			}
 		}
 
+		public void timeRealLife(int reps) throws Exception {
+			for (int i = 0; i < reps; i++) {
+				REAL_LIVE_TEST.shop(referenceEngine);
+			}
+		}
+
+		public void timeRealLifeCached(int reps)
+				throws Exception {
+			for (int i = 0; i < reps; i++) {
+				REAL_LIVE_TEST.shop(cachingEngine);
+			}
+		}
+
+		public void timeRealLifeCompiled(int reps)
+				throws Exception {
+			for (int i = 0; i < reps; i++) {
+				REAL_LIVE_TEST.shop(compilingEngine);
+			}
+		}
 	}
 
 }
