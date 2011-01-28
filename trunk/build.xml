@@ -80,6 +80,8 @@
 		</javac>
 		<copy todir="${build.dir}">
 			<fileset dir="${src.dir}" includes="**/*.properties" />
+			<fileset dir="${test.dir}" includes="**/*.jmte" />
+			<fileset dir="${test.dir}" includes="**/*.txt" />
 		</copy>
 	</target>
 
@@ -96,8 +98,8 @@
 				<attribute name="Version" value="${version}" />
 				<attribute name="Build-Date" value="${today}" />
 			</manifest>
-			<fileset dir="${build.dir}" excludes="**/*Test*.class,**/*Tests*.class,**/sample/**,tmp/**" />
-		</jar>
+			<fileset dir="${build.dir}" excludes="**/*Test*.class,**/*Tests*.class,**/sample/**,**/realLive/**,tmp/**" />
+		</jar>	
 
 		<taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="lib/jarjar-1.0.jar" />
 
