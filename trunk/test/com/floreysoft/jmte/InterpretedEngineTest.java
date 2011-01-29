@@ -141,7 +141,7 @@ public class InterpretedEngineTest extends AbstractEngineTest {
 		engine.addProcessListener(new ProcessListener() {
 
 			@Override
-			public void log(Token token, Action action) {
+			public void log(TemplateContext context, Token token, Action action) {
 				actions.add(action);
 			}
 

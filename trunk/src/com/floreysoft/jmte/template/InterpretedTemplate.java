@@ -54,7 +54,7 @@ public class InterpretedTemplate extends Template {
 		engine.addProcessListener(new ProcessListener() {
 
 			@Override
-			public void log(Token token, Action action) {
+			public void log(TemplateContext context, Token token, Action action) {
 				if (token instanceof ExpressionToken) {
 					String variable = ((ExpressionToken) token).getExpression();
 					if (!isLocal(variable)) {

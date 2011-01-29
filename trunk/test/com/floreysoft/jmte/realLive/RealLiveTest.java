@@ -23,21 +23,13 @@ import com.floreysoft.jmte.util.Util;
 
 public class RealLiveTest {
 
-	public static String unifyNewlines(String source) {
-		final String regex = "\\r?\\n";
-		final String clearedSource = source.replaceAll(regex, "\n");
-		return clearedSource;
-	}
+	public static String template = Util.resourceToString(
+			"com/floreysoft/jmte/realLive/template/email.jmte", "UTF-8");
 
-	public static String template;
-	static {
-		try {
-			template = Util.resourceToString(
-					"com/floreysoft/jmte/realLive/template/email.jmte", "UTF-8");
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
+	public static String expected = Util.resourceToString(
+			"com/floreysoft/jmte/realLive/template/expected-output.txt",
+			"UTF-8");
+
 	Map<String, Object> model = new HashMap<String, Object>();
 
 	{
@@ -59,7 +51,6 @@ public class RealLiveTest {
 		model.put("order", order);
 		model.put("separator", "----------------");
 
-
 	}
 
 	@Test
@@ -67,14 +58,10 @@ public class RealLiveTest {
 		Engine engine = Engine.createDefaultEngine();
 		shopTest(engine);
 	}
-	
+
 	public void shopTest(Engine engine) throws Exception {
 		String output = shop(engine);
-		String expected = Util.resourceToString(
-				"com/floreysoft/jmte/realLive/template/expected-output.txt",
-				"UTF-8");
-		assertEquals(unifyNewlines(expected), unifyNewlines(output));
-
+		assertEquals(Util.unifyNewlines(expected), Util.unifyNewlines(output));
 
 	}
 
@@ -82,6 +69,6 @@ public class RealLiveTest {
 		engine.registerRenderer(Date.class, new DateRenderer());
 		engine.registerNamedRenderer(new CurrencyRenderer());
 		return engine.transform(template, model);
-		
+
 	}
 }

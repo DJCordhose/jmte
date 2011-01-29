@@ -1,5 +1,6 @@
 package com.floreysoft.jmte;
 
+
 /**
  * A renderer addressed by its name, not by its type.
  * 
@@ -8,15 +9,17 @@ package com.floreysoft.jmte;
  */
 public interface NamedRenderer {
 	/**
-	 * Renders an object of the type supported by the renderer.
+	 * Renders an object of a type supported by the renderer.
 	 * 
+	 * @param context
+	 *            current context during template evaluation
 	 * @param o
 	 *            the object to render
 	 * @param format
 	 *            anything that tells the renderer how to do its work
 	 * @return the rendered object
 	 */
-	public String render(Object o, String format);
+	public String render(TemplateContext context, Object o, String format);
 
 	/**
 	 * Gets the name of the renderer.

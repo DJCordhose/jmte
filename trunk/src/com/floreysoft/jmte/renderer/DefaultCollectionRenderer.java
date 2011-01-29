@@ -3,13 +3,14 @@ package com.floreysoft.jmte.renderer;
 import java.util.Collection;
 
 import com.floreysoft.jmte.Renderer;
+import com.floreysoft.jmte.TemplateContext;
 
 
 @SuppressWarnings("unchecked")
 public class DefaultCollectionRenderer implements Renderer<Collection> {
 
 	@Override
-	public String render(Collection collection) {
+	public String render(TemplateContext context, Collection collection) {
 		final String renderedResult;
 
 		if (collection.size() == 0) {

@@ -2,11 +2,12 @@ package com.floreysoft.jmte.sample;
 
 import com.floreysoft.jmte.NamedRenderer;
 import com.floreysoft.jmte.RenderFormatInfo;
+import com.floreysoft.jmte.TemplateContext;
 import com.floreysoft.jmte.renderer.OptionRenderFormatInfo;
 
-public class NamedStringRenderer implements NamedRenderer {
+public final class NamedStringRenderer implements NamedRenderer {
 
-	String convert(Object o) {
+	private String convert(Object o) {
 		if (o instanceof String) {
 			return (String) o;
 		}
@@ -19,7 +20,7 @@ public class NamedStringRenderer implements NamedRenderer {
 	}
 
 	@Override
-	public String render(Object value, String parameters) {
+	public String render(TemplateContext context, Object value, String parameters) {
 		String o = convert(value);
 		if (o == null) {
 			return null;

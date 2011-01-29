@@ -7,8 +7,8 @@ Shipping address:
 ${, order.customer.firstName, }${order.customer.lastName}
 ${order.customer.address}
 
-${foreach order.items item}
-${item.amount}x ${item.article.name} à ${item.article.price;currency} = ${item.subTotal;currency}${
+${foreach order.items item
+}${item.amount}x ${item.article.name} à ${item.article.price;currency} = ${item.subTotal;currency}${
 }${end}
 ${if !order.shippingCost=0}plus shipping = ${order.shippingCost;currency}${end}
 ${separator}

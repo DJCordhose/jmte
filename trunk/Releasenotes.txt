@@ -53,3 +53,7 @@ Release 2.0 rc3
 * Added a real world example/test
 
 * Added comment token ${-- comment}
+
+* Wrapped all exceptions in Util into RuntimeException
+
+* All renderers and process listener now get the template context as a parameter

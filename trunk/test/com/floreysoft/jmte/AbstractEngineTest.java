@@ -1,6 +1,5 @@
 package com.floreysoft.jmte;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -87,13 +86,13 @@ public abstract class AbstractEngineTest {
 			Object.class, new Renderer<Object>() {
 
 				@Override
-				public String render(Object o) {
+				public String render(TemplateContext context, Object o) {
 					return "Object=" + o.toString();
 				}
 			}).registerRenderer(MyBean.class, new Renderer<MyBean>() {
 
 		@Override
-		public String render(MyBean o) {
+		public String render(TemplateContext context, MyBean o) {
 			return "Render=" + o.property1.toString();
 		}
 
@@ -424,8 +423,7 @@ public abstract class AbstractEngineTest {
 	public void invalidExpressionError() throws Exception {
 		Engine newEngine = newEngine();
 		newEngine.setErrorHandler(getTestErrorHandler());
-		String output = newEngine.transform("${loop does not exist}", DEFAULT_MODEL);
-		
+		newEngine.transform("${loop does not exist}", DEFAULT_MODEL);
 	}
 
 	@Test
