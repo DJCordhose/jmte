@@ -8,7 +8,6 @@ import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,7 +40,8 @@ public class Util {
 			.fullRawInstance();
 	public final static MiniParser NO_QUOTE_MINI_PARSER = new MiniParser(
 			MiniParser.DEFAULT_ESCAPE_CHAR, (char) -1, false, false, false);
-	public final static MiniParser RAW_OUTPUT_MINI_PARSER = MiniParser.rawOutputInstance();
+	public final static MiniParser RAW_OUTPUT_MINI_PARSER = MiniParser
+			.rawOutputInstance();
 
 	/**
 	 * Writes a string into a file.
@@ -52,22 +52,24 @@ public class Util {
 	 *            the file
 	 * @param charsetName
 	 *            encoding of the file
-	 * @throws IOException
 	 */
-	public static void stringToFile(String string, File file, String charsetName)
-			throws IOException {
+	public static void stringToFile(String string, File file, String charsetName) {
 		FileOutputStream fos = null;
 		Writer writer = null;
 		try {
-			fos = new FileOutputStream(file);
-			writer = new OutputStreamWriter(fos, charsetName);
-			writer.write(string);
-		} finally {
-			if (writer != null) {
-				writer.close();
-			} else if (fos != null) {
-				fos.close();
+			try {
+				fos = new FileOutputStream(file);
+				writer = new OutputStreamWriter(fos, charsetName);
+				writer.write(string);
+			} finally {
+				if (writer != null) {
+					writer.close();
+				} else if (fos != null) {
+					fos.close();
+				}
 			}
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -80,18 +82,21 @@ public class Util {
 	 *            encoding of the file
 	 * @return the string containing the content of the file
 	 */
-	public static String fileToString(File file, String charsetName)
-			throws UnsupportedEncodingException, FileNotFoundException,
-			IOException {
+	public static String fileToString(File file, String charsetName) {
 		FileInputStream fileInputStream = null;
 		try {
-			fileInputStream = new FileInputStream(file);
-			return streamToString(fileInputStream, charsetName);
-		} finally {
-			if (fileInputStream != null) {
-				fileInputStream.close();
+			try {
+				fileInputStream = new FileInputStream(file);
+				return streamToString(fileInputStream, charsetName);
+			} finally {
+				if (fileInputStream != null) {
+					fileInputStream.close();
+				}
 			}
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
+
 	}
 
 	/**
@@ -103,9 +108,7 @@ public class Util {
 	 *            encoding of the file
 	 * @return the string containing the content of the file
 	 */
-	public static String fileToString(String fileName, String charsetName)
-			throws UnsupportedEncodingException, FileNotFoundException,
-			IOException {
+	public static String fileToString(String fileName, String charsetName) {
 		return fileToString(new File(fileName), charsetName);
 	}
 
@@ -118,20 +121,24 @@ public class Util {
 	 *            encoding of the file
 	 * @return the string containing the content of the stream
 	 */
-	public static String streamToString(InputStream is, String charsetName)
-			throws UnsupportedEncodingException, IOException {
-		Reader r = null;
+	public static String streamToString(InputStream is, String charsetName) {
 		try {
-			r = new BufferedReader(new InputStreamReader(is, charsetName));
-			return readerToString(r);
-		} finally {
-			if (r != null) {
-				try {
-					r.close();
-				} catch (IOException e) {
+			Reader r = null;
+			try {
+				r = new BufferedReader(new InputStreamReader(is, charsetName));
+				return readerToString(r);
+			} finally {
+				if (r != null) {
+					try {
+						r.close();
+					} catch (IOException e) {
+					}
 				}
 			}
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
+
 	}
 
 	/**
@@ -145,8 +152,7 @@ public class Util {
 	 * @see ClassLoader#getResourceAsStream(String)
 	 */
 	public static String resourceToString(String resourceName,
-			String charsetName) throws UnsupportedEncodingException,
-			IOException {
+			String charsetName) {
 		InputStream templateStream = Thread.currentThread()
 				.getContextClassLoader().getResourceAsStream(resourceName);
 		String template = Util.streamToString(templateStream, "UTF-8");
@@ -160,25 +166,35 @@ public class Util {
 	 *            the reader to be transformed
 	 * @return the string containing the content of the reader
 	 */
-	public static String readerToString(Reader reader) throws IOException {
-		StringBuilder sb = new StringBuilder();
-		char[] buf = new char[1024];
-		int numRead = 0;
-		while ((numRead = reader.read(buf)) != -1) {
-			sb.append(buf, 0, numRead);
+	public static String readerToString(Reader reader) {
+		try {
+			StringBuilder sb = new StringBuilder();
+			char[] buf = new char[1024];
+			int numRead = 0;
+			while ((numRead = reader.read(buf)) != -1) {
+				sb.append(buf, 0, numRead);
+			}
+			return sb.toString();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
-		return sb.toString();
+
 	}
 
-	public static byte[] streamToBa(InputStream is) throws IOException {
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		byte[] buf = new byte[1024];
-		int numRead = 0;
-		while ((numRead = is.read(buf)) != -1) {
-			baos.write(buf, 0, numRead);
+	public static byte[] streamToBa(InputStream is) {
+		try {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			byte[] buf = new byte[1024];
+			int numRead = 0;
+			while ((numRead = is.read(buf)) != -1) {
+				baos.write(buf, 0, numRead);
+			}
+			byte[] byteArray = baos.toByteArray();
+			return byteArray;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
-		byte[] byteArray = baos.toByteArray();
-		return byteArray;
+
 	}
 
 	/**
@@ -273,43 +289,44 @@ public class Util {
 	 *         there is no such value
 	 */
 	@SuppressWarnings("unchecked")
-	public static Object getPropertyValue(Object o, String attributeName)
-			throws IntrospectionException, IllegalArgumentException,
-			IllegalAccessException, InvocationTargetException,
-			SecurityException, NoSuchFieldException {
-		BeanInfo beanInfo = Introspector.getBeanInfo(o.getClass());
-		PropertyDescriptor[] propertyDescriptors = beanInfo
-				.getPropertyDescriptors();
-		// XXX this is so strange, can not call invoke on key and value for
-		// Map.Entry, so we have to get this done like this:
-		if (o instanceof Map.Entry) {
-			Map.Entry entry = (Entry) o;
-			if (attributeName.equals("key")) {
-				final Object result = entry.getKey();
-				return result;
-			} else if (attributeName.equals("value")) {
-				final Object result = entry.getValue();
-				return result;
-			}
-
-		}
-
-		for (PropertyDescriptor propertyDescriptor : propertyDescriptors) {
-			String propertyName = propertyDescriptor.getName();
-			if (propertyName.equals(attributeName)) {
-				Method readMethod = propertyDescriptor.getReadMethod();
-				if (readMethod != null) {
-					final Object result = readMethod.invoke(o);
+	public static Object getPropertyValue(Object o, String attributeName) {
+		try {
+			BeanInfo beanInfo = Introspector.getBeanInfo(o.getClass());
+			PropertyDescriptor[] propertyDescriptors = beanInfo
+					.getPropertyDescriptors();
+			// XXX this is so strange, can not call invoke on key and value for
+			// Map.Entry, so we have to get this done like this:
+			if (o instanceof Map.Entry) {
+				Map.Entry entry = (Entry) o;
+				if (attributeName.equals("key")) {
+					final Object result = entry.getKey();
+					return result;
+				} else if (attributeName.equals("value")) {
+					final Object result = entry.getValue();
 					return result;
 				}
+
 			}
+
+			for (PropertyDescriptor propertyDescriptor : propertyDescriptors) {
+				String propertyName = propertyDescriptor.getName();
+				if (propertyName.equals(attributeName)) {
+					Method readMethod = propertyDescriptor.getReadMethod();
+					if (readMethod != null) {
+						final Object result = readMethod.invoke(o);
+						return result;
+					}
+				}
+			}
+			Field field = o.getClass().getField(attributeName);
+			if (Modifier.isPublic(field.getModifiers())) {
+				final Object result = field.get(o);
+				return result;
+			}
+			return null;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
-		Field field = o.getClass().getField(attributeName);
-		if (Modifier.isPublic(field.getModifiers())) {
-			final Object result = field.get(o);
-			return result;
-		}
-		return null;
 	}
 
 	/**
@@ -380,4 +397,12 @@ public class Util {
 		return a != null ? new HashSet(Arrays.asList(a)) : Collections
 				.emptySet();
 	}
+	
+	public static String unifyNewlines(String source) {
+		final String regex = "\\r?\\n";
+		final String clearedSource = source.replaceAll(regex, "\n");
+		return clearedSource;
+	}
+
+
 }

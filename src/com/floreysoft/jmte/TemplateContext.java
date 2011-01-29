@@ -87,6 +87,6 @@ public class TemplateContext {
 	 * @param action the action that is executed on the action
 	 */
 	public void notifyProcessListeners(Token token, Action action) {
-		engine.notifyProcessListeners(token, action);
+		engine.notifyProcessListeners(this, token, action);
 	}
 }

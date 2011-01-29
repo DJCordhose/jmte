@@ -322,9 +322,9 @@ public final class Engine {
 		listeners.remove(listener);
 	}
 
-	protected void notifyProcessListeners(Token token, Action action) {
+	protected void notifyProcessListeners(TemplateContext context, Token token, Action action) {
 		for (ProcessListener processListener : listeners) {
-			processListener.log(token, action);
+			processListener.log(context, token, action);
 		}
 	}
 

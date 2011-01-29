@@ -7,14 +7,15 @@ import java.util.Date;
 
 import com.floreysoft.jmte.NamedRenderer;
 import com.floreysoft.jmte.RenderFormatInfo;
+import com.floreysoft.jmte.TemplateContext;
 
 
-public class NamedDateRenderer implements NamedRenderer {
+public final class NamedDateRenderer implements NamedRenderer {
 
 	private static final String DEFAULT_PATTERN = "dd.MM.yyyy HH:mm:ss Z";
 	private final String regexPatternDescription = "Was weiß ich denn?";
 
-	Date convert(Object o, DateFormat dateFormat) {
+	private Date convert(Object o, DateFormat dateFormat) {
 		if (o instanceof Date) {
 			return (Date) o;
 		} else if (o instanceof Number) {
@@ -46,7 +47,7 @@ public class NamedDateRenderer implements NamedRenderer {
 	}
 
 	@Override
-	public String render(Object o, String pattern) {
+	public String render(TemplateContext context, Object o, String pattern) {
 		String patternToUse = pattern != null ? pattern : DEFAULT_PATTERN;
 		try {
 			DateFormat dateFormat =  new SimpleDateFormat(patternToUse);

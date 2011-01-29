@@ -8,6 +8,7 @@ import java.util.Locale;
 
 import com.floreysoft.jmte.NamedRenderer;
 import com.floreysoft.jmte.RenderFormatInfo;
+import com.floreysoft.jmte.TemplateContext;
 
 public class CurrencyRenderer implements NamedRenderer {
 
@@ -31,7 +32,7 @@ public class CurrencyRenderer implements NamedRenderer {
 	}
 
 	@Override
-	public String render(Object o, String format) {
+	public String render(TemplateContext context, Object o, String format) {
 		if (o instanceof BigDecimal) {
 			final NumberFormat numberFormat;
 			if (format == null) {
