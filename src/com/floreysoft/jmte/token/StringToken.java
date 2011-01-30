@@ -33,8 +33,9 @@ public class StringToken extends ExpressionToken {
 		this(variableName, variableName, null, null, null, null, null);
 	}
 
-	public StringToken(String text, List<String> segments, String variableName, String defaultValue,
-			String prefix, String suffix, String rendererName, String parameters) {
+	public StringToken(String text, List<String> segments, String variableName,
+			String defaultValue, String prefix, String suffix,
+			String rendererName, String parameters) {
 		super(segments, variableName);
 		this.defaultValue = defaultValue;
 		this.prefix = prefix;
@@ -54,39 +55,38 @@ public class StringToken extends ExpressionToken {
 	}
 
 	public String getPrefix() {
-		return prefix != null ? prefix : "";
+		return prefix;
 	}
 
 	public String getSuffix() {
-		return suffix != null ? suffix : "";
+		return suffix;
 	}
 
 	public String getDefaultValue() {
-		return defaultValue != null ? defaultValue : "";
+		return defaultValue;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Object evaluate(TemplateContext context) {
 		final Object value = evaluatePlain(context);
 
 		final String renderedResult;
 		if (value == null || value.equals("")) {
-			renderedResult = getDefaultValue();
+			renderedResult = defaultValue != null ? defaultValue : "";
 		} else {
 			String namedRendererResult = null;
 			if (rendererName != null && !rendererName.equals("")) {
-				NamedRenderer rendererForName = context.engine
+				final NamedRenderer rendererForName = context.engine
 						.resolveNamedRenderer(rendererName);
 				if (rendererForName != null) {
-					namedRendererResult = rendererForName.render(context, value,
-							parameters);
+					namedRendererResult = rendererForName.render(context,
+							value, parameters);
 				}
 			}
 			if (namedRendererResult != null) {
 				renderedResult = namedRendererResult;
 			} else {
-				Renderer<Object> rendererForClass = context.engine
+				final Renderer<Object> rendererForClass = context.engine
 						.resolveRendererForClass(value.getClass());
 				if (rendererForClass != null) {
 					renderedResult = rendererForClass.render(context, value);
@@ -99,7 +99,8 @@ public class StringToken extends ExpressionToken {
 		if (renderedResult == null || renderedResult.equals("")) {
 			return renderedResult;
 		} else {
-			return getPrefix() + renderedResult + getSuffix();
+			return (prefix != null ? prefix : "") + renderedResult
+					+ (suffix != null ? suffix : "");
 		}
 	}
 
