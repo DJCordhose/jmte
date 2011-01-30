@@ -173,4 +173,19 @@ speedup of caching
                                Foreach 16898,1 ==============================
                               Renderer  4472,6 ========================
 
+30.01.2011 New object resolvation and caching reflection code without BeanInfo (svn rev 153)
+============================================================================================
+                             benchmark      ns logarithmic runtime
+                StringBuilderReference   483,9 =============
+                 StringConcatReference   427,5 =============
+                       PrintfReference  3097,3 =====================
+                 EngineFormatReference  1504,0 ==================
+                            Expression  7470,5 =========================
+                     NativeIfReference    23,3 =
+                                    If  8062,1 =========================
+                NativeForeachReference   358,6 ============
+ NativeForeachNoStringBuilderReference   572,6 ==============
+                               Foreach 18026,8 =============================
+                              Renderer 20747,7 ==============================
+
                               

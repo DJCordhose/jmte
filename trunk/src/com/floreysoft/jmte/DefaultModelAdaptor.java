@@ -75,7 +75,8 @@ public class DefaultModelAdaptor implements ModelAdaptor {
 			}
 			String attributeName = attributeNames.get(index);
 			Object nextStep = nextStep(o, attributeName, errorHandler, token);
-			result = traverse(nextStep, attributeNames, index + 1, errorHandler, token);
+			result = traverse(nextStep, attributeNames, index + 1,
+					errorHandler, token);
 		}
 		return result;
 	}
@@ -93,7 +94,6 @@ public class DefaultModelAdaptor implements ModelAdaptor {
 			result = map.get(attributeName);
 		} else {
 			try {
-				// result = Util.getPropertyValue(o, attributeName);
 				result = getPropertyValue(o, attributeName);
 			} catch (Exception e) {
 				errorHandler.error("property-access-error", token,
@@ -138,19 +138,18 @@ public class DefaultModelAdaptor implements ModelAdaptor {
 				}
 			}
 
-			final String suffix = Character.toUpperCase(propertyName
-					.charAt(0))
+			final String suffix = Character.toUpperCase(propertyName.charAt(0))
 					+ propertyName.substring(1, propertyName.length());
 			final Method[] declaredMethods = clazz.getMethods();
 			for (Method method : declaredMethods) {
-				if (Modifier.isPublic(method.getModifiers())) {
-					if (method.getName().equals("get" + suffix)
-							|| method.getName().equals("is" + suffix)) {
-						value = method.invoke(o, (Object[]) null);
-						valueSet = true;
-						member = method;
-						break;
-					}
+				if (Modifier.isPublic(method.getModifiers())
+						&& (method.getName().equals("get" + suffix) || method
+								.getName().equals("is" + suffix))) {
+					value = method.invoke(o, (Object[]) null);
+					valueSet = true;
+					member = method;
+					break;
+
 				}
 			}
 			if (!valueSet) {
