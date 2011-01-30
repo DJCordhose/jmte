@@ -69,6 +69,27 @@ public class CompiledCaliperTest {
 			}
 		}
 
+		public void timeJMTEReflect(int reps) throws Exception {
+			for (int i = 0; i < reps; i++) {
+				referenceEngine.transform("${bean.property1}",
+						InterpretedEngineTest.DEFAULT_MODEL);
+			}
+		}
+
+		public void timeJMTEReflectCached(int reps) throws Exception {
+			for (int i = 0; i < reps; i++) {
+				cachingEngine.transform("${bean.property1}",
+						InterpretedEngineTest.DEFAULT_MODEL);
+			}
+		}
+
+		public void timeJMTEReflectCompiled(int reps) throws Exception {
+			for (int i = 0; i < reps; i++) {
+				compilingEngine.transform("${bean.property1}",
+						InterpretedEngineTest.DEFAULT_MODEL);
+			}
+		}
+
 		public void timeComplexExpressionReference(int reps) throws Exception {
 			Engine engine = referenceEngine;
 			for (int i = 0; i < reps; i++) {

@@ -50,3 +50,27 @@ in engine
                            RealLife   180144 ================
                      RealLifeCached    87823 =============
                    RealLifeCompiled    84166 =============
+
+30.01.2011 New object resolvation and caching reflection code without BeanInfo (svn rev 153)
+============================================================================================
+
+                          benchmark       ns logarithmic runtime
+                    SimpleReference     3282 =====
+              SimpleCachedReference      896 =
+            SimpleCompiledReference      662 =
+                               Long  3690506 ========================
+                         LongCached  3678096 ========================
+                       LongCompiled  2861785 ========================
+                           LongText  1557267 ======================
+                     LongTextCached  1484422 ======================
+                   LongTextCompiled  1323609 ======================
+                       LongTemplate   165715 ================
+                 LongTemplateCached    40992 ============
+               LongTemplateCompiled    29154 ===========
+         LongTemplateManyIterations 22796350 ==============================
+   LongTemplateManyIterationsCached 22719074 =============================
+ LongTemplateManyIterationsCompiled 14081701 ============================
+                           RealLife   165077 ================
+                     RealLifeCached    65688 =============
+                   RealLifeCompiled    61031 =============
+                   

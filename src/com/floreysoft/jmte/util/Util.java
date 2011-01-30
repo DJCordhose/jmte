@@ -278,58 +278,6 @@ public class Util {
 	}
 
 	/**
-	 * Finds the property value for a certain object.
-	 * 
-	 * 
-	 * @param o
-	 *            object to find the property value for
-	 * @param attributeName
-	 *            name of the requested attribute
-	 * @return the value for the requested attribute or <code>null</code> when
-	 *         there is no such value
-	 */
-	@SuppressWarnings("unchecked")
-	public static Object getPropertyValue(Object o, String attributeName) {
-		try {
-			BeanInfo beanInfo = Introspector.getBeanInfo(o.getClass());
-			PropertyDescriptor[] propertyDescriptors = beanInfo
-					.getPropertyDescriptors();
-			// XXX this is so strange, can not call invoke on key and value for
-			// Map.Entry, so we have to get this done like this:
-			if (o instanceof Map.Entry) {
-				Map.Entry entry = (Entry) o;
-				if (attributeName.equals("key")) {
-					final Object result = entry.getKey();
-					return result;
-				} else if (attributeName.equals("value")) {
-					final Object result = entry.getValue();
-					return result;
-				}
-
-			}
-
-			for (PropertyDescriptor propertyDescriptor : propertyDescriptors) {
-				String propertyName = propertyDescriptor.getName();
-				if (propertyName.equals(attributeName)) {
-					Method readMethod = propertyDescriptor.getReadMethod();
-					if (readMethod != null) {
-						final Object result = readMethod.invoke(o);
-						return result;
-					}
-				}
-			}
-			Field field = o.getClass().getField(attributeName);
-			if (Modifier.isPublic(field.getModifiers())) {
-				final Object result = field.get(o);
-				return result;
-			}
-			return null;
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	/**
 	 * Scans the input and spits out begin/end pairs telling you where
 	 * expressions can be found.
 	 * 
@@ -397,12 +345,11 @@ public class Util {
 		return a != null ? new HashSet(Arrays.asList(a)) : Collections
 				.emptySet();
 	}
-	
+
 	public static String unifyNewlines(String source) {
 		final String regex = "\\r?\\n";
 		final String clearedSource = source.replaceAll(regex, "\n");
 		return clearedSource;
 	}
-
 
 }

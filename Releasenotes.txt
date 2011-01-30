@@ -56,4 +56,6 @@ Release 2.0 rc3
 
 * Wrapped all exceptions in Util into RuntimeException
 
-* All renderers and process listener now get the template context as a parameter
+* All renderers and process listener now get the template context as an additional parameter
+
+* Reflection code optimized for performance
