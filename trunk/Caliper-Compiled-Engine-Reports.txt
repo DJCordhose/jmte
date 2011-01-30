@@ -113,4 +113,49 @@ creation of engines and templates to make comparison more fair (svn rev 141)
                      ForeachCompiled  5645 =====================
   PrototypeCompiledForeachExpression  5462 =====================
  
- 
+30.01.2011 Reference measurement before reflection refactoring (svn rev 152)
+=============================================================================
+                          benchmark    ns logarithmic runtime
+          SimpleExpressionReference  3520 ================
+             SimpleExpressionCached   963 ==
+           SimpleExpressionCompiled   977 ==
+  PrototypeCompiledSimpleExpression  1276 =====
+                        JMTEReflect  5111 ====================
+                  JMTEReflectCached  1477 =======
+                JMTEReflectCompiled  1474 =======
+         ComplexExpressionReference  7057 =======================
+            ComplexExpressionCached  1213 ====
+          ComplexExpressionCompiled  1211 ====
+ PrototypeCompiledComplexExpression  1564 =======
+                                 If  6667 ======================
+                           IfCached  1280 =====
+                         IfCompiled   836 =
+      PrototypeCompiledIfExpression  1272 =====
+                            Foreach 12926 ==============================
+                      ForeachCached  6143 ======================
+                    ForeachCompiled  5811 =====================
+ PrototypeCompiledForeachExpression  5738 =====================
+
+30.01.2011 New object resolvation and caching reflection code without BeanInfo (svn rev 153)
+============================================================================================
+
+                          benchmark    ns logarithmic runtime
+          SimpleExpressionReference  3273 =================
+             SimpleExpressionCached   896 =====
+           SimpleExpressionCompiled   683 ==
+  PrototypeCompiledSimpleExpression  1163 =======
+                        JMTEReflect  5045 =====================
+                  JMTEReflectCached  1188 =======
+                JMTEReflectCompiled   952 =====
+         ComplexExpressionReference  6859 ========================
+            ComplexExpressionCached  1084 =======
+          ComplexExpressionCompiled   880 =====
+ PrototypeCompiledComplexExpression  1434 =========
+                                 If  6512 ========================
+                           IfCached  1166 =======
+                         IfCompiled   577 =
+      PrototypeCompiledIfExpression   792 ====
+                            Foreach 12109 ==============================
+                      ForeachCached  5158 =====================
+                    ForeachCompiled  4237 ===================
+ PrototypeCompiledForeachExpression  4194 ===================
