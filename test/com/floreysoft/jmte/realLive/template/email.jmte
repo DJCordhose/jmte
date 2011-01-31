@@ -1,5 +1,5 @@
 ${-- This is a comment
-}Hello${\, ,order.customer.firstName,}!
+}Hello, ${order.customer.firstName(dear customer)}!
 
 On ${order.orderDate} we received the following order:
 
