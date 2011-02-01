@@ -24,11 +24,21 @@ public class Lexer {
 
 	private AbstractToken innerNextToken(final String untrimmedInput) {
 		final String input = Util.trimFront(untrimmedInput);
+		// annotation
+		if (input.length() > 0 && input.charAt(0) == '@') {
+			final List<String> split = Util.RAW_MINI_PARSER.splitOnWhitespace(
+					input.substring(1), 2);
+			String receiver = access(split, 0);
+			String arguments = access(split, 1);
+			AnnotationToken annotationToken = new AnnotationToken(receiver,
+					arguments);
+			return annotationToken;
+		}
+
 		final List<String> split = Util.RAW_MINI_PARSER
 				.splitOnWhitespace(input);
 
 		// LENGTH 0
-
 		if (split.size() == 0) {
 			// empty expression like ${}
 			return new StringToken();
@@ -158,7 +168,7 @@ public class Lexer {
 		if (variableName.contains(" ")) {
 			return new InvalidToken();
 		}
-		
+
 		final StringToken stringToken = new StringToken(untrimmedInput,
 				variableName, defaultValue, prefix, suffix, rendererName,
 				parameters);
