@@ -1135,4 +1135,10 @@ public abstract class AbstractEngineTest {
 		assertEquals("Filbert", output);
 	}
 
+	@Test
+	public void annotation() throws Exception {
+		String input = "${@type MyBean bean}${foreach bean.list item , }${item.property1}${end}";
+		String output = newEngine().transform(input, DEFAULT_MODEL);
+		assertEquals("1.1, 2.1", output);
+	}
 }

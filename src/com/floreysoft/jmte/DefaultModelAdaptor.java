@@ -139,7 +139,7 @@ public class DefaultModelAdaptor implements ModelAdaptor {
 			}
 
 			final String suffix = Character.toUpperCase(propertyName.charAt(0))
-					+ propertyName.substring(1, propertyName.length());
+					+ propertyName.substring(1);
 			final Method[] declaredMethods = clazz.getMethods();
 			for (Method method : declaredMethods) {
 				if (Modifier.isPublic(method.getModifiers())

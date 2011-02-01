@@ -63,3 +63,10 @@ Release 2.0 final
 =================
 
 no changes from 2.0 rc3
+
+Release 2.1
+===========
+
+* Fixed i18n build problem
+
+* Added annotation token ${@ ...}, e.g. for static type declarations

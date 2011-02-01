@@ -235,6 +235,9 @@ public class Compiler {
 		} else if (token instanceof InvalidToken) {
 			tokenStream.consume();
 			engine.getErrorHandler().error("invalid-expression", token, null);
+		} else {
+			// what ever else there may be, we just ignore it
+			tokenStream.consume();
 		}
 
 	}
