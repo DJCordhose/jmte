@@ -32,6 +32,7 @@ import com.floreysoft.jmte.sample.SampleIfEmptyFalseExpressionCompiledTemplate;
 import com.floreysoft.jmte.sample.SampleNestedExpressionCompiledTemplate;
 import com.floreysoft.jmte.sample.SampleNewlineForeachSeparatorCompiledTemplate;
 import com.floreysoft.jmte.sample.SampleSimpleExpressionCompiledTemplate;
+import com.floreysoft.jmte.token.AnnotationToken;
 import com.floreysoft.jmte.token.ForEachToken;
 import com.floreysoft.jmte.token.Token;
 import com.floreysoft.jmte.util.Util;
@@ -1140,5 +1141,24 @@ public abstract class AbstractEngineTest {
 		String input = "${@type MyBean bean}${foreach bean.list item , }${item.property1}${end}";
 		String output = newEngine().transform(input, DEFAULT_MODEL);
 		assertEquals("1.1, 2.1", output);
+	}
+	@Test
+	public void annotationProcessor() throws Exception {
+		String input = "${@sample argument}${foreach bean.list item , }${item.property1}${end}";
+		Engine engine = newEngine();
+		engine.registerAnnotationProcessor(new AnnotationProcessor<String>() {
+
+			@Override
+			public String eval(AnnotationToken token, TemplateContext context) {
+				return token.getArguments();
+			}
+
+			@Override
+			public String getType() {
+				return "sample";
+			}
+		});
+		String output = engine.transform(input, DEFAULT_MODEL);
+		assertEquals("argument1.1, 2.1", output);
 	}
 }

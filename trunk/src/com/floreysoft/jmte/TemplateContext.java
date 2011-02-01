@@ -11,13 +11,13 @@ import com.floreysoft.jmte.token.Token;
  * Holds the combined current state of a template during evaluation.
  * 
  * @author olli
- *
+ * 
  */
 public class TemplateContext {
 
 	public final ScopedMap model;
 	/**
-	 * Stack like hierarchy of structure giving tokens (if  and foreach)
+	 * Stack like hierarchy of structure giving tokens (if and foreach)
 	 */
 	public final List<Token> scopes;
 	public final String template;
@@ -81,12 +81,27 @@ public class TemplateContext {
 	}
 
 	/**
-	 * Allows you to send additional notifications of executed processing steps. 
+	 * Allows you to send additional notifications of executed processing steps.
 	 * 
-	 * @param token the token that is handled
-	 * @param action the action that is executed on the action
+	 * @param token
+	 *            the token that is handled
+	 * @param action
+	 *            the action that is executed on the action
 	 */
 	public void notifyProcessListeners(Token token, Action action) {
 		engine.notifyProcessListeners(this, token, action);
 	}
+
+	public AnnotationProcessor<?> resolveAnnotationProcessor(String type) {
+		return engine.resolveAnnotationProcessor(type);
+	}
+
+	public Renderer<Object> resolveRendererForClass(Class<?> clazz) {
+		return engine.resolveRendererForClass(clazz);
+	}
+
+	public NamedRenderer resolveNamedRenderer(String rendererName) {
+		return engine.resolveNamedRenderer(rendererName);
+	}
+
 }
