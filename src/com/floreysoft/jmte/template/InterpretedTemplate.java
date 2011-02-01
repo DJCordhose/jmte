@@ -242,8 +242,10 @@ public class InterpretedTemplate extends Template {
 			tokenStream.consume();
 			engine.getErrorHandler().error("invalid-expression", token);
 		} else {
-			// what ever else there may be, we just ignore it
 			tokenStream.consume();
+			// what ever else there may be, we just evaluate it
+			String evaluated = (String) token.evaluate(context);
+			output.append(evaluated);
 		}
 
 	}

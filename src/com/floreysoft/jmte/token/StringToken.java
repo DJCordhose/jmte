@@ -76,7 +76,7 @@ public class StringToken extends ExpressionToken {
 		} else {
 			String namedRendererResult = null;
 			if (rendererName != null && !rendererName.equals("")) {
-				final NamedRenderer rendererForName = context.engine
+				final NamedRenderer rendererForName = context
 						.resolveNamedRenderer(rendererName);
 				if (rendererForName != null) {
 					namedRendererResult = rendererForName.render(context,
@@ -86,7 +86,7 @@ public class StringToken extends ExpressionToken {
 			if (namedRendererResult != null) {
 				renderedResult = namedRendererResult;
 			} else {
-				final Renderer<Object> rendererForClass = context.engine
+				final Renderer<Object> rendererForClass = context
 						.resolveRendererForClass(value.getClass());
 				if (rendererForClass != null) {
 					renderedResult = rendererForClass.render(context, value);

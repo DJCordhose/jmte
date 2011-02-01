@@ -19,6 +19,7 @@ import org.objectweb.asm.Opcodes; //import org.objectweb.asm.util.CheckClassAdap
 //import org.objectweb.asm.util.TraceClassVisitor;
 
 import com.floreysoft.jmte.Engine;
+import com.floreysoft.jmte.token.AnnotationToken;
 import com.floreysoft.jmte.token.ElseToken;
 import com.floreysoft.jmte.token.EndToken;
 import com.floreysoft.jmte.token.ForEachToken;
@@ -235,6 +236,9 @@ public class Compiler {
 		} else if (token instanceof InvalidToken) {
 			tokenStream.consume();
 			engine.getErrorHandler().error("invalid-expression", token, null);
+		} else if (token instanceof AnnotationToken) {
+			tokenStream.consume();
+			codeGenerateAnnotationToken((AnnotationToken) token);
 		} else {
 			// what ever else there may be, we just ignore it
 			tokenStream.consume();
@@ -348,6 +352,10 @@ public class Compiler {
 		mv.visitCode();
 		mv.visitLabel(startLabel);
 		createStringBuilder();
+	}
+
+	private void codeGenerateAnnotationToken(AnnotationToken token) {
+		// FIXME
 	}
 
 	private void codeGenerateStringToken(StringToken stringToken) {

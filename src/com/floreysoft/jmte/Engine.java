@@ -113,6 +113,8 @@ public final class Engine {
 	private final Map<Class<?>, Renderer<?>> renderers = new HashMap<Class<?>, Renderer<?>>();
 	private final Map<Class<?>, Renderer<?>> resolvedRendererCache = new HashMap<Class<?>, Renderer<?>>();
 
+	private final Map<String, AnnotationProcessor<?>> annotationProcessors = new HashMap<String, AnnotationProcessor<?>>();
+
 	private final Map<String, NamedRenderer> namedRenderers = new HashMap<String, NamedRenderer>();
 	private final Map<Class<?>, Set<NamedRenderer>> namedRenderersForClass = new HashMap<Class<?>, Set<NamedRenderer>>();
 
@@ -165,7 +167,7 @@ public final class Engine {
 	 *            model
 	 * @return the expanded output
 	 */
-	protected String transform(String template, String sourceName,
+	private String transform(String template, String sourceName,
 			Map<String, Object> model, ModelAdaptor modelAdaptor) {
 		Template templateImpl = getTemplate(template, sourceName);
 		String output = templateImpl.transform(model, modelAdaptor);
@@ -269,8 +271,22 @@ public final class Engine {
 		return values;
 	}
 
-	public NamedRenderer resolveNamedRenderer(String rendererName) {
+	NamedRenderer resolveNamedRenderer(String rendererName) {
 		return namedRenderers.get(rendererName);
+	}
+
+	public Engine registerAnnotationProcessor(AnnotationProcessor<?> annotationProcessor) {
+		annotationProcessors.put(annotationProcessor.getType(), annotationProcessor);
+		return this;
+	}
+
+	public Engine deregisterAnnotationProcessor(AnnotationProcessor<?> annotationProcessor) {
+		annotationProcessors.remove(annotationProcessor.getType());
+		return this;
+	}
+
+	AnnotationProcessor<?> resolveAnnotationProcessor(String type) {
+		return annotationProcessors.get(type);
 	}
 
 	public <C> Engine registerRenderer(Class<C> clazz, Renderer<C> renderer) {
@@ -286,7 +302,7 @@ public final class Engine {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Renderer<Object> resolveRendererForClass(Class<?> clazz) {
+	Renderer<Object> resolveRendererForClass(Class<?> clazz) {
 		Renderer resolvedRenderer = resolvedRendererCache.get(clazz);
 		if (resolvedRenderer != null) {
 			return resolvedRenderer;
@@ -322,7 +338,7 @@ public final class Engine {
 		listeners.remove(listener);
 	}
 
-	protected void notifyProcessListeners(TemplateContext context, Token token, Action action) {
+	void notifyProcessListeners(TemplateContext context, Token token, Action action) {
 		for (ProcessListener processListener : listeners) {
 			processListener.log(context, token, action);
 		}

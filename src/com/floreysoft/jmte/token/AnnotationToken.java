@@ -1,5 +1,6 @@
 package com.floreysoft.jmte.token;
 
+import com.floreysoft.jmte.AnnotationProcessor;
 import com.floreysoft.jmte.TemplateContext;
 
 public class AnnotationToken extends AbstractToken {
@@ -21,6 +22,14 @@ public class AnnotationToken extends AbstractToken {
 	}
 
 	public Object evaluate(TemplateContext context) {
+		AnnotationProcessor<?> annotationProcessor = context
+				.resolveAnnotationProcessor(receiver);
+		if (annotationProcessor != null) {
+			Object value = annotationProcessor.eval(this, context);
+			if (value != null) {
+				return value;
+			}
+		}
 		return "";
 	}
 }
