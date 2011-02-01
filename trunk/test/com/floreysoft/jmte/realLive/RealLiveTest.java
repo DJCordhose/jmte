@@ -38,7 +38,7 @@ public class RealLiveTest {
 		Date orderDate = instance.getTime();
 
 		Customer customer = new Customer("Oliver", "Zeigermann",
-				"Gaußstraße 180\n" + "22765 Hamburg\n" + "GERMANY");
+				"Gaussstrasse 180\n" + "22765 Hamburg\n" + "GERMANY");
 		Order order = new Order(customer, orderDate);
 
 		Article article1 = new Article("How to become famous", new BigDecimal(
