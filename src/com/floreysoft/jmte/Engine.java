@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.junit.experimental.theories.Theory;
+
 import com.floreysoft.jmte.ProcessListener.Action;
 import com.floreysoft.jmte.message.DefaultErrorHandler;
 import com.floreysoft.jmte.renderer.DefaultCollectionRenderer;
@@ -60,6 +62,10 @@ import com.floreysoft.jmte.util.Util;
  * when the template is used often this will speed up the execution by a factor
  * between 2 and 10. However, each compiled template results in a new class
  * definition and a new globally cached singleton instance of it.
+ * </p>
+ * 
+ * <p>
+ * This class is thread safe.
  * </p>
  * 
  * @see ErrorHandler
@@ -147,7 +153,7 @@ public final class Engine {
 	 *            the model used to evaluate expressions inside the template
 	 * @return the expanded output
 	 */
-	public String transform(String template, String sourceName,
+	public synchronized String transform(String template, String sourceName,
 			Map<String, Object> model) {
 		return transform(template, sourceName, model, getModelAdaptor());
 	}
@@ -197,7 +203,7 @@ public final class Engine {
 	 *            any number of arguments
 	 * @return the expanded template
 	 */
-	public String format(final String pattern, final Object... args) {
+	public synchronized String format(final String pattern, final Object... args) {
 		Map<String, Object> model = Collections.emptyMap();
 		ModelAdaptor modelAdaptor = new ModelAdaptor() {
 
@@ -217,12 +223,12 @@ public final class Engine {
 	/**
 	 * Gets all variables used in the given template.
 	 */
-	public Set<String> getUsedVariables(String template) {
+	public synchronized Set<String> getUsedVariables(String template) {
 		Template templateImpl = getTemplate(template, null);
 		return templateImpl.getUsedVariables();
 	}
 
-	public Engine registerNamedRenderer(NamedRenderer renderer) {
+	public synchronized Engine registerNamedRenderer(NamedRenderer renderer) {
 		namedRenderers.put(renderer.getName(), renderer);
 		Set<Class<?>> supportedClasses = Util.asSet(renderer
 				.getSupportedClasses());
@@ -236,7 +242,7 @@ public final class Engine {
 		return this;
 	}
 
-	public Engine deregisterNamedRenderer(NamedRenderer renderer) {
+	public synchronized Engine deregisterNamedRenderer(NamedRenderer renderer) {
 		namedRenderers.remove(renderer.getName());
 		Set<Class<?>> supportedClasses = Util.asSet(renderer
 				.getSupportedClasses());
@@ -257,7 +263,7 @@ public final class Engine {
 		compatibleRenderers.add(renderer);
 	}
 
-	public Collection<NamedRenderer> getCompatibleRenderers(Class<?> inputType) {
+	public synchronized Collection<NamedRenderer> getCompatibleRenderers(Class<?> inputType) {
 		Set<NamedRenderer> renderers = namedRenderersForClass.get(inputType);
 		if (renderers == null) {
 			renderers = new HashSet<NamedRenderer>();
@@ -266,7 +272,7 @@ public final class Engine {
 		return renderers;
 	}
 
-	public Collection<NamedRenderer> getAllNamedRenderers() {
+	public synchronized Collection<NamedRenderer> getAllNamedRenderers() {
 		Collection<NamedRenderer> values = namedRenderers.values();
 		return values;
 	}
@@ -275,12 +281,12 @@ public final class Engine {
 		return namedRenderers.get(rendererName);
 	}
 
-	public Engine registerAnnotationProcessor(AnnotationProcessor<?> annotationProcessor) {
+	public synchronized Engine registerAnnotationProcessor(AnnotationProcessor<?> annotationProcessor) {
 		annotationProcessors.put(annotationProcessor.getType(), annotationProcessor);
 		return this;
 	}
 
-	public Engine deregisterAnnotationProcessor(AnnotationProcessor<?> annotationProcessor) {
+	public synchronized Engine deregisterAnnotationProcessor(AnnotationProcessor<?> annotationProcessor) {
 		annotationProcessors.remove(annotationProcessor.getType());
 		return this;
 	}
@@ -289,13 +295,13 @@ public final class Engine {
 		return annotationProcessors.get(type);
 	}
 
-	public <C> Engine registerRenderer(Class<C> clazz, Renderer<C> renderer) {
+	public synchronized <C> Engine registerRenderer(Class<C> clazz, Renderer<C> renderer) {
 		renderers.put(clazz, renderer);
 		resolvedRendererCache.clear();
 		return this;
 	}
 
-	public Engine deregisterRenderer(Class<?> clazz) {
+	public synchronized Engine deregisterRenderer(Class<?> clazz) {
 		renderers.remove(clazz);
 		resolvedRendererCache.clear();
 		return this;
@@ -330,11 +336,11 @@ public final class Engine {
 		return resolvedRenderer;
 	}
 
-	public void addProcessListener(ProcessListener listener) {
+	public synchronized void addProcessListener(ProcessListener listener) {
 		listeners.add(listener);
 	}
 
-	public void removeProcessListener(ProcessListener listener) {
+	public synchronized void removeProcessListener(ProcessListener listener) {
 		listeners.remove(listener);
 	}
 
@@ -344,59 +350,59 @@ public final class Engine {
 		}
 	}
 
-	public void setErrorHandler(ErrorHandler errorHandler) {
+	public synchronized void setErrorHandler(ErrorHandler errorHandler) {
 		this.errorHandler = errorHandler;
 	}
 
-	public ErrorHandler getErrorHandler() {
+	public synchronized ErrorHandler getErrorHandler() {
 		return errorHandler;
 	}
 
-	public String getExprStartToken() {
+	public synchronized String getExprStartToken() {
 		return exprStartToken;
 	}
 
-	public String getExprEndToken() {
+	public synchronized String getExprEndToken() {
 		return exprEndToken;
 	}
 
-	public void setExprStartToken(String exprStartToken) {
+	public synchronized void setExprStartToken(String exprStartToken) {
 		this.exprStartToken = exprStartToken;
 	}
 
-	public void setExprEndToken(String exprEndToken) {
+	public synchronized void setExprEndToken(String exprEndToken) {
 		this.exprEndToken = exprEndToken;
 	}
 
-	public void setExpansionSizeFactor(double expansionSizeFactor) {
+	public synchronized void setExpansionSizeFactor(double expansionSizeFactor) {
 		this.expansionSizeFactor = expansionSizeFactor;
 	}
 
-	public double getExpansionSizeFactor() {
+	public synchronized double getExpansionSizeFactor() {
 		return expansionSizeFactor;
 	}
 
-	public boolean isUseCompilation() {
+	public synchronized boolean isUseCompilation() {
 		return useCompilation;
 	}
 
-	public void setUseCompilation(boolean useCompilation) {
+	public synchronized void setUseCompilation(boolean useCompilation) {
 		this.useCompilation = useCompilation;
 	}
 
-	public void setModelAdaptor(ModelAdaptor modelAdaptor) {
+	public synchronized void setModelAdaptor(ModelAdaptor modelAdaptor) {
 		this.modelAdaptor = modelAdaptor;
 	}
 
-	public ModelAdaptor getModelAdaptor() {
+	public synchronized ModelAdaptor getModelAdaptor() {
 		return modelAdaptor;
 	}
 
-	public boolean isEnabledInterpretedTemplateCache() {
+	public synchronized boolean isEnabledInterpretedTemplateCache() {
 		return enabledInterpretedTemplateCache;
 	}
 
-	public void setEnabledInterpretedTemplateCache(
+	public synchronized void setEnabledInterpretedTemplateCache(
 			boolean enabledInterpretedTemplateCache) {
 		this.enabledInterpretedTemplateCache = enabledInterpretedTemplateCache;
 	}
@@ -426,5 +432,4 @@ public final class Engine {
 		}
 		return templateImpl;
 	}
-
 }

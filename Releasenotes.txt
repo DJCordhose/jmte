@@ -70,3 +70,7 @@ Release 2.1
 * Fixed i18n build problem
 
 * Added annotation token ${@ ...}, e.g. for static type declarations
+
+* Engine now thread safe on public methods
+
+* Minor cleaning of API visibilities
