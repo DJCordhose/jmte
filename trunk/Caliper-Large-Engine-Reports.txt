@@ -73,4 +73,27 @@ in engine
                            RealLife   165077 ================
                      RealLifeCached    65688 =============
                    RealLifeCompiled    61031 =============
+
+02.02.2011 Single process listener and array list as template context scope (svn rev 174)
+=========================================================================================
+
+                          benchmark       ns logarithmic runtime
+                    SimpleReference     3194 =====
+              SimpleCachedReference      836 =
+            SimpleCompiledReference      716 =
+                               Long  3309833 =========================
+                         LongCached  3317210 =========================
+                       LongCompiled  2719714 ========================
+                          LongText  1370570 ======================
+                     LongTextCached  1385956 ======================
+                   LongTextCompiled  1256315 ======================
+                       LongTemplate   148032 ================
+                 LongTemplateCached    34681 ============
+               LongTemplateCompiled    26889 ===========
+         LongTemplateManyIterations 17822049 ==============================
+   LongTemplateManyIterationsCached 17448027 =============================
+ LongTemplateManyIterationsCompiled 13247910 =============================
+                           RealLife   156732 ================
+                     RealLifeCached    61192 =============
+                   RealLifeCompiled    57962 =============
                    

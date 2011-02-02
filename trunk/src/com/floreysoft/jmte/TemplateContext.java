@@ -1,10 +1,9 @@
 package com.floreysoft.jmte;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.floreysoft.jmte.ProcessListener.Action;
-import com.floreysoft.jmte.token.Lexer;
 import com.floreysoft.jmte.token.Token;
 
 /**
@@ -31,7 +30,7 @@ public class TemplateContext {
 		this.model = model;
 		this.template = template;
 		this.engine = engine;
-		this.scopes = new LinkedList<Token>();
+		this.scopes = new ArrayList<Token>();
 		this.sourceName = sourceName;
 		this.modelAdaptor = modelAdaptor;
 		this.processListener = processListener;
