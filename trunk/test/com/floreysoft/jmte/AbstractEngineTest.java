@@ -1016,7 +1016,7 @@ public abstract class AbstractEngineTest {
 		String input = "${address}";
 		String interpretedOutput = newEngine().transform(input, DEFAULT_MODEL);
 		String compiledOutput = new SampleSimpleExpressionCompiledTemplate(
-				newEngine()).transform(DEFAULT_MODEL, MODEL_ADAPTOR);
+				newEngine()).transform(DEFAULT_MODEL, MODEL_ADAPTOR, null);
 		assertEquals(interpretedOutput, compiledOutput);
 	}
 
@@ -1027,7 +1027,7 @@ public abstract class AbstractEngineTest {
 				input, DEFAULT_MODEL);
 		String compiledOutput = new SampleComplexExpressionCompiledTemplate(
 				ENGINE_WITH_CUSTOM_RENDERERS).transform(DEFAULT_MODEL,
-				MODEL_ADAPTOR);
+				MODEL_ADAPTOR, null);
 		assertEquals(interpretedOutput, compiledOutput);
 	}
 
@@ -1036,7 +1036,7 @@ public abstract class AbstractEngineTest {
 		String input = "${if !bean.trueCond}${address}${else}NIX${end}";
 		String interpretedOutput = newEngine().transform(input, DEFAULT_MODEL);
 		String compiledOutput = new SampleIfEmptyFalseExpressionCompiledTemplate(
-				newEngine()).transform(DEFAULT_MODEL, MODEL_ADAPTOR);
+				newEngine()).transform(DEFAULT_MODEL, MODEL_ADAPTOR, null);
 		assertEquals(interpretedOutput, compiledOutput);
 	}
 
@@ -1045,7 +1045,7 @@ public abstract class AbstractEngineTest {
 		String input = "${ foreach list item \n}${item.property1}${end}";
 		String interpretedOutput = newEngine().transform(input, DEFAULT_MODEL);
 		String compiledOutput = new SampleNewlineForeachSeparatorCompiledTemplate(
-				newEngine()).transform(DEFAULT_MODEL, MODEL_ADAPTOR);
+				newEngine()).transform(DEFAULT_MODEL, MODEL_ADAPTOR, null);
 		assertEquals(interpretedOutput, compiledOutput);
 	}
 
@@ -1054,7 +1054,7 @@ public abstract class AbstractEngineTest {
 		String input = "PREFIX${<h1>,address(NIX),</h1>;long(full)}SUFFIX";
 		String interpretedOutput = newEngine().transform(input, DEFAULT_MODEL);
 		String compiledOutput = new SampleCompiledSequenceTemplate(newEngine())
-				.transform(DEFAULT_MODEL, MODEL_ADAPTOR);
+				.transform(DEFAULT_MODEL, MODEL_ADAPTOR, null);
 		assertEquals(interpretedOutput, compiledOutput);
 	}
 
@@ -1063,7 +1063,7 @@ public abstract class AbstractEngineTest {
 		String input = "${foreach list item}${foreach item.list item2}OUTER_PRFIX${if item}${item2.property1}INNER_SUFFIX${end}${end}\n${end}";
 		String interpretedOutput = newEngine().transform(input, DEFAULT_MODEL);
 		String compiledOutput = new SampleNestedExpressionCompiledTemplate(
-				newEngine()).transform(DEFAULT_MODEL, MODEL_ADAPTOR);
+				newEngine()).transform(DEFAULT_MODEL, MODEL_ADAPTOR, null);
 		assertEquals(interpretedOutput, compiledOutput);
 	}
 
@@ -1072,7 +1072,7 @@ public abstract class AbstractEngineTest {
 		String input = "${if address='Filbert'}${address}${else}NIX${end}";
 		String interpretedOutput = newEngine().transform(input, DEFAULT_MODEL);
 		String compiledOutput = new SampleIfCmpCompiledTemplate(newEngine())
-				.transform(DEFAULT_MODEL, MODEL_ADAPTOR);
+				.transform(DEFAULT_MODEL, MODEL_ADAPTOR, null);
 		assertEquals(interpretedOutput, compiledOutput);
 	}
 

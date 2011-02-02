@@ -65,7 +65,7 @@ public class CompiledCaliperTest {
 			for (int i = 0; i < reps; i++) {
 				simpleExpressiontemplate.transform(
 						InterpretedEngineTest.DEFAULT_MODEL,
-						AbstractEngineTest.MODEL_ADAPTOR);
+						AbstractEngineTest.MODEL_ADAPTOR, null);
 			}
 		}
 
@@ -118,7 +118,7 @@ public class CompiledCaliperTest {
 				throws Exception {
 			for (int i = 0; i < reps; i++) {
 				complexTemplate.transform(InterpretedEngineTest.DEFAULT_MODEL,
-						AbstractEngineTest.MODEL_ADAPTOR);
+						AbstractEngineTest.MODEL_ADAPTOR, null);
 			}
 		}
 
@@ -150,7 +150,7 @@ public class CompiledCaliperTest {
 				throws Exception {
 			for (int i = 0; i < reps; i++) {
 				ifTemplate.transform(InterpretedEngineTest.DEFAULT_MODEL,
-						AbstractEngineTest.MODEL_ADAPTOR);
+						AbstractEngineTest.MODEL_ADAPTOR, null);
 			}
 		}
 
@@ -185,7 +185,7 @@ public class CompiledCaliperTest {
 				throws Exception {
 			for (int i = 0; i < reps; i++) {
 				foreachTemplate.transform(InterpretedEngineTest.DEFAULT_MODEL,
-						AbstractEngineTest.MODEL_ADAPTOR);
+						AbstractEngineTest.MODEL_ADAPTOR, null);
 			}
 		}
 	}
