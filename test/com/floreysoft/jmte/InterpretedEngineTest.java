@@ -138,15 +138,15 @@ public class InterpretedEngineTest extends AbstractEngineTest {
 		String input = "${if empty}EMPTY${else}NOT_EMPTY${end}${foreach not_there var}${var}${end}";
 		Engine engine = newEngine();
 		final List<ProcessListener.Action> actions = new ArrayList<ProcessListener.Action>();
-		engine.addProcessListener(new ProcessListener() {
+		final ProcessListener processListener = new ProcessListener() {
 
 			@Override
 			public void log(TemplateContext context, Token token, Action action) {
 				actions.add(action);
 			}
 
-		});
-		engine.transform(input, DEFAULT_MODEL);
+		};
+		engine.transform(input, DEFAULT_MODEL, processListener);
 		assertArrayEquals(new ProcessListener.Action[] {
 				ProcessListener.Action.EVAL, ProcessListener.Action.SKIP,
 				ProcessListener.Action.EVAL, ProcessListener.Action.EVAL,

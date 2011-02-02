@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.floreysoft.jmte.ModelAdaptor;
+import com.floreysoft.jmte.ProcessListener;
 import com.floreysoft.jmte.token.ForEachToken;
 
 public abstract class Template {
@@ -33,7 +34,7 @@ public abstract class Template {
 	 * @return the expanded output
 	 */
 	public abstract String transform(Map<String, Object> model,
-			ModelAdaptor modelAdaptor);
+			ModelAdaptor modelAdaptor, ProcessListener processListener);
 
 	public abstract Set<String> getUsedVariables();
 

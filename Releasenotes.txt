@@ -74,3 +74,5 @@ Release 2.1
 * Engine now thread safe on public methods
 
 * Minor cleaning of API visibilities
+
+* ProcessListener is now passed on a per transformation basis

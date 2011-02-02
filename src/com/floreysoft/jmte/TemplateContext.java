@@ -24,15 +24,17 @@ public class TemplateContext {
 	public final Engine engine;
 	public final String sourceName;
 	public final ModelAdaptor modelAdaptor;
+	private final ProcessListener processListener;
 
 	public TemplateContext(String template, String sourceName, ScopedMap model,
-			ModelAdaptor modelAdaptor, Engine engine) {
+			ModelAdaptor modelAdaptor, Engine engine, ProcessListener processListener) {
 		this.model = model;
 		this.template = template;
 		this.engine = engine;
 		this.scopes = new LinkedList<Token>();
 		this.sourceName = sourceName;
 		this.modelAdaptor = modelAdaptor;
+		this.processListener = processListener;
 	}
 
 	/**
@@ -88,8 +90,10 @@ public class TemplateContext {
 	 * @param action
 	 *            the action that is executed on the action
 	 */
-	public void notifyProcessListeners(Token token, Action action) {
-		engine.notifyProcessListeners(this, token, action);
+	public void notifyProcessListener(Token token, Action action) {
+		if (processListener != null) {
+			processListener.log(this, token, action);
+		}
 	}
 
 	public AnnotationProcessor<?> resolveAnnotationProcessor(String type) {

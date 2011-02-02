@@ -48,10 +48,8 @@ public class InterpretedTemplate extends Template {
 		final Set<String> usedVariables = new TreeSet<String>();
 		final Engine engine = new Engine();
 		final ScopedMap scopedMap = new ScopedMap(Collections.EMPTY_MAP);
-		context = new TemplateContext(template, sourceName, scopedMap,
-				new DefaultModelAdaptor(), engine);
 
-		engine.addProcessListener(new ProcessListener() {
+		ProcessListener processListener = new ProcessListener() {
 
 			@Override
 			public void log(TemplateContext context, Token token, Action action) {
@@ -79,16 +77,19 @@ public class InterpretedTemplate extends Template {
 
 			}
 
-		});
+		};
+		context = new TemplateContext(template, sourceName, scopedMap,
+				new DefaultModelAdaptor(), engine, processListener);
 
 		transformPure(context);
 		return usedVariables;
 	}
 
 	@Override
-	public String transform(Map<String, Object> model, ModelAdaptor modelAdaptor) {
+	public String transform(Map<String, Object> model,
+			ModelAdaptor modelAdaptor, ProcessListener processListener) {
 		context = new TemplateContext(template, sourceName,
-				new ScopedMap(model), modelAdaptor, engine);
+				new ScopedMap(model), modelAdaptor, engine, processListener);
 		String transformed = transformPure(context);
 		String unescaped = Util.NO_QUOTE_MINI_PARSER.unescape(transformed);
 		return unescaped;
@@ -130,7 +131,7 @@ public class InterpretedTemplate extends Template {
 					engine.getErrorHandler().error("missing-end", feToken);
 				} else {
 					tokenStream.consume();
-					context.notifyProcessListeners(contentToken, Action.END);
+					context.notifyProcessListener(contentToken, Action.END);
 				}
 			} else {
 
@@ -151,9 +152,7 @@ public class InterpretedTemplate extends Template {
 						engine.getErrorHandler().error("missing-end", feToken);
 					} else {
 						tokenStream.consume();
-						context
-								.notifyProcessListeners(contentToken,
-										Action.END);
+						context.notifyProcessListener(contentToken, Action.END);
 					}
 					if (!feToken.isLast()) {
 						output.append(feToken.getSeparator());
@@ -193,7 +192,7 @@ public class InterpretedTemplate extends Template {
 				if (!inheritedSkip) {
 					localSkip = !localSkip;
 				}
-				context.notifyProcessListeners(contentToken,
+				context.notifyProcessListener(contentToken,
 						inheritedSkip ? Action.SKIP : Action.EVAL);
 
 				while ((contentToken = tokenStream.currentToken()) != null
@@ -207,7 +206,7 @@ public class InterpretedTemplate extends Template {
 				engine.getErrorHandler().error("missing-end", ifToken);
 			} else {
 				tokenStream.consume();
-				context.notifyProcessListeners(contentToken, Action.END);
+				context.notifyProcessListener(contentToken, Action.END);
 			}
 		} finally {
 			context.pop();
@@ -216,7 +215,7 @@ public class InterpretedTemplate extends Template {
 
 	private void content(boolean skip) {
 		Token token = tokenStream.currentToken();
-		context.notifyProcessListeners(token, skip ? Action.SKIP : Action.EVAL);
+		context.notifyProcessListener(token, skip ? Action.SKIP : Action.EVAL);
 		if (token instanceof PlainTextToken) {
 			tokenStream.consume();
 			if (!skip) {

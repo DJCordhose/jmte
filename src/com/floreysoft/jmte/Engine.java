@@ -124,8 +124,6 @@ public final class Engine {
 	private final Map<String, NamedRenderer> namedRenderers = new HashMap<String, NamedRenderer>();
 	private final Map<Class<?>, Set<NamedRenderer>> namedRenderersForClass = new HashMap<Class<?>, Set<NamedRenderer>>();
 
-	final List<ProcessListener> listeners = new ArrayList<ProcessListener>();
-
 	/**
 	 * Creates a new engine having <code>${</code> and <code>}</code> as start
 	 * and end strings for expressions.
@@ -155,7 +153,33 @@ public final class Engine {
 	 */
 	public synchronized String transform(String template, String sourceName,
 			Map<String, Object> model) {
-		return transform(template, sourceName, model, getModelAdaptor());
+		return transform(template, sourceName, model, getModelAdaptor(), null);
+	}
+
+	/**
+	 * Transforms a template into an expanded output using the given model.
+	 * 
+	 * @param template
+	 *            the template to expand
+	 * @param model
+	 *            the model used to evaluate expressions inside the template
+	 * @return the expanded output
+	 */
+	public synchronized String transform(String template,
+			Map<String, Object> model) {
+		return transform(template, null, model);
+	}
+
+	public synchronized String transform(String template,
+			Map<String, Object> model, ProcessListener processListener) {
+		return transform(template, null, model, getModelAdaptor(),
+				processListener);
+	}
+
+	public synchronized String transform(String template, String sourceName,
+			Map<String, Object> model, ProcessListener processListener) {
+		return transform(template, sourceName, model, getModelAdaptor(),
+				processListener);
 	}
 
 	/**
@@ -174,23 +198,12 @@ public final class Engine {
 	 * @return the expanded output
 	 */
 	private String transform(String template, String sourceName,
-			Map<String, Object> model, ModelAdaptor modelAdaptor) {
+			Map<String, Object> model, ModelAdaptor modelAdaptor,
+			ProcessListener processListener) {
 		Template templateImpl = getTemplate(template, sourceName);
-		String output = templateImpl.transform(model, modelAdaptor);
+		String output = templateImpl.transform(model, modelAdaptor,
+				processListener);
 		return output;
-	}
-
-	/**
-	 * Transforms a template into an expanded output using the given model.
-	 * 
-	 * @param template
-	 *            the template to expand
-	 * @param model
-	 *            the model used to evaluate expressions inside the template
-	 * @return the expanded output
-	 */
-	public String transform(String template, Map<String, Object> model) {
-		return transform(template, null, model);
 	}
 
 	/**
@@ -203,7 +216,8 @@ public final class Engine {
 	 *            any number of arguments
 	 * @return the expanded template
 	 */
-	public synchronized String format(final String pattern, final Object... args) {
+	public synchronized String format(final String pattern,
+			final Object... args) {
 		Map<String, Object> model = Collections.emptyMap();
 		ModelAdaptor modelAdaptor = new ModelAdaptor() {
 
@@ -216,7 +230,7 @@ public final class Engine {
 
 		};
 
-		String output = transform(pattern, null, model, modelAdaptor);
+		String output = transform(pattern, null, model, modelAdaptor, null);
 		return output;
 	}
 
@@ -263,7 +277,8 @@ public final class Engine {
 		compatibleRenderers.add(renderer);
 	}
 
-	public synchronized Collection<NamedRenderer> getCompatibleRenderers(Class<?> inputType) {
+	public synchronized Collection<NamedRenderer> getCompatibleRenderers(
+			Class<?> inputType) {
 		Set<NamedRenderer> renderers = namedRenderersForClass.get(inputType);
 		if (renderers == null) {
 			renderers = new HashSet<NamedRenderer>();
@@ -281,12 +296,15 @@ public final class Engine {
 		return namedRenderers.get(rendererName);
 	}
 
-	public synchronized Engine registerAnnotationProcessor(AnnotationProcessor<?> annotationProcessor) {
-		annotationProcessors.put(annotationProcessor.getType(), annotationProcessor);
+	public synchronized Engine registerAnnotationProcessor(
+			AnnotationProcessor<?> annotationProcessor) {
+		annotationProcessors.put(annotationProcessor.getType(),
+				annotationProcessor);
 		return this;
 	}
 
-	public synchronized Engine deregisterAnnotationProcessor(AnnotationProcessor<?> annotationProcessor) {
+	public synchronized Engine deregisterAnnotationProcessor(
+			AnnotationProcessor<?> annotationProcessor) {
 		annotationProcessors.remove(annotationProcessor.getType());
 		return this;
 	}
@@ -295,7 +313,8 @@ public final class Engine {
 		return annotationProcessors.get(type);
 	}
 
-	public synchronized <C> Engine registerRenderer(Class<C> clazz, Renderer<C> renderer) {
+	public synchronized <C> Engine registerRenderer(Class<C> clazz,
+			Renderer<C> renderer) {
 		renderers.put(clazz, renderer);
 		resolvedRendererCache.clear();
 		return this;
@@ -334,20 +353,6 @@ public final class Engine {
 			resolvedRendererCache.put(clazz, resolvedRenderer);
 		}
 		return resolvedRenderer;
-	}
-
-	public synchronized void addProcessListener(ProcessListener listener) {
-		listeners.add(listener);
-	}
-
-	public synchronized void removeProcessListener(ProcessListener listener) {
-		listeners.remove(listener);
-	}
-
-	void notifyProcessListeners(TemplateContext context, Token token, Action action) {
-		for (ProcessListener processListener : listeners) {
-			processListener.log(context, token, action);
-		}
 	}
 
 	public synchronized void setErrorHandler(ErrorHandler errorHandler) {
