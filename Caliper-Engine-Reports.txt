@@ -188,4 +188,18 @@ speedup of caching
                                Foreach 18026,8 =============================
                               Renderer 20747,7 ==============================
 
-                              
+
+02.02.2011 Single process listener and array list as template context scope (svn rev 174)
+=========================================================================================
+                             benchmark      ns logarithmic runtime
+                StringBuilderReference   498,2 ==============
+                 StringConcatReference   498,4 ==============
+                       PrintfReference  2872,7 =====================
+                 EngineFormatReference  1390,7 ==================
+                            Expression  7074,6 =========================
+                     NativeIfReference    21,9 =
+                                    If  7466,2 =========================
+                NativeForeachReference   339,5 ============
+ NativeForeachNoStringBuilderReference   512,0 ==============
+                               Foreach 16973,5 =============================
+                              Renderer 19688,1 ==============================
