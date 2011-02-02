@@ -354,8 +354,30 @@ public class Compiler {
 		createStringBuilder();
 	}
 
-	private void codeGenerateAnnotationToken(AnnotationToken token) {
-		// FIXME
+	private void codeGenerateAnnotationToken(AnnotationToken annotationToken) {
+
+		mv.visitVarInsn(ALOAD, BUFFER);
+		mv.visitTypeInsn(NEW, "com/floreysoft/jmte/token/AnnotationToken");
+		mv.visitInsn(DUP);
+		pushConstant(annotationToken.getReceiver());
+		pushConstant(annotationToken.getArguments());
+		mv
+				.visitMethodInsn(
+						INVOKESPECIAL,
+						"com/floreysoft/jmte/token/AnnotationToken",
+						"<init>",
+						"(Ljava/lang/String;Ljava/lang/String;)V");
+
+		mv.visitVarInsn(ALOAD, CONTEXT);
+		mv.visitMethodInsn(INVOKEVIRTUAL,
+				"com/floreysoft/jmte/token/AnnotationToken", "evaluate",
+				"(Lcom/floreysoft/jmte/TemplateContext;)Ljava/lang/Object;");
+		mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Object", "toString",
+				"()Ljava/lang/String;");
+		mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append",
+				"(Ljava/lang/String;)Ljava/lang/StringBuilder;");
+		mv.visitInsn(POP);
+
 	}
 
 	private void codeGenerateStringToken(StringToken stringToken) {
