@@ -1,6 +1,7 @@
 package com.floreysoft.jmte.sample;
 
 import java.util.Arrays;
+import java.util.TreeSet;
 
 import com.floreysoft.jmte.Engine;
 import com.floreysoft.jmte.TemplateContext;
@@ -18,6 +19,7 @@ public class SampleNestedExpressionCompiledTemplate extends
 
 	public SampleNestedExpressionCompiledTemplate(Engine engine) {
 		super(engine);
+		usedVariables = new TreeSet<String>();
 		usedVariables.add("address");
 	}
 

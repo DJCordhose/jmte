@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
@@ -83,7 +84,7 @@ public class Compiler {
 	private final UniqueNameGenerator<String, String> uniqueNameGenerator = new UniqueNameGenerator<String, String>(
 			COMPILED_TEMPLATE_NAME_PREFIX);
 
-	protected final Set<String> usedVariables = new HashSet<String>();
+	protected transient Set<String> usedVariables;
 	protected final List<String> localVarStack = new LinkedList<String>();
 	protected transient ClassVisitor classVisitor;
 	protected transient ClassWriter classWriter;
@@ -102,7 +103,7 @@ public class Compiler {
 	protected transient Engine engine;
 
 	private void initCompilation() {
-		usedVariables.clear();
+		usedVariables = new TreeSet<String>();
 		localVarStack.clear();
 		className = uniqueNameGenerator.nextUniqueName();
 		typeDescriptor = "L" + className + ";";
@@ -257,7 +258,7 @@ public class Compiler {
 			compiledTemplate.setEngine(engine);
 			compiledTemplate.setTemplate(template);
 			compiledTemplate.setSourceName(sourceName);
-			compiledTemplate.usedVariables.addAll(this.usedVariables);
+			compiledTemplate.usedVariables = this.usedVariables;
 			return compiledTemplate;
 
 		} catch (InstantiationException e) {
