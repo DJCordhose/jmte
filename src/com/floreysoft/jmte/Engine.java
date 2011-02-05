@@ -108,10 +108,11 @@ public final class Engine {
 	private boolean enabledInterpretedTemplateCache = true;
 	private ModelAdaptor modelAdaptor = new DefaultModelAdaptor();
 
-	// As classes will never be unloaded and are thus global, it might be a good
-	// idea to have
-	// the templates in a static, shared location as well
-	private final static Map<String, Template> compiledTemplates = new HashMap<String, Template>();
+	// compiler plus all compiled classes live as long as this engine
+	private final Compiler compiler = new Compiler();
+
+	// compiled templates cache lives as long as this engine
+	private final Map<String, Template> compiledTemplates = new HashMap<String, Template>();
 
 	// interpreted templates cache lives as long as this engine
 	private final Map<String, Template> interpretedTemplates = new HashMap<String, Template>();
@@ -412,13 +413,32 @@ public final class Engine {
 		this.enabledInterpretedTemplateCache = enabledInterpretedTemplateCache;
 	}
 
-	private Template getTemplate(String template, String sourceName) {
+	/**
+	 * Gets a template for a certain source.
+	 * 
+	 * @param template
+	 *            the template source
+	 * @return the prepared template
+	 */
+	public Template getTemplate(String template) {
+		return getTemplate(template, null);
+	}
+
+	/**
+	 * Gets a template for a certain source.
+	 * 
+	 * @param template
+	 *            the template source
+	 * @param sourceName
+	 *            the template name
+	 * @return the prepared template
+	 */
+	public Template getTemplate(String template, String sourceName) {
 		Template templateImpl;
 		if (useCompilation) {
 			templateImpl = compiledTemplates.get(template);
 			if (templateImpl == null) {
-				templateImpl = new Compiler(template, sourceName, this)
-						.compile();
+				templateImpl = compiler.compile(template, sourceName, this);
 				compiledTemplates.put(template, templateImpl);
 			}
 			return templateImpl;

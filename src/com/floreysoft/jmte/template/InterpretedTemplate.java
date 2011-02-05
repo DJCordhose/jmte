@@ -29,7 +29,7 @@ public class InterpretedTemplate extends Template {
 	protected final String template;
 	protected final Engine engine;
 	protected final String sourceName;
-	protected transient TokenStream tokenStream;
+	protected final TokenStream tokenStream;
 	protected transient StringBuilder output;
 	protected transient TemplateContext context;
 
@@ -86,14 +86,18 @@ public class InterpretedTemplate extends Template {
 	}
 
 	@Override
-	public String transform(Map<String, Object> model,
+	public synchronized String transform(Map<String, Object> model,
 			ModelAdaptor modelAdaptor, ProcessListener processListener) {
-		context = new TemplateContext(template, sourceName,
-				new ScopedMap(model), modelAdaptor, engine, processListener);
-		String transformed = transformPure(context);
-		String unescaped = Util.NO_QUOTE_MINI_PARSER.unescape(transformed);
-		return unescaped;
-
+		try {
+			context = new TemplateContext(template, sourceName, new ScopedMap(
+					model), modelAdaptor, engine, processListener);
+			String transformed = transformPure(context);
+			String unescaped = Util.NO_QUOTE_MINI_PARSER.unescape(transformed);
+			return unescaped;
+		} finally {
+			context = null;
+			output = null;
+		}
 	}
 
 	protected String transformPure(TemplateContext context) {

@@ -3,6 +3,7 @@ package com.floreysoft.jmte.template;
 import java.util.Map;
 import java.util.Set;
 
+import com.floreysoft.jmte.Engine;
 import com.floreysoft.jmte.ModelAdaptor;
 import com.floreysoft.jmte.ProcessListener;
 import com.floreysoft.jmte.token.ForEachToken;
@@ -14,6 +15,10 @@ public abstract class Template {
 	public static final String LAST_PREFIX = "last_";
 	public static final String FIRST_PREFIX = "first_";
 
+	protected Engine engine;
+	protected String template;
+	protected String sourceName;
+	
 	protected void addSpecialVariables(ForEachToken feToken,
 			Map<String, Object> model) {
 		String suffix = feToken.getVarName();
@@ -36,6 +41,29 @@ public abstract class Template {
 	public abstract String transform(Map<String, Object> model,
 			ModelAdaptor modelAdaptor, ProcessListener processListener);
 
+	/**
+	 * Transforms a template into an expanded output using the given model.
+	 * 
+	 * @param model
+	 *            the model used to evaluate expressions inside the template
+	 * @return the expanded output
+	 */
+	public String transform(Map<String, Object> model,
+			ProcessListener processListener) {
+		return transform(model, engine.getModelAdaptor(), processListener);
+	}
+	
+	/**
+	 * Transforms a template into an expanded output using the given model.
+	 * 
+	 * @param model
+	 *            the model used to evaluate expressions inside the template
+	 * @return the expanded output
+	 */
+	public String transform(Map<String, Object> model) {
+		return transform(model, engine.getModelAdaptor(), null);
+	}
+	
 	public abstract Set<String> getUsedVariables();
 
 }
