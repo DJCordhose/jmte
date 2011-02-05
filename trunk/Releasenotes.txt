@@ -76,3 +76,12 @@ Release 2.1
 * Minor cleaning of API visibilities
 
 * ProcessListener is now passed on a per transformation basis
+
+Release 2.2
+===========
+
+* Performance optimizations
+
+* Compiled classes are no longer stored globally and forever, but live as long as the engine - each engine has its own class loader that dies with it
+
+* Now direct access to template is possible as an alternative to the Engine#transform call

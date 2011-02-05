@@ -12,10 +12,8 @@ import com.floreysoft.jmte.TemplateContext;
 import com.floreysoft.jmte.util.Util;
 
 public abstract class AbstractCompiledTemplate extends Template {
-	protected final Set<String> usedVariables = new TreeSet<String>();;
-	private Engine engine;
-	private String template;
-	private String sourceName;
+
+	protected final Set<String> usedVariables = new TreeSet<String>();
 
 	public AbstractCompiledTemplate() {
 	}
@@ -30,7 +28,7 @@ public abstract class AbstractCompiledTemplate extends Template {
 	}
 
 	@Override
-	public String transform(Map<String, Object> model, ModelAdaptor modelAdaptor, ProcessListener processListener) {
+	public synchronized String transform(Map<String, Object> model, ModelAdaptor modelAdaptor, ProcessListener processListener) {
 		TemplateContext context = new TemplateContext(template, sourceName,
 				new ScopedMap(model), modelAdaptor, engine, processListener);
 

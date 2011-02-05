@@ -2,10 +2,7 @@ package com.floreysoft.jmte.template;
 
 import static org.objectweb.asm.Opcodes.*;
 
-import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,35 +23,30 @@ import com.floreysoft.jmte.token.ForEachToken;
 import com.floreysoft.jmte.token.IfCmpToken;
 import com.floreysoft.jmte.token.IfToken;
 import com.floreysoft.jmte.token.InvalidToken;
-import com.floreysoft.jmte.token.Lexer;
 import com.floreysoft.jmte.token.PlainTextToken;
 import com.floreysoft.jmte.token.StringToken;
 import com.floreysoft.jmte.token.Token;
 import com.floreysoft.jmte.token.TokenStream;
-import com.floreysoft.jmte.util.StartEndPair;
 import com.floreysoft.jmte.util.UniqueNameGenerator;
-import com.floreysoft.jmte.util.Util;
 
 /**
  * 
  * @author olli
  * 
  * @see http://asm.ow2.org/
- * @see http
- *      ://java.sun.com/docs/books/jvms/second_edition/html/ClassFile.doc.html
- * @see http 
- *      ://java.sun.com/docs/books/jvms/second_edition/html/Instructions.doc.
- *      html
+ * @see http://java.sun.com/docs/books/jvms/second_edition/html/ClassFile.doc.html
+ * @see http://java.sun.com/docs/books/jvms/second_edition/html/Instructions.doc.html
+ * @see http://stackoverflow.com/questions/148681/unloading-classes-in-java
  */
 public class Compiler {
 
 	@SuppressWarnings("unchecked")
-	protected static <T> Class<T> loadClass(byte[] b, Class<T> type) {
-		return MY_CLASS_LOADER.defineClass(null, b);
+	protected <T> Class<T> loadClass(byte[] b, Class<T> type) {
+		return cloadLoader.defineClass(null, b);
 	}
 
-	protected static Class<?> loadClass(byte[] b) {
-		return MY_CLASS_LOADER.defineClass(null, b);
+	protected Class<?> loadClass(byte[] b) {
+		return cloadLoader.defineClass(null, b);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -75,16 +67,7 @@ public class Compiler {
 		}
 	};
 
-	private final static DelegatingClassLoader MY_CLASS_LOADER = new DelegatingClassLoader(
-			Compiler.class.getClassLoader());
-
-	// make sure we are in the same package as context to have access to its
-	// protected parts
 	private final static String COMPILED_TEMPLATE_NAME_PREFIX = "com/floreysoft/jmte/template/CompiledTemplate";
-
-	// must be globally unique
-	private final static UniqueNameGenerator<String, String> uniqueNameGenerator = new UniqueNameGenerator<String, String>(
-			COMPILED_TEMPLATE_NAME_PREFIX);
 
 	private final static int THIS = 0;
 	private final static int CONTEXT = 1;
@@ -92,8 +75,14 @@ public class Compiler {
 	private final static int EXCEPTION = 3;
 	private final static int HIGHEST = EXCEPTION;
 
-	protected final String template;
-	protected final Engine engine;
+	// all the compiled classes live as long as this class loader lives
+	// this class loader lives as long as this compiler
+	private final DelegatingClassLoader cloadLoader = new DelegatingClassLoader(
+			Compiler.class.getClassLoader());
+
+	private final UniqueNameGenerator<String, String> uniqueNameGenerator = new UniqueNameGenerator<String, String>(
+			COMPILED_TEMPLATE_NAME_PREFIX);
+
 	protected final Set<String> usedVariables = new HashSet<String>();
 	protected final List<String> localVarStack = new LinkedList<String>();
 	protected transient ClassVisitor classVisitor;
@@ -110,13 +99,7 @@ public class Compiler {
 	protected transient TokenStream tokenStream;
 	protected transient int tokenLocalVarIndex = HIGHEST + 1;
 
-	protected final String sourceName;
-
-	public Compiler(String template, String sourceName, Engine engine) {
-		this.template = template;
-		this.engine = engine;
-		this.sourceName = sourceName;
-	}
+	protected transient Engine engine;
 
 	private void initCompilation() {
 		usedVariables.clear();
@@ -246,9 +229,10 @@ public class Compiler {
 
 	}
 
-	public Template compile() {
+	public Template compile(String template, String sourceName, Engine engine) {
+		try {
+		this.engine = engine;
 		initCompilation();
-
 		openCompilation();
 
 		tokenStream = new TokenStream(sourceName, template, engine
@@ -266,7 +250,7 @@ public class Compiler {
 		// FIXME: Only for debugging
 		// System.out.println(writer.toString());
 		byte[] byteArray = classWriter.toByteArray();
-		Class<?> myClass = Compiler.loadClass(byteArray);
+		Class<?> myClass = loadClass(byteArray);
 		try {
 			AbstractCompiledTemplate compiledTemplate = (AbstractCompiledTemplate) myClass
 					.newInstance();
@@ -280,6 +264,11 @@ public class Compiler {
 			throw new RuntimeException("Internal error " + e);
 		} catch (IllegalAccessException e) {
 			throw new RuntimeException("Internal error " + e);
+		}
+		} finally {
+			// free resources as soon as possible
+			this.engine = null;
+			this.tokenStream = null;
 		}
 	}
 
@@ -361,12 +350,9 @@ public class Compiler {
 		mv.visitInsn(DUP);
 		pushConstant(annotationToken.getReceiver());
 		pushConstant(annotationToken.getArguments());
-		mv
-				.visitMethodInsn(
-						INVOKESPECIAL,
-						"com/floreysoft/jmte/token/AnnotationToken",
-						"<init>",
-						"(Ljava/lang/String;Ljava/lang/String;)V");
+		mv.visitMethodInsn(INVOKESPECIAL,
+				"com/floreysoft/jmte/token/AnnotationToken", "<init>",
+				"(Ljava/lang/String;Ljava/lang/String;)V");
 
 		mv.visitVarInsn(ALOAD, CONTEXT);
 		mv.visitMethodInsn(INVOKEVIRTUAL,
