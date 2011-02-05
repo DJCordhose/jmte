@@ -13,8 +13,6 @@ import com.floreysoft.jmte.util.Util;
 
 public abstract class AbstractCompiledTemplate extends Template {
 
-	protected final Set<String> usedVariables = new TreeSet<String>();
-
 	public AbstractCompiledTemplate() {
 	}
 

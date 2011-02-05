@@ -44,8 +44,12 @@ public class InterpretedTemplate extends Template {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public Set<String> getUsedVariables() {
-		final Set<String> usedVariables = new TreeSet<String>();
+	public synchronized Set<String> getUsedVariables() {
+		if (this.usedVariables != null) {
+			return this.usedVariables;
+		}
+
+		this.usedVariables = new TreeSet<String>();
 		final Engine engine = new Engine();
 		final ScopedMap scopedMap = new ScopedMap(Collections.EMPTY_MAP);
 

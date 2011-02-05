@@ -18,6 +18,7 @@ public abstract class Template {
 	protected Engine engine;
 	protected String template;
 	protected String sourceName;
+	protected Set<String> usedVariables;
 	
 	protected void addSpecialVariables(ForEachToken feToken,
 			Map<String, Object> model) {

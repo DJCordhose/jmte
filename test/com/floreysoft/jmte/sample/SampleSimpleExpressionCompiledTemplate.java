@@ -1,5 +1,7 @@
 package com.floreysoft.jmte.sample;
 
+import java.util.TreeSet;
+
 import com.floreysoft.jmte.Engine;
 import com.floreysoft.jmte.TemplateContext;
 import com.floreysoft.jmte.template.AbstractCompiledTemplate;
@@ -14,6 +16,7 @@ public class SampleSimpleExpressionCompiledTemplate extends
 
 	public SampleSimpleExpressionCompiledTemplate(Engine engine) {
 		super(engine);
+		usedVariables = new TreeSet<String>();
 		usedVariables.add("address");
 	}
 
