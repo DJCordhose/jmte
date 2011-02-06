@@ -85,3 +85,5 @@ Release 2.2
 * Compiled classes are no longer stored globally and forever, but live as long as the engine - each engine has its own class loader that dies with it
 
 * Now direct access to template is possible as an alternative to the Engine#transform call
+
+* Used variables for interpreted templates are now buffered (have always been buffered for compiled templates)

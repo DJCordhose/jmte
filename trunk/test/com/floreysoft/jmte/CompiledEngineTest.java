@@ -46,29 +46,4 @@ public class CompiledEngineTest extends AbstractEngineTest {
 		// and give the same result
 		assertEquals(transformed1, transformed2);
 	}
-
-	public static void main(String[] args) {
-		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-		SimpleJavaFileObject fromString = new JavaSourceFromString("testCode",
-				"class olli {}");
-		CompilationTask task = compiler.getTask(null, null, null, null, null,
-				Arrays.asList(fromString));
-		Boolean call = task.call();
-		System.out.println(call);
-	}
-
-	public static class JavaSourceFromString extends SimpleJavaFileObject {
-		final String code;
-
-		public JavaSourceFromString(String name, String code) {
-			super(URI.create("string:///" + name.replace('.', '/')
-					+ Kind.SOURCE.extension), Kind.SOURCE);
-			this.code = code;
-		}
-
-		@Override
-		public CharSequence getCharContent(boolean ignoreEncodingErrors) {
-			return code;
-		}
-	}
 }
