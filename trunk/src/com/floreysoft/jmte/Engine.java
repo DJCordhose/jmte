@@ -17,7 +17,8 @@ import com.floreysoft.jmte.renderer.DefaultCollectionRenderer;
 import com.floreysoft.jmte.renderer.DefaultIterableRenderer;
 import com.floreysoft.jmte.renderer.DefaultMapRenderer;
 import com.floreysoft.jmte.renderer.DefaultObjectRenderer;
-import com.floreysoft.jmte.template.Compiler;
+import com.floreysoft.jmte.template.TemplateCompiler;
+import com.floreysoft.jmte.template.DynamicBytecodeCompiler;
 import com.floreysoft.jmte.template.InterpretedTemplate;
 import com.floreysoft.jmte.template.Template;
 import com.floreysoft.jmte.token.Token;
@@ -109,7 +110,7 @@ public final class Engine {
 	private ModelAdaptor modelAdaptor = new DefaultModelAdaptor();
 
 	// compiler plus all compiled classes live as long as this engine
-	private final Compiler compiler = new Compiler();
+	private TemplateCompiler compiler = new DynamicBytecodeCompiler();
 
 	// compiled templates cache lives as long as this engine
 	private final Map<String, Template> compiledTemplates = new HashMap<String, Template>();
@@ -456,5 +457,13 @@ public final class Engine {
 			}
 		}
 		return templateImpl;
+	}
+
+	public void setCompiler(TemplateCompiler compiler) {
+		this.compiler = compiler;
+	}
+
+	public TemplateCompiler getCompiler() {
+		return compiler;
 	}
 }

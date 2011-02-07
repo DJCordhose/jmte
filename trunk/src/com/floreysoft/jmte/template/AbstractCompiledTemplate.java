@@ -11,7 +11,7 @@ import com.floreysoft.jmte.ScopedMap;
 import com.floreysoft.jmte.TemplateContext;
 import com.floreysoft.jmte.util.Util;
 
-public abstract class AbstractCompiledTemplate extends Template {
+public abstract class AbstractCompiledTemplate extends AbstractTemplate {
 
 	public AbstractCompiledTemplate() {
 	}
