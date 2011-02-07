@@ -39,7 +39,7 @@ import com.floreysoft.jmte.util.UniqueNameGenerator;
  * @see http://java.sun.com/docs/books/jvms/second_edition/html/Instructions.doc.html
  * @see http://stackoverflow.com/questions/148681/unloading-classes-in-java
  */
-public class Compiler {
+public class DynamicBytecodeCompiler implements TemplateCompiler {
 
 	@SuppressWarnings("unchecked")
 	protected <T> Class<T> loadClass(byte[] b, Class<T> type) {
@@ -79,7 +79,7 @@ public class Compiler {
 	// all the compiled classes live as long as this class loader lives
 	// this class loader lives as long as this compiler
 	private final DelegatingClassLoader cloadLoader = new DelegatingClassLoader(
-			Compiler.class.getClassLoader());
+			DynamicBytecodeCompiler.class.getClassLoader());
 
 	private final UniqueNameGenerator<String, String> uniqueNameGenerator = new UniqueNameGenerator<String, String>(
 			COMPILED_TEMPLATE_NAME_PREFIX);

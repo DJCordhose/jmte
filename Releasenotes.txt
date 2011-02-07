@@ -87,3 +87,9 @@ Release 2.2
 * Now direct access to template is possible as an alternative to the Engine#transform call
 
 * Used variables for interpreted templates are now buffered (have always been buffered for compiled templates)
+
+* Introduced compiler interface "TemplateCompiler"
+
+* Made compiler configurable in Engine allowing for very different compiler implementations even making use of annotations (e.g. for static type information)
+
+* Template now is interface instead of abstract class
