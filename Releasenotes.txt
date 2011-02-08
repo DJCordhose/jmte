@@ -93,3 +93,9 @@ Release 2.2
 * Made compiler configurable in Engine allowing for very different compiler implementations even making use of annotations (e.g. for static type information)
 
 * Template now is interface instead of abstract class
+
+* Made all renderer resolvation methods public to be accessible from outside compilers (also added generic parameters)
+
+* Reverted decision that all renderers and get the template context as an additional parameter - now without context again
+
+* Introduced RendererRegistry interface implemented by Engine

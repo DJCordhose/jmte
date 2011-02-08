@@ -99,7 +99,7 @@ public class TemplateContext {
 		return engine.resolveAnnotationProcessor(type);
 	}
 
-	public Renderer<Object> resolveRendererForClass(Class<?> clazz) {
+	public <C> Renderer<C> resolveRendererForClass(Class<C> clazz) {
 		return engine.resolveRendererForClass(clazz);
 	}
 
