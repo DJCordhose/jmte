@@ -1,4 +1,4 @@
-package com.floreysoft.jmte.realLive;
+package com.floreysoft.jmte.realLife;
 
 import static org.junit.Assert.assertEquals;
 
@@ -15,19 +15,19 @@ import java.util.Map;
 import org.junit.Test;
 
 import com.floreysoft.jmte.Engine;
-import com.floreysoft.jmte.realLive.model.Article;
-import com.floreysoft.jmte.realLive.model.Customer;
-import com.floreysoft.jmte.realLive.model.Item;
-import com.floreysoft.jmte.realLive.model.Order;
+import com.floreysoft.jmte.realLife.model.Article;
+import com.floreysoft.jmte.realLife.model.Customer;
+import com.floreysoft.jmte.realLife.model.Item;
+import com.floreysoft.jmte.realLife.model.Order;
 import com.floreysoft.jmte.util.Util;
 
 public class RealLiveTest {
 
 	public static String template = Util.resourceToString(
-			"com/floreysoft/jmte/realLive/template/email.jmte", "UTF-8");
+			"com/floreysoft/jmte/realLife/template/email.jmte", "UTF-8");
 
 	public static String expected = Util.resourceToString(
-			"com/floreysoft/jmte/realLive/template/expected-output.txt",
+			"com/floreysoft/jmte/realLife/template/expected-output.txt",
 			"UTF-8");
 
 	Map<String, Object> model = new HashMap<String, Object>();

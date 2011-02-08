@@ -1,6 +1,6 @@
 package com.floreysoft.jmte;
 
-import com.floreysoft.jmte.realLive.RealLiveTest;
+import com.floreysoft.jmte.realLife.RealLiveTest;
 import com.google.caliper.SimpleBenchmark;
 
 public class LargeScaleCaliperTest {

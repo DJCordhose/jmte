@@ -1,4 +1,4 @@
-package com.floreysoft.jmte.realLive.model;
+package com.floreysoft.jmte.realLife.model;
 
 public class Customer {
 	public final String firstName;

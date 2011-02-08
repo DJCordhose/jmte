@@ -1,4 +1,4 @@
-package com.floreysoft.jmte.realLive;
+package com.floreysoft.jmte.realLife;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
