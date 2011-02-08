@@ -47,7 +47,7 @@ public final class NamedDateRenderer implements NamedRenderer {
 	}
 
 	@Override
-	public String render(TemplateContext context, Object o, String pattern) {
+	public String render(Object o, String pattern) {
 		String patternToUse = pattern != null ? pattern : DEFAULT_PATTERN;
 		try {
 			DateFormat dateFormat =  new SimpleDateFormat(patternToUse);

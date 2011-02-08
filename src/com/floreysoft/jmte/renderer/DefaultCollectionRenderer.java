@@ -10,7 +10,7 @@ import com.floreysoft.jmte.TemplateContext;
 public class DefaultCollectionRenderer implements Renderer<Collection> {
 
 	@Override
-	public String render(TemplateContext context, Collection collection) {
+	public String render(Collection collection) {
 		final String renderedResult;
 
 		if (collection.size() == 0) {
