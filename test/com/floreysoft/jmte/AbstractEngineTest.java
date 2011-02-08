@@ -22,7 +22,7 @@ import com.floreysoft.jmte.message.AbstractErrorHandler;
 import com.floreysoft.jmte.message.Message;
 import com.floreysoft.jmte.message.ParseException;
 import com.floreysoft.jmte.message.ResourceBundleMessage;
-import com.floreysoft.jmte.realLive.RealLiveTest;
+import com.floreysoft.jmte.realLife.RealLiveTest;
 import com.floreysoft.jmte.sample.NamedDateRenderer;
 import com.floreysoft.jmte.sample.NamedStringRenderer;
 import com.floreysoft.jmte.sample.SampleCompiledSequenceTemplate;

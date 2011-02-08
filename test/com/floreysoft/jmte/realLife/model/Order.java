@@ -1,4 +1,4 @@
-package com.floreysoft.jmte.realLive.model;
+package com.floreysoft.jmte.realLife.model;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;

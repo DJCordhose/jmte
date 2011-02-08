@@ -1,4 +1,4 @@
-package com.floreysoft.jmte.realLive;
+package com.floreysoft.jmte.realLife;
 
 import java.text.DateFormat;
 import java.util.Date;
