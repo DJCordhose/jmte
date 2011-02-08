@@ -98,7 +98,7 @@
 				<attribute name="Version" value="${version}" />
 				<attribute name="Build-Date" value="${today}" />
 			</manifest>
-			<fileset dir="${build.dir}" excludes="**/*Test*.class,**/*Tests*.class,**/sample/**,**/realLive/**,tmp/**" />
+			<fileset dir="${build.dir}" excludes="**/*Test*.class,**/*Tests*.class,**/sample/**,**/realLife/**,tmp/**" />
 		</jar>	
 
 		<taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="lib/jarjar-1.0.jar" />
