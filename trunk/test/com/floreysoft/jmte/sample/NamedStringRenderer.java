@@ -20,7 +20,7 @@ public final class NamedStringRenderer implements NamedRenderer {
 	}
 
 	@Override
-	public String render(TemplateContext context, Object value, String parameters) {
+	public String render(Object value, String parameters) {
 		String o = convert(value);
 		if (o == null) {
 			return null;

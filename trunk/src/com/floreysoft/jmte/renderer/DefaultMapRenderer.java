@@ -10,7 +10,7 @@ import com.floreysoft.jmte.TemplateContext;
 public class DefaultMapRenderer implements Renderer<Map> {
 
 	@Override
-	public String render(TemplateContext context, Map map) {
+	public String render(Map map) {
 		final String renderedResult;
 
 		if (map.size() == 0) {

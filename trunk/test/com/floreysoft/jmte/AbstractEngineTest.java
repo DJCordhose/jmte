@@ -87,13 +87,13 @@ public abstract class AbstractEngineTest {
 			Object.class, new Renderer<Object>() {
 
 				@Override
-				public String render(TemplateContext context, Object o) {
+				public String render(Object o) {
 					return "Object=" + o.toString();
 				}
 			}).registerRenderer(MyBean.class, new Renderer<MyBean>() {
 
 		@Override
-		public String render(TemplateContext context, MyBean o) {
+		public String render(MyBean o) {
 			return "Render=" + o.property1.toString();
 		}
 

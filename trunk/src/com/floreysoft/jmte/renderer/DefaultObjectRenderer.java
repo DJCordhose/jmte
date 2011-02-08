@@ -9,7 +9,7 @@ import com.floreysoft.jmte.util.Util;
 public class DefaultObjectRenderer implements Renderer<Object> {
 
 	@Override
-	public String render(TemplateContext context, Object value) {
+	public String render(Object value) {
 		final String renderedResult;
 
 		if (value instanceof String) {

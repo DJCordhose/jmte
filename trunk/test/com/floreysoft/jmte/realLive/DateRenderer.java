@@ -12,7 +12,7 @@ public class DateRenderer implements Renderer<Date>{
 //		DateFormat dateFormat = new SimpleDateFormat("EEE, d MMM, ''yy", Locale.GERMAN);
 
 	@Override
-	public String render(TemplateContext context, Date date) {
+	public String render(Date date) {
 		String rendered = dateFormat.format(date);
 		return rendered;
 	}

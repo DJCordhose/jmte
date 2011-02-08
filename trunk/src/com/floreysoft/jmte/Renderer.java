@@ -12,10 +12,8 @@ public interface Renderer<T> {
 	/**
 	 * Renders an object of the type supported by the renderer.
 	 * 
-	 * @param context
-	 *            current context during template evaluation
 	 * @param o
 	 *            the object to render
 	 */
-	public String render(TemplateContext context, T o);
+	public String render(T o);
 }

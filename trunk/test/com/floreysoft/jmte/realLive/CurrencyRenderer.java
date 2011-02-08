@@ -32,7 +32,7 @@ public class CurrencyRenderer implements NamedRenderer {
 	}
 
 	@Override
-	public String render(TemplateContext context, Object o, String format) {
+	public String render(Object o, String format) {
 		if (o instanceof BigDecimal) {
 			final NumberFormat numberFormat;
 			if (format == null) {

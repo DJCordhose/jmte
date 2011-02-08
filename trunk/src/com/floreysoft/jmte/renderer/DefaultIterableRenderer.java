@@ -10,7 +10,7 @@ import com.floreysoft.jmte.TemplateContext;
 public class DefaultIterableRenderer implements Renderer<Iterable> {
 
 	@Override
-	public String render(TemplateContext context, Iterable iterable) {
+	public String render(Iterable iterable) {
 		final String renderedResult;
 
 		final Iterator<?> iterator = iterable.iterator();
