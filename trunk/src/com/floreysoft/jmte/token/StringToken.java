@@ -66,6 +66,7 @@ public class StringToken extends ExpressionToken {
 		return defaultValue;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Object evaluate(TemplateContext context) {
 		final Object value = evaluatePlain(context);
@@ -86,7 +87,7 @@ public class StringToken extends ExpressionToken {
 			if (namedRendererResult != null) {
 				renderedResult = namedRendererResult;
 			} else {
-				final Renderer<Object> rendererForClass = context
+				final Renderer<Object> rendererForClass = (Renderer<Object>) context
 						.resolveRendererForClass(value.getClass());
 				if (rendererForClass != null) {
 					renderedResult = rendererForClass.render(context, value);

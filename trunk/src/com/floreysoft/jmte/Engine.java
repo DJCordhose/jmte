@@ -76,7 +76,7 @@ import com.floreysoft.jmte.util.Util;
  * @see ModelAdaptor
  * @see ProcessListener
  */
-public final class Engine {
+public final class Engine implements RendererRegistry {
 
 	public static Engine createCachingEngine() {
 		Engine engine = new Engine();
@@ -244,6 +244,7 @@ public final class Engine {
 		return templateImpl.getUsedVariables();
 	}
 
+	@Override
 	public synchronized Engine registerNamedRenderer(NamedRenderer renderer) {
 		namedRenderers.put(renderer.getName(), renderer);
 		Set<Class<?>> supportedClasses = Util.asSet(renderer
@@ -258,6 +259,7 @@ public final class Engine {
 		return this;
 	}
 
+	@Override
 	public synchronized Engine deregisterNamedRenderer(NamedRenderer renderer) {
 		namedRenderers.remove(renderer.getName());
 		Set<Class<?>> supportedClasses = Util.asSet(renderer
@@ -279,6 +281,7 @@ public final class Engine {
 		compatibleRenderers.add(renderer);
 	}
 
+	@Override
 	public synchronized Collection<NamedRenderer> getCompatibleRenderers(
 			Class<?> inputType) {
 		Set<NamedRenderer> renderers = namedRenderersForClass.get(inputType);
@@ -289,12 +292,14 @@ public final class Engine {
 		return renderers;
 	}
 
+	@Override
 	public synchronized Collection<NamedRenderer> getAllNamedRenderers() {
 		Collection<NamedRenderer> values = namedRenderers.values();
 		return values;
 	}
 
-	NamedRenderer resolveNamedRenderer(String rendererName) {
+	@Override
+	public NamedRenderer resolveNamedRenderer(String rendererName) {
 		return namedRenderers.get(rendererName);
 	}
 
@@ -315,6 +320,7 @@ public final class Engine {
 		return annotationProcessors.get(type);
 	}
 
+	@Override
 	public synchronized <C> Engine registerRenderer(Class<C> clazz,
 			Renderer<C> renderer) {
 		renderers.put(clazz, renderer);
@@ -322,6 +328,7 @@ public final class Engine {
 		return this;
 	}
 
+	@Override
 	public synchronized Engine deregisterRenderer(Class<?> clazz) {
 		renderers.remove(clazz);
 		resolvedRendererCache.clear();
@@ -329,7 +336,8 @@ public final class Engine {
 	}
 
 	@SuppressWarnings("unchecked")
-	Renderer<Object> resolveRendererForClass(Class<?> clazz) {
+	@Override
+	public <C> Renderer<C> resolveRendererForClass(Class<C> clazz) {
 		Renderer resolvedRenderer = resolvedRendererCache.get(clazz);
 		if (resolvedRenderer != null) {
 			return resolvedRenderer;
