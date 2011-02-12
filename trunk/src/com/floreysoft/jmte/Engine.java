@@ -1,6 +1,5 @@
 package com.floreysoft.jmte;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -9,18 +8,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.experimental.theories.Theory;
-
-import com.floreysoft.jmte.ProcessListener.Action;
 import com.floreysoft.jmte.message.DefaultErrorHandler;
 import com.floreysoft.jmte.renderer.DefaultCollectionRenderer;
 import com.floreysoft.jmte.renderer.DefaultIterableRenderer;
 import com.floreysoft.jmte.renderer.DefaultMapRenderer;
 import com.floreysoft.jmte.renderer.DefaultObjectRenderer;
-import com.floreysoft.jmte.template.TemplateCompiler;
 import com.floreysoft.jmte.template.DynamicBytecodeCompiler;
 import com.floreysoft.jmte.template.InterpretedTemplate;
 import com.floreysoft.jmte.template.Template;
+import com.floreysoft.jmte.template.TemplateCompiler;
 import com.floreysoft.jmte.token.Token;
 import com.floreysoft.jmte.util.Tool;
 import com.floreysoft.jmte.util.Util;
@@ -77,6 +73,8 @@ import com.floreysoft.jmte.util.Util;
  * @see ProcessListener
  */
 public final class Engine implements RendererRegistry {
+
+	public final static String VERSION = "@version@";
 
 	public static Engine createCachingEngine() {
 		Engine engine = new Engine();

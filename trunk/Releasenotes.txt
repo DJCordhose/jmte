@@ -101,3 +101,9 @@ Release 2.2
 * Reverted decision that all renderers and get the template context as an additional parameter - now without context again
 
 * Renamed test package "realLive" to "realLife"
+
+
+Release 2.3
+===========
+
+* Engine now holds current version number in #VERSION copied from common.properties
