@@ -72,9 +72,18 @@
   =================================================================== 
   -->
 
-	<target name="build" depends="prepare" description="Compiles the main classes">
-		<javac destdir="${build.dir}" source="${compile.source}" target="${compile.target}" debug="${compile.debug}" deprecation="${compile.deprecation}" optimize="${compile.optimize}">
-			<src path="${src.dir}" />
+	<target name="tag-version" depends="prepare">
+		<mkdir dir="${tmp.dir}/src"/>
+		<copy todir="${tmp.dir}/src" >
+			<fileset dir="${src.dir}"/>
+		</copy>
+		<replace dir="${tmp.dir}/src" token="@version@" value="${version}"/>
+	</target>
+	
+	<target name="build" depends="prepare,tag-version" description="Compiles the main classes">
+		<javac destdir="${build.dir}" source="${compile.source}" target="${compile.target}" debug="${compile.debug}" 
+			deprecation="${compile.deprecation}" optimize="${compile.optimize}">
+			<src path="${tmp.dir}/src"/>
 			<src path="${test.dir}" />
 			<classpath refid="classpath" />
 		</javac>
