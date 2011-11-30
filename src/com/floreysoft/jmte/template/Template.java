@@ -1,5 +1,6 @@
 package com.floreysoft.jmte.template;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -12,12 +13,14 @@ public interface Template {
 	 * 
 	 * @param model
 	 *            the model used to evaluate expressions inside the template
+	 * @param locale
+	 *            the locale used to render this template
 	 * @param modelAdaptor
 	 *            adaptor used for this transformation to look up values from
 	 *            model
 	 * @return the expanded output
 	 */
-	public String transform(Map<String, Object> model,
+	public String transform(Map<String, Object> model, Locale locale,
 			ModelAdaptor modelAdaptor, ProcessListener processListener);
 
 	/**
@@ -25,9 +28,11 @@ public interface Template {
 	 * 
 	 * @param model
 	 *            the model used to evaluate expressions inside the template
+	 * @param locale
+	 *            the locale used to render this template
 	 * @return the expanded output
 	 */
-	public String transform(Map<String, Object> model,
+	public String transform(Map<String, Object> model, Locale locale,
 			ProcessListener processListener);
 
 	/**
@@ -35,9 +40,11 @@ public interface Template {
 	 * 
 	 * @param model
 	 *            the model used to evaluate expressions inside the template
+	 * @param locale
+	 *            the locale used to render this template
 	 * @return the expanded output
 	 */
-	public String transform(Map<String, Object> model);
+	public String transform(Map<String, Object> model, Locale locale);
 
 	public Set<String> getUsedVariables();
 

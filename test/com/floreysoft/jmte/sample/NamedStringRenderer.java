@@ -1,5 +1,7 @@
 package com.floreysoft.jmte.sample;
 
+import java.util.Locale;
+
 import com.floreysoft.jmte.NamedRenderer;
 import com.floreysoft.jmte.RenderFormatInfo;
 import com.floreysoft.jmte.TemplateContext;
@@ -20,7 +22,7 @@ public final class NamedStringRenderer implements NamedRenderer {
 	}
 
 	@Override
-	public String render(Object value, String parameters) {
+	public String render(Object value, String parameters, Locale locale) {
 		String o = convert(value);
 		if (o == null) {
 			return null;

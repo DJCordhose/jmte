@@ -36,13 +36,12 @@ public class CompiledEngineTest extends AbstractEngineTest {
 		// having the same name
 		Template template1 = engine1.getTemplate(templateSource);
 		Template template2 = engine2.getTemplate(templateSource);
-		assertEquals(template1.getClass().getName(), template2.getClass()
-				.getName());
+		assertEquals(template1.getClass().getName(), template2.getClass().getName());
 		// sill, both classes are not the same
 		assertNotSame(template1.getClass(), template2.getClass());
 		// but, both still work
-		String transformed1 = template1.transform(DEFAULT_MODEL);
-		String transformed2 = template2.transform(DEFAULT_MODEL);
+		String transformed1 = template1.transform(DEFAULT_MODEL, DEFAULT_LOCALE);
+		String transformed2 = template2.transform(DEFAULT_MODEL, DEFAULT_LOCALE);
 		// and give the same result
 		assertEquals(transformed1, transformed2);
 	}
