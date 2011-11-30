@@ -1,16 +1,15 @@
 package com.floreysoft.jmte.renderer;
 
 import java.util.Collection;
+import java.util.Locale;
 
 import com.floreysoft.jmte.Renderer;
-import com.floreysoft.jmte.TemplateContext;
 
-
-@SuppressWarnings("unchecked")
+@SuppressWarnings("rawtypes")
 public class DefaultCollectionRenderer implements Renderer<Collection> {
 
 	@Override
-	public String render(Collection collection) {
+	public String render(Collection collection, Locale locale) {
 		final String renderedResult;
 
 		if (collection.size() == 0) {

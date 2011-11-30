@@ -1,5 +1,6 @@
 package com.floreysoft.jmte.template;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -39,7 +40,7 @@ public abstract class AbstractTemplate implements Template {
 	 *            model
 	 * @return the expanded output
 	 */
-	public abstract String transform(Map<String, Object> model,
+	public abstract String transform(Map<String, Object> model, Locale locale,
 			ModelAdaptor modelAdaptor, ProcessListener processListener);
 
 	/**
@@ -49,9 +50,9 @@ public abstract class AbstractTemplate implements Template {
 	 *            the model used to evaluate expressions inside the template
 	 * @return the expanded output
 	 */
-	public String transform(Map<String, Object> model,
+	public String transform(Map<String, Object> model, Locale locale,
 			ProcessListener processListener) {
-		return transform(model, engine.getModelAdaptor(), processListener);
+		return transform(model, locale, engine.getModelAdaptor(), processListener);
 	}
 	
 	/**
@@ -61,8 +62,8 @@ public abstract class AbstractTemplate implements Template {
 	 *            the model used to evaluate expressions inside the template
 	 * @return the expanded output
 	 */
-	public String transform(Map<String, Object> model) {
-		return transform(model, engine.getModelAdaptor(), null);
+	public String transform(Map<String, Object> model, Locale locale) {
+		return transform(model, locale, engine.getModelAdaptor(), null);
 	}
 	
 	public abstract Set<String> getUsedVariables();

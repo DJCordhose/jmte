@@ -2,6 +2,7 @@ package com.floreysoft.jmte;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import com.floreysoft.jmte.ProcessListener.Action;
 import com.floreysoft.jmte.token.Token;
@@ -23,12 +24,14 @@ public class TemplateContext {
 	public final Engine engine;
 	public final String sourceName;
 	public final ModelAdaptor modelAdaptor;
+	public final Locale locale;
 	private final ProcessListener processListener;
 
-	public TemplateContext(String template, String sourceName, ScopedMap model,
+	public TemplateContext(String template, Locale locale, String sourceName, ScopedMap model,
 			ModelAdaptor modelAdaptor, Engine engine, ProcessListener processListener) {
 		this.model = model;
 		this.template = template;
+		this.locale = locale;
 		this.engine = engine;
 		this.scopes = new ArrayList<Token>();
 		this.sourceName = sourceName;

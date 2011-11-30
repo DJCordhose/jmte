@@ -39,85 +39,73 @@ public class CompiledCaliperTest {
 		public void timeSimpleExpressionReference(int reps) throws Exception {
 			Engine engine = referenceEngine;
 			for (int i = 0; i < reps; i++) {
-				engine.transform("${address}",
-						InterpretedEngineTest.DEFAULT_MODEL);
+				engine.transform("${address}", InterpretedEngineTest.DEFAULT_MODEL);
 			}
 		}
 
 		public void timeSimpleExpressionCached(int reps) throws Exception {
 			Engine engine = cachingEngine;
 			for (int i = 0; i < reps; i++) {
-				engine.transform("${address}",
-						InterpretedEngineTest.DEFAULT_MODEL);
+				engine.transform("${address}", InterpretedEngineTest.DEFAULT_MODEL);
 			}
 		}
 
 		public void timeSimpleExpressionCompiled(int reps) throws Exception {
 			Engine engine = compilingEngine;
 			for (int i = 0; i < reps; i++) {
-				engine.transform("${address}",
-						InterpretedEngineTest.DEFAULT_MODEL);
+				engine.transform("${address}", InterpretedEngineTest.DEFAULT_MODEL);
 			}
 		}
 
-		public void timePrototypeCompiledSimpleExpression(int reps)
-				throws Exception {
+		public void timePrototypeCompiledSimpleExpression(int reps) throws Exception {
 			for (int i = 0; i < reps; i++) {
-				simpleExpressiontemplate.transform(
-						InterpretedEngineTest.DEFAULT_MODEL,
-						AbstractEngineTest.MODEL_ADAPTOR, null);
+				simpleExpressiontemplate.transform(InterpretedEngineTest.DEFAULT_MODEL,
+						AbstractEngineTest.DEFAULT_LOCALE, AbstractEngineTest.MODEL_ADAPTOR, null);
 			}
 		}
 
 		public void timeJMTEReflect(int reps) throws Exception {
 			for (int i = 0; i < reps; i++) {
-				referenceEngine.transform("${bean.property1}",
-						InterpretedEngineTest.DEFAULT_MODEL);
+				referenceEngine.transform("${bean.property1}", InterpretedEngineTest.DEFAULT_MODEL);
 			}
 		}
 
 		public void timeJMTEReflectCached(int reps) throws Exception {
 			for (int i = 0; i < reps; i++) {
-				cachingEngine.transform("${bean.property1}",
-						InterpretedEngineTest.DEFAULT_MODEL);
+				cachingEngine.transform("${bean.property1}", InterpretedEngineTest.DEFAULT_MODEL);
 			}
 		}
 
 		public void timeJMTEReflectCompiled(int reps) throws Exception {
 			for (int i = 0; i < reps; i++) {
-				compilingEngine.transform("${bean.property1}",
-						InterpretedEngineTest.DEFAULT_MODEL);
+				compilingEngine.transform("${bean.property1}", InterpretedEngineTest.DEFAULT_MODEL);
 			}
 		}
 
 		public void timeComplexExpressionReference(int reps) throws Exception {
 			Engine engine = referenceEngine;
 			for (int i = 0; i < reps; i++) {
-				engine.transform("${<h1>,address(NIX),</h1>;long(full)}",
-						InterpretedEngineTest.DEFAULT_MODEL);
+				engine.transform("${<h1>,address(NIX),</h1>;long(full)}", InterpretedEngineTest.DEFAULT_MODEL);
 			}
 		}
 
 		public void timeComplexExpressionCached(int reps) throws Exception {
 			Engine engine = cachingEngine;
 			for (int i = 0; i < reps; i++) {
-				engine.transform("${<h1>,address(NIX),</h1>;long(full)}",
-						InterpretedEngineTest.DEFAULT_MODEL);
+				engine.transform("${<h1>,address(NIX),</h1>;long(full)}", InterpretedEngineTest.DEFAULT_MODEL);
 			}
 		}
 
 		public void timeComplexExpressionCompiled(int reps) throws Exception {
 			Engine engine = compilingEngine;
 			for (int i = 0; i < reps; i++) {
-				engine.transform("${<h1>,address(NIX),</h1>;long(full)}",
-						InterpretedEngineTest.DEFAULT_MODEL);
+				engine.transform("${<h1>,address(NIX),</h1>;long(full)}", InterpretedEngineTest.DEFAULT_MODEL);
 			}
 		}
 
-		public void timePrototypeCompiledComplexExpression(int reps)
-				throws Exception {
+		public void timePrototypeCompiledComplexExpression(int reps) throws Exception {
 			for (int i = 0; i < reps; i++) {
-				complexTemplate.transform(InterpretedEngineTest.DEFAULT_MODEL,
+				complexTemplate.transform(InterpretedEngineTest.DEFAULT_MODEL, AbstractEngineTest.DEFAULT_LOCALE,
 						AbstractEngineTest.MODEL_ADAPTOR, null);
 			}
 		}
@@ -125,31 +113,27 @@ public class CompiledCaliperTest {
 		public void timeIf(int reps) throws Exception {
 			Engine engine = referenceEngine;
 			for (int i = 0; i < reps; i++) {
-				engine.transform("${if empty}${address}${else}NIX${end}",
-						InterpretedEngineTest.DEFAULT_MODEL);
+				engine.transform("${if empty}${address}${else}NIX${end}", InterpretedEngineTest.DEFAULT_MODEL);
 			}
 		}
 
 		public void timeIfCached(int reps) throws Exception {
 			Engine engine = cachingEngine;
 			for (int i = 0; i < reps; i++) {
-				engine.transform("${if empty}${address}${else}NIX${end}",
-						InterpretedEngineTest.DEFAULT_MODEL);
+				engine.transform("${if empty}${address}${else}NIX${end}", InterpretedEngineTest.DEFAULT_MODEL);
 			}
 		}
 
 		public void timeIfCompiled(int reps) throws Exception {
 			Engine engine = compilingEngine;
 			for (int i = 0; i < reps; i++) {
-				engine.transform("${if empty}${address}${else}NIX${end}",
-						InterpretedEngineTest.DEFAULT_MODEL);
+				engine.transform("${if empty}${address}${else}NIX${end}", InterpretedEngineTest.DEFAULT_MODEL);
 			}
 		}
 
-		public void timePrototypeCompiledIfExpression(int reps)
-				throws Exception {
+		public void timePrototypeCompiledIfExpression(int reps) throws Exception {
 			for (int i = 0; i < reps; i++) {
-				ifTemplate.transform(InterpretedEngineTest.DEFAULT_MODEL,
+				ifTemplate.transform(InterpretedEngineTest.DEFAULT_MODEL, AbstractEngineTest.DEFAULT_LOCALE,
 						AbstractEngineTest.MODEL_ADAPTOR, null);
 			}
 		}
@@ -157,34 +141,27 @@ public class CompiledCaliperTest {
 		public void timeForeach(int reps) throws Exception {
 			Engine engine = referenceEngine;
 			for (int i = 0; i < reps; i++) {
-				engine.transform(
-						"${ foreach list item \n}${item.property1}${end}",
-						InterpretedEngineTest.DEFAULT_MODEL);
+				engine.transform("${ foreach list item \n}${item.property1}${end}", InterpretedEngineTest.DEFAULT_MODEL);
 			}
 		}
 
 		public void timeForeachCached(int reps) throws Exception {
 			Engine engine = cachingEngine;
 			for (int i = 0; i < reps; i++) {
-				engine.transform(
-						"${ foreach list item \n}${item.property1}${end}",
-						InterpretedEngineTest.DEFAULT_MODEL);
+				engine.transform("${ foreach list item \n}${item.property1}${end}", InterpretedEngineTest.DEFAULT_MODEL);
 			}
 		}
 
 		public void timeForeachCompiled(int reps) throws Exception {
 			Engine engine = compilingEngine;
 			for (int i = 0; i < reps; i++) {
-				engine.transform(
-						"${ foreach list item \n}${item.property1}${end}",
-						InterpretedEngineTest.DEFAULT_MODEL);
+				engine.transform("${ foreach list item \n}${item.property1}${end}", InterpretedEngineTest.DEFAULT_MODEL);
 			}
 		}
 
-		public void timePrototypeCompiledForeachExpression(int reps)
-				throws Exception {
+		public void timePrototypeCompiledForeachExpression(int reps) throws Exception {
 			for (int i = 0; i < reps; i++) {
-				foreachTemplate.transform(InterpretedEngineTest.DEFAULT_MODEL,
+				foreachTemplate.transform(InterpretedEngineTest.DEFAULT_MODEL, AbstractEngineTest.DEFAULT_LOCALE,
 						AbstractEngineTest.MODEL_ADAPTOR, null);
 			}
 		}

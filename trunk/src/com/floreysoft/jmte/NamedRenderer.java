@@ -1,5 +1,7 @@
 package com.floreysoft.jmte;
 
+import java.util.Locale;
+
 
 /**
  * A renderer addressed by its name, not by its type.
@@ -15,9 +17,11 @@ public interface NamedRenderer {
 	 *            the object to render
 	 * @param format
 	 *            anything that tells the renderer how to do its work
+	 * @param locale
+	 *            the locale used in transformation
 	 * @return the rendered object
 	 */
-	public String render(Object o, String format);
+	public String render(Object o, String format, Locale locale);
 
 	/**
 	 * Gets the name of the renderer.

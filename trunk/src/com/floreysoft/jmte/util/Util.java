@@ -205,7 +205,7 @@ public class Util {
 	 * @return List representation if passed in value was an array,
 	 *         <code>null</code> otherwise
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static List<Object> arrayAsList(Object value) {
 		List list = null;
 		if (value instanceof int[]) {

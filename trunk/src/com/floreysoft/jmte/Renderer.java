@@ -1,5 +1,7 @@
 package com.floreysoft.jmte;
 
+import java.util.Locale;
+
 /**
  * Renderer for a certain type.
  * 
@@ -14,6 +16,9 @@ public interface Renderer<T> {
 	 * 
 	 * @param o
 	 *            the object to render
+	 * @param locale
+	 *            the locale used in transformation
+	 *            
 	 */
-	public String render(T o);
+	public String render(T o,Locale locale);
 }

@@ -1,6 +1,7 @@
 package com.floreysoft.jmte.template;
 
 import java.util.Collections;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -82,7 +83,8 @@ public class InterpretedTemplate extends AbstractTemplate {
 			}
 
 		};
-		context = new TemplateContext(template, sourceName, scopedMap,
+		final Locale locale = Locale.getDefault();
+		context = new TemplateContext(template, locale, sourceName, scopedMap,
 				new DefaultModelAdaptor(), engine, processListener);
 
 		transformPure(context);
@@ -90,10 +92,10 @@ public class InterpretedTemplate extends AbstractTemplate {
 	}
 
 	@Override
-	public synchronized String transform(Map<String, Object> model,
+	public synchronized String transform(Map<String, Object> model, Locale locale,
 			ModelAdaptor modelAdaptor, ProcessListener processListener) {
 		try {
-			context = new TemplateContext(template, sourceName, new ScopedMap(
+			context = new TemplateContext(template, locale, sourceName, new ScopedMap(
 					model), modelAdaptor, engine, processListener);
 			String transformed = transformPure(context);
 			String unescaped = Util.NO_QUOTE_MINI_PARSER.unescape(transformed);

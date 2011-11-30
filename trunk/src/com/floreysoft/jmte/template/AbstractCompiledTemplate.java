@@ -1,5 +1,6 @@
 package com.floreysoft.jmte.template;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -26,8 +27,8 @@ public abstract class AbstractCompiledTemplate extends AbstractTemplate {
 	}
 
 	@Override
-	public synchronized String transform(Map<String, Object> model, ModelAdaptor modelAdaptor, ProcessListener processListener) {
-		TemplateContext context = new TemplateContext(template, sourceName,
+	public synchronized String transform(Map<String, Object> model, Locale locale, ModelAdaptor modelAdaptor, ProcessListener processListener) {
+		TemplateContext context = new TemplateContext(template, locale, sourceName,
 				new ScopedMap(model), modelAdaptor, engine, processListener);
 
 		String transformed = transformCompiled(context);

@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -144,6 +145,9 @@ public final class Engine implements RendererRegistry {
 	 * 
 	 * @param template
 	 *            the template to expand
+	 * @param locale
+	 *            the locale being passed into renderers in
+	 *            {@link TemplateContext}
 	 * @param sourceName
 	 *            the name of the current template (if there is anything like
 	 *            that)
@@ -151,58 +155,51 @@ public final class Engine implements RendererRegistry {
 	 *            the model used to evaluate expressions inside the template
 	 * @return the expanded output
 	 */
-	public synchronized String transform(String template, String sourceName,
-			Map<String, Object> model) {
-		return transform(template, sourceName, model, getModelAdaptor(), null);
-	}
-
-	/**
-	 * Transforms a template into an expanded output using the given model.
-	 * 
-	 * @param template
-	 *            the template to expand
-	 * @param model
-	 *            the model used to evaluate expressions inside the template
-	 * @return the expanded output
-	 */
-	public synchronized String transform(String template,
-			Map<String, Object> model) {
-		return transform(template, null, model);
-	}
-
-	public synchronized String transform(String template,
-			Map<String, Object> model, ProcessListener processListener) {
-		return transform(template, null, model, getModelAdaptor(),
-				processListener);
-	}
-
-	public synchronized String transform(String template, String sourceName,
-			Map<String, Object> model, ProcessListener processListener) {
-		return transform(template, sourceName, model, getModelAdaptor(),
-				processListener);
-	}
-
-	/**
-	 * Transforms a template into an expanded output using the given model.
-	 * 
-	 * @param template
-	 *            the template to expand
-	 * @param sourceName
-	 *            the name of the current template (if there is anything like
-	 *            that)
-	 * @param model
-	 *            the model used to evaluate expressions inside the template
-	 * @param modelAdaptor
-	 *            adaptor used for this transformation to look up values from
-	 *            model
-	 * @return the expanded output
-	 */
-	private String transform(String template, String sourceName,
-			Map<String, Object> model, ModelAdaptor modelAdaptor,
+	public synchronized String transform(String template, Locale locale, String sourceName, Map<String, Object> model,
 			ProcessListener processListener) {
+		return transformInternal(template, locale, sourceName, model, getModelAdaptor(), processListener);
+	}
+
+	public synchronized String transform(String template, String sourceName, Map<String, Object> model,
+			ProcessListener processListener) {
+		return transformInternal(template, sourceName, model, getModelAdaptor(), processListener);
+	}
+
+	public synchronized String transform(String template, Locale locale, String sourceName, Map<String, Object> model) {
+		return transformInternal(template, locale, sourceName, model, getModelAdaptor(), null);
+	}
+
+	public synchronized String transform(String template, String sourceName, Map<String, Object> model) {
+		return transformInternal(template, sourceName, model, getModelAdaptor(), null);
+	}
+
+	public synchronized String transform(String template, Locale locale, Map<String, Object> model) {
+		return transformInternal(template, locale, null, model, getModelAdaptor(), null);
+	}
+
+	public synchronized String transform(String template, Map<String, Object> model) {
+		return transformInternal(template, null, model, getModelAdaptor(), null);
+	}
+
+	public synchronized String transform(String template, Map<String, Object> model, ProcessListener processListener) {
+		return transformInternal(template, null, model, getModelAdaptor(), processListener);
+	}
+
+	public synchronized String transform(String template, Locale locale, Map<String, Object> model,
+			ProcessListener processListener) {
+		return transformInternal(template, locale, null, model, getModelAdaptor(), processListener);
+	}
+
+	String transformInternal(String template, String sourceName, Map<String, Object> model, ModelAdaptor modelAdaptor,
+			ProcessListener processListener) {
+		Locale locale = Locale.getDefault();
+		return transformInternal(template, locale, sourceName, model, modelAdaptor, processListener);
+	}
+
+	String transformInternal(String template, Locale locale, String sourceName, Map<String, Object> model,
+			ModelAdaptor modelAdaptor, ProcessListener processListener) {
 		Template templateImpl = getTemplate(template, sourceName);
-		String output = templateImpl.transform(model, modelAdaptor,
-				processListener);
+		String output = templateImpl.transform(model, locale, modelAdaptor, processListener);
 		return output;
 	}
 
@@ -216,21 +213,19 @@ public final class Engine implements RendererRegistry {
 	 *            any number of arguments
 	 * @return the expanded template
 	 */
-	public synchronized String format(final String pattern,
-			final Object... args) {
+	public synchronized String format(final String pattern, final Object... args) {
 		Map<String, Object> model = Collections.emptyMap();
 		ModelAdaptor modelAdaptor = new ModelAdaptor() {
 
 			@Override
-			public Object getValue(TemplateContext context, Token token,
-					List<String> segments, String expression) {
+			public Object getValue(TemplateContext context, Token token, List<String> segments, String expression) {
 				int index = Integer.parseInt(expression) - 1;
 				return args[index];
 			}
 
 		};
 
-		String output = transform(pattern, null, model, modelAdaptor, null);
+		String output = transformInternal(pattern, null, model, modelAdaptor, null);
 		return output;
 	}
 
@@ -245,8 +240,7 @@ public final class Engine implements RendererRegistry {
 	@Override
 	public synchronized Engine registerNamedRenderer(NamedRenderer renderer) {
 		namedRenderers.put(renderer.getName(), renderer);
-		Set<Class<?>> supportedClasses = Util.asSet(renderer
-				.getSupportedClasses());
+		Set<Class<?>> supportedClasses = Util.asSet(renderer.getSupportedClasses());
 		for (Class<?> clazz : supportedClasses) {
 			Class<?> classInHierarchy = clazz;
 			while (classInHierarchy != null) {
@@ -260,13 +254,11 @@ public final class Engine implements RendererRegistry {
 	@Override
 	public synchronized Engine deregisterNamedRenderer(NamedRenderer renderer) {
 		namedRenderers.remove(renderer.getName());
-		Set<Class<?>> supportedClasses = Util.asSet(renderer
-				.getSupportedClasses());
+		Set<Class<?>> supportedClasses = Util.asSet(renderer.getSupportedClasses());
 		for (Class<?> clazz : supportedClasses) {
 			Class<?> classInHierarchy = clazz;
 			while (classInHierarchy != null) {
-				Set<NamedRenderer> renderers = namedRenderersForClass
-						.get(classInHierarchy);
+				Set<NamedRenderer> renderers = namedRenderersForClass.get(classInHierarchy);
 				renderers.remove(renderer);
 				classInHierarchy = classInHierarchy.getSuperclass();
 			}
@@ -280,8 +272,7 @@ public final class Engine implements RendererRegistry {
 	}
 
 	@Override
-	public synchronized Collection<NamedRenderer> getCompatibleRenderers(
-			Class<?> inputType) {
+	public synchronized Collection<NamedRenderer> getCompatibleRenderers(Class<?> inputType) {
 		Set<NamedRenderer> renderers = namedRenderersForClass.get(inputType);
 		if (renderers == null) {
 			renderers = new HashSet<NamedRenderer>();
@@ -301,15 +292,12 @@ public final class Engine implements RendererRegistry {
 		return namedRenderers.get(rendererName);
 	}
 
-	public synchronized Engine registerAnnotationProcessor(
-			AnnotationProcessor<?> annotationProcessor) {
-		annotationProcessors.put(annotationProcessor.getType(),
-				annotationProcessor);
+	public synchronized Engine registerAnnotationProcessor(AnnotationProcessor<?> annotationProcessor) {
+		annotationProcessors.put(annotationProcessor.getType(), annotationProcessor);
 		return this;
 	}
 
-	public synchronized Engine deregisterAnnotationProcessor(
-			AnnotationProcessor<?> annotationProcessor) {
+	public synchronized Engine deregisterAnnotationProcessor(AnnotationProcessor<?> annotationProcessor) {
 		annotationProcessors.remove(annotationProcessor.getType());
 		return this;
 	}
@@ -319,8 +307,7 @@ public final class Engine implements RendererRegistry {
 	}
 
 	@Override
-	public synchronized <C> Engine registerRenderer(Class<C> clazz,
-			Renderer<C> renderer) {
+	public synchronized <C> Engine registerRenderer(Class<C> clazz, Renderer<C> renderer) {
 		renderers.put(clazz, renderer);
 		resolvedRendererCache.clear();
 		return this;
@@ -415,8 +402,7 @@ public final class Engine implements RendererRegistry {
 		return enabledInterpretedTemplateCache;
 	}
 
-	public synchronized void setEnabledInterpretedTemplateCache(
-			boolean enabledInterpretedTemplateCache) {
+	public synchronized void setEnabledInterpretedTemplateCache(boolean enabledInterpretedTemplateCache) {
 		this.enabledInterpretedTemplateCache = enabledInterpretedTemplateCache;
 	}
 
@@ -453,13 +439,11 @@ public final class Engine implements RendererRegistry {
 			if (enabledInterpretedTemplateCache) {
 				templateImpl = interpretedTemplates.get(template);
 				if (templateImpl == null) {
-					templateImpl = new InterpretedTemplate(template,
-							sourceName, this);
+					templateImpl = new InterpretedTemplate(template, sourceName, this);
 					interpretedTemplates.put(template, templateImpl);
 				}
 			} else {
-				templateImpl = new InterpretedTemplate(template, sourceName,
-						this);
+				templateImpl = new InterpretedTemplate(template, sourceName, this);
 			}
 		}
 		return templateImpl;
