@@ -1,19 +1,16 @@
 package com.floreysoft.jmte;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 
 import com.floreysoft.jmte.token.Token;
-import com.floreysoft.jmte.util.Util;
 
 /**
  * Default implementation of the model adapter.
@@ -35,11 +32,10 @@ public class DefaultModelAdaptor implements ModelAdaptor {
 	protected Map<Class<?>, Map<String, Member>> cache = new HashMap<Class<?>, Map<String, Member>>();
 
 	@Override
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public Object getValue(TemplateContext context, Token token,
 			List<String> segments, String expression) {
-		Object value = traverse(segments, context.model, context.engine
-				.getErrorHandler(), token);
+		Object value = traverse(segments, context.model, context.errorHandler, token);
 		// if value implements both, we use the more specialized implementation
 		if (value instanceof Processor) {
 			value = ((Processor) value).eval(context);
@@ -81,7 +77,7 @@ public class DefaultModelAdaptor implements ModelAdaptor {
 		return result;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	protected Object nextStep(Object o, String attributeName,
 			ErrorHandler errorHandler, Token token) {
 		Object result;
@@ -105,6 +101,7 @@ public class DefaultModelAdaptor implements ModelAdaptor {
 		return result;
 	}
 
+	@SuppressWarnings("rawtypes")
 	protected Object getPropertyValue(Object o, String propertyName) {
 		try {
 			// XXX this is so strange, can not call invoke on key and value for

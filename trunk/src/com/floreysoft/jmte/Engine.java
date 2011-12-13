@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.Set;
 
 import com.floreysoft.jmte.message.DefaultErrorHandler;
+import com.floreysoft.jmte.message.ParseException;
+import com.floreysoft.jmte.message.NoLogErrorHandler;
 import com.floreysoft.jmte.renderer.DefaultCollectionRenderer;
 import com.floreysoft.jmte.renderer.DefaultIterableRenderer;
 import com.floreysoft.jmte.renderer.DefaultMapRenderer;
@@ -18,6 +20,8 @@ import com.floreysoft.jmte.template.DynamicBytecodeCompiler;
 import com.floreysoft.jmte.template.InterpretedTemplate;
 import com.floreysoft.jmte.template.Template;
 import com.floreysoft.jmte.template.TemplateCompiler;
+import com.floreysoft.jmte.token.ExpressionToken;
+import com.floreysoft.jmte.token.StringToken;
 import com.floreysoft.jmte.token.Token;
 import com.floreysoft.jmte.util.Tool;
 import com.floreysoft.jmte.util.Util;
@@ -138,6 +142,29 @@ public final class Engine implements RendererRegistry {
 		registerRenderer(Map.class, new DefaultMapRenderer());
 		registerRenderer(Collection.class, new DefaultCollectionRenderer());
 		registerRenderer(Iterable.class, new DefaultIterableRenderer());
+	}
+
+	public boolean variablesAvailable(Map<String, Object> model, String... vars) {
+		boolean missing = false;
+		for (String var : vars) {
+			final TemplateContext context = new TemplateContext(null, null, null, new ScopedMap(model), modelAdaptor, this,
+					new NoLogErrorHandler(), null);
+			final ExpressionToken token = new StringToken(var);
+			final List<String> segments = token.getSegments();
+			final String expression = token.getExpression();
+			
+			Object value = null;
+			try {
+				value = modelAdaptor.getValue(context, token, segments, expression);
+			} catch (ParseException pe) {
+			}
+			if (value == null) {
+				missing = true;
+				break;
+			}
+		}
+		return !missing;
+
 	}
 
 	/**

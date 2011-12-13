@@ -25,10 +25,11 @@ public class TemplateContext {
 	public final String sourceName;
 	public final ModelAdaptor modelAdaptor;
 	public final Locale locale;
-	private final ProcessListener processListener;
+	public final ErrorHandler errorHandler;
+	final ProcessListener processListener;
 
 	public TemplateContext(String template, Locale locale, String sourceName, ScopedMap model,
-			ModelAdaptor modelAdaptor, Engine engine, ProcessListener processListener) {
+			ModelAdaptor modelAdaptor, Engine engine, ErrorHandler errorHandler, ProcessListener processListener) {
 		this.model = model;
 		this.template = template;
 		this.locale = locale;
@@ -36,6 +37,7 @@ public class TemplateContext {
 		this.scopes = new ArrayList<Token>();
 		this.sourceName = sourceName;
 		this.modelAdaptor = modelAdaptor;
+		this.errorHandler = errorHandler;
 		this.processListener = processListener;
 	}
 
