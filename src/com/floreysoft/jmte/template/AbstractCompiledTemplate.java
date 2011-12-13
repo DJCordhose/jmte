@@ -3,7 +3,6 @@ package com.floreysoft.jmte.template;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 import com.floreysoft.jmte.Engine;
 import com.floreysoft.jmte.ModelAdaptor;
@@ -29,7 +28,7 @@ public abstract class AbstractCompiledTemplate extends AbstractTemplate {
 	@Override
 	public synchronized String transform(Map<String, Object> model, Locale locale, ModelAdaptor modelAdaptor, ProcessListener processListener) {
 		TemplateContext context = new TemplateContext(template, locale, sourceName,
-				new ScopedMap(model), modelAdaptor, engine, processListener);
+				new ScopedMap(model), modelAdaptor, engine, engine.getErrorHandler(), processListener);
 
 		String transformed = transformCompiled(context);
 		String unescaped = Util.NO_QUOTE_MINI_PARSER.unescape(transformed);

@@ -1,5 +1,6 @@
 package com.floreysoft.jmte;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -38,7 +39,7 @@ import com.floreysoft.jmte.token.ForEachToken;
 import com.floreysoft.jmte.token.Token;
 import com.floreysoft.jmte.util.Util;
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings("rawtypes")
 public abstract class AbstractEngineTest {
 
 	static final DefaultModelAdaptor MODEL_ADAPTOR = new DefaultModelAdaptor();
@@ -832,15 +833,6 @@ public abstract class AbstractEngineTest {
 		assertEquals(
 				"\"1970.01.01 01:00:00 MEZ\" and \"01.01.1970 01:00:00 +0100\" and Render=propertyValue1 and String=Filbert(this is the format(no matter what I type; - this is part of the format))",
 				output);
-	}
-
-	@Test
-	public void allVariables() throws Exception {
-		Set<String> output = newEngine()
-				.getUsedVariables(
-						"${foreach strings string}${if string='String2'}${string}${adresse}${end}${end}${if !int}${date}${end}");
-		// string is a local variable and should not be included here
-		assertArrayEquals(new String[] { "adresse", "date", "int", "strings" }, output.toArray());
 	}
 
 	@Test

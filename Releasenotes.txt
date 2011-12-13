@@ -103,9 +103,13 @@ Release 2.2
 * Renamed test package "realLive" to "realLife"
 
 
-Release 2.3
+Release 3.0
 ===========
 
 * Engine now holds current version number in #VERSION copied from common.properties
 
-* Engine now supports locale as parameter for transformation that gets passed into TemplateContext for processors and into renderers as an additional parameter - good for locale dependent rendering / processing
+* Engine now supports locale as parameter for transformation that gets passed into TemplateContext for processors and into renderers as an additional parameter - good for locale dependent rendering / processing - breaks public API, though
+
+* NoLogErrorHandler introduced which does does not log, but only throws an exception
+
+* Engine now supports check if variables (expressions) are present in a specific model using #variablesAvailable

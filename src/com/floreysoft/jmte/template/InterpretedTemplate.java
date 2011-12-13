@@ -10,9 +10,9 @@ import com.floreysoft.jmte.DefaultModelAdaptor;
 import com.floreysoft.jmte.Engine;
 import com.floreysoft.jmte.ModelAdaptor;
 import com.floreysoft.jmte.ProcessListener;
+import com.floreysoft.jmte.ProcessListener.Action;
 import com.floreysoft.jmte.ScopedMap;
 import com.floreysoft.jmte.TemplateContext;
-import com.floreysoft.jmte.ProcessListener.Action;
 import com.floreysoft.jmte.token.ElseToken;
 import com.floreysoft.jmte.token.EndToken;
 import com.floreysoft.jmte.token.ExpressionToken;
@@ -85,7 +85,7 @@ public class InterpretedTemplate extends AbstractTemplate {
 		};
 		final Locale locale = Locale.getDefault();
 		context = new TemplateContext(template, locale, sourceName, scopedMap,
-				new DefaultModelAdaptor(), engine, processListener);
+				new DefaultModelAdaptor(), engine, engine.getErrorHandler(), processListener);
 
 		transformPure(context);
 		return usedVariables;
@@ -96,7 +96,7 @@ public class InterpretedTemplate extends AbstractTemplate {
 			ModelAdaptor modelAdaptor, ProcessListener processListener) {
 		try {
 			context = new TemplateContext(template, locale, sourceName, new ScopedMap(
-					model), modelAdaptor, engine, processListener);
+					model), modelAdaptor, engine, engine.getErrorHandler(), processListener);
 			String transformed = transformPure(context);
 			String unescaped = Util.NO_QUOTE_MINI_PARSER.unescape(transformed);
 			return unescaped;
@@ -118,7 +118,7 @@ public class InterpretedTemplate extends AbstractTemplate {
 		return output.toString();
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void foreach(boolean inheritedSkip) {
 		ForEachToken feToken = (ForEachToken) tokenStream.currentToken();
 		Iterable iterable = (Iterable) feToken.evaluate(context);
