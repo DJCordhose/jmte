@@ -26,9 +26,22 @@ public final class HelperTest {
 		boolean variablesAvailable = newEngine().variablesAvailable(AbstractEngineTest.DEFAULT_MODEL);
 		assertTrue(variablesAvailable);
 	}
+	
 	@Test
 	public void variablesNotAvailable() throws Exception {
 		boolean variablesAvailable = newEngine().variablesAvailable(AbstractEngineTest.DEFAULT_MODEL, "something", "bean.property1", "bean.propertyNotThere");
+		assertFalse(variablesAvailable);
+	}
+	
+	@Test
+	public void variablesAvailableBooleanTrue() throws Exception {
+		boolean variablesAvailable = newEngine().variablesAvailable(AbstractEngineTest.DEFAULT_MODEL, "bean.trueCond");
+		assertTrue(variablesAvailable);
+	}
+	
+	@Test
+	public void variablesAvailableBooleanFalse() throws Exception {
+		boolean variablesAvailable = newEngine().variablesAvailable(AbstractEngineTest.DEFAULT_MODEL, "bean.falseCond");
 		assertFalse(variablesAvailable);
 	}
 	
