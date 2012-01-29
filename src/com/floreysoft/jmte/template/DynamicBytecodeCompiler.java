@@ -64,11 +64,6 @@ import com.floreysoft.jmte.util.UniqueNameGenerator;
  */
 public class DynamicBytecodeCompiler implements TemplateCompiler {
 
-	@SuppressWarnings("unchecked")
-	protected <T> Class<T> loadClass(byte[] b, Class<T> type) {
-		return cloadLoader.defineClass(null, b);
-	}
-
 	protected Class<?> loadClass(byte[] b) {
 		return cloadLoader.defineClass(null, b);
 	}
