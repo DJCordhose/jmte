@@ -144,13 +144,13 @@ public final class Engine implements RendererRegistry {
 	}
 
 	/**
-	 * Checkes if all given variables are there and if so, that they evaluate to true inside an if.
+	 * Checks if all given variables are there and if so, that they evaluate to true inside an if.
 	 */
 	public boolean variablesAvailable(Map<String, Object> model, String... vars) {
 		final TemplateContext context = new TemplateContext(null, null, null, new ScopedMap(model), modelAdaptor, this,
 				new SilentErrorHandler(), null);
 		for (String var : vars) {
-			final ExpressionToken token = new IfToken(var, false);
+			final IfToken token = new IfToken(var, false);
 			if (!(Boolean) token.evaluate(context)) {
 				return false;
 			}
