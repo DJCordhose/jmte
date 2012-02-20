@@ -6,6 +6,11 @@
   <packaging>jar</packaging>
   <version>3.0-SNAPSHOT</version>
   <name>Java Minimal Template Engine</name>
+  <description>
+   To build and locally install jar, javadoc and sources, please use:
+      mvn clean javadoc:jar source:jar install -Dmaven.test.skip=true
+   Tested on Maven 2.0.9, JDK 1.6
+  </description>
   <url>http://code.google.com/p/jmte/</url>
   <dependencies>
     <dependency>
@@ -27,11 +32,17 @@
     <resources>
       <resource>
         <directory>${project.basedir}/src</directory>
+	<excludes>
+		 <exclude>**/*.java</exclude>
+	</excludes>
       </resource>
     </resources>
     <testResources>
       <testResource>
         <directory>${project.basedir}/test</directory>
+	<excludes>
+		 <exclude>**/*.java</exclude>
+	</excludes>
       </testResource>
     </testResources>
     <plugins>
@@ -63,6 +74,17 @@
                </excludes>
            </configuration>
        </plugin>
+       <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <configuration>
+              <show>public</show>
+	      <links>
+		      <link>http://docs.oracle.com/javase/6/docs/api</link>
+	      </links>
+	      <windowtitle>${project.name} - Public API</windowtitle>
+            </configuration>
+      </plugin>
     </plugins>
   </build>
 </project>
