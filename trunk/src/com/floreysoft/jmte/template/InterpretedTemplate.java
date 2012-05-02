@@ -98,8 +98,7 @@ public class InterpretedTemplate extends AbstractTemplate {
 			context = new TemplateContext(template, locale, sourceName, new ScopedMap(
 					model), modelAdaptor, engine, engine.getErrorHandler(), processListener);
 			String transformed = transformPure(context);
-			String unescaped = Util.NO_QUOTE_MINI_PARSER.unescape(transformed);
-			return unescaped;
+			return transformed;
 		} finally {
 			context = null;
 			output = null;

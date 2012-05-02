@@ -1161,7 +1161,7 @@ public abstract class AbstractEngineTest {
 	}
 
 	@Test
-	public void testBackslashInData() throws Exception {
+	public void backslashInData() throws Exception {
 		Map<String, Object> model = new HashMap<String, Object>();
 		model.put("str", "Hello \\ world!");
 		String output = newEngine().transform("back\\\\slash for all: ${str}",

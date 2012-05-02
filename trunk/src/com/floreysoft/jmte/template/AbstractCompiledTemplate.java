@@ -31,8 +31,7 @@ public abstract class AbstractCompiledTemplate extends AbstractTemplate {
 				new ScopedMap(model), modelAdaptor, engine, engine.getErrorHandler(), processListener);
 
 		String transformed = transformCompiled(context);
-		String unescaped = Util.NO_QUOTE_MINI_PARSER.unescape(transformed);
-		return unescaped;
+		return transformed;
 
 	}
 
