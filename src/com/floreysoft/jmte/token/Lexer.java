@@ -21,6 +21,14 @@ public class Lexer {
 		token.setColumn(template, start, end);
 		return token;
 	}
+	
+	private String unescapeAccess(List<? extends Object> arr,int index){
+		String val = access(arr,index);
+		if (val!=null && val.trim().length()>0){
+			val = Util.NO_QUOTE_MINI_PARSER.unescape(val); 
+		}
+		return val;
+	}
 
 	private AbstractToken innerNextToken(final String untrimmedInput) {
 		final String input = Util.trimFront(untrimmedInput);
@@ -102,6 +110,9 @@ public class Lexer {
 				}
 
 				String separator = input.substring(separatorBegin);
+				if (separator !=null){
+					separator = Util.NO_QUOTE_MINI_PARSER.unescape(separator);
+				}
 				return new ForEachToken(objectExpression, varName, separator
 						.length() != 0 ? separator : null);
 			}
@@ -140,20 +151,20 @@ public class Lexer {
 		final List<String> wrappedStrings = Util.RAW_OUTPUT_MINI_PARSER.split(
 				complexVariable, ',', 3);
 		// <h1>
-		prefix = wrappedStrings.size() == 3 ? access(wrappedStrings, 0) : null;
+		prefix = wrappedStrings.size() == 3 ? unescapeAccess(wrappedStrings, 0) : null;
 		// </h1>
-		suffix = wrappedStrings.size() == 3 ? access(wrappedStrings, 2) : null;
+		suffix = wrappedStrings.size() == 3 ? unescapeAccess(wrappedStrings, 2) : null;
 
 		// address(NIX)
-		final String completeDefaultString = (wrappedStrings.size() == 3 ? access(
+		final String completeDefaultString = (wrappedStrings.size() == 3 ? unescapeAccess(
 				wrappedStrings, 1)
 				: complexVariable).trim();
 		final List<String> defaultStrings = Util.MINI_PARSER.greedyScan(
 				completeDefaultString, "(", ")");
 		// address
-		variableName = access(defaultStrings, 0);
+		variableName = unescapeAccess(defaultStrings, 0);
 		// NIX
-		defaultValue = access(defaultStrings, 1);
+		defaultValue = unescapeAccess(defaultStrings, 1);
 
 		// long(full)
 		final String format = access(strings, 1);
