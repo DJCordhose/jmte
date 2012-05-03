@@ -23,13 +23,9 @@ import com.floreysoft.jmte.token.PlainTextToken;
 import com.floreysoft.jmte.token.StringToken;
 import com.floreysoft.jmte.token.Token;
 import com.floreysoft.jmte.token.TokenStream;
-import com.floreysoft.jmte.util.Util;
 
 public class InterpretedTemplate extends AbstractTemplate {
 
-	protected final String template;
-	protected final Engine engine;
-	protected final String sourceName;
 	protected final TokenStream tokenStream;
 	protected transient StringBuilder output;
 	protected transient TemplateContext context;
