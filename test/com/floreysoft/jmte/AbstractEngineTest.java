@@ -942,10 +942,14 @@ public abstract class AbstractEngineTest {
 						"\"${date;date(yyyy.MM.dd HH:mm:ss z)}\" and \"${int;date}\" and ${bean;date(long)} and ${address;string(this is the format(no matter what I type; - this is part of the format))}",
 						DEFAULT_MODEL);
 		assertEquals(
-				"\"1970.01.01 01:00:00 MEZ\" and \"01.01.1970 01:00:00 +0100\" and Render=propertyValue1 and String=Filbert(this is the format(no matter what I type; - this is part of the format))",
-				output);
+				clearTimezone("\"1970.01.01 01:00:00 MEZ\" and \"01.01.1970 01:00:00 +0100\" and Render=propertyValue1 and String=Filbert(this is the format(no matter what I type; - this is part of the format))"),
+				clearTimezone(output));
 	}
 
+	private String clearTimezone(String timeString) {
+		return timeString.replace("MEZ", "").replace("CET", "");
+	}
+	
 	@Test
 	public void callable() throws Exception {
 		Callable<Date> date = new Callable<Date>() {
@@ -959,7 +963,7 @@ public abstract class AbstractEngineTest {
 		model.put("date", date);
 		String output = ENGINE_WITH_NAMED_RENDERERS.transform(
 				"${date;date(yyyy.MM.dd HH:mm:ss z)}", model);
-		assertEquals("1970.01.01 01:00:00 MEZ", output);
+		assertEquals(clearTimezone("1970.01.01 01:00:00 MEZ"), clearTimezone(output));
 	}
 
 	@Test
