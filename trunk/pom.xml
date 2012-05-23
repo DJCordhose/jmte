@@ -1,5 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>7</version>  
+  </parent>
+  
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.floreysoft</groupId>
   <artifactId>jmte</artifactId>
@@ -12,6 +18,30 @@
    Tested on Maven 2.0.9, JDK 1.6
   </description>
   <url>http://code.google.com/p/jmte/</url>
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>    
+  </licenses>
+  <scm>
+    <connection>scm:svn:http://jmte.googlecode.com/svn/trunk/</connection>
+    <developerConnection>scm:svn:https://jmte.googlecode.com/svn/trunk/</developerConnection>
+    <url>http://jmte.googlecode.com/svn/trunk/</url>  
+  </scm>
+  <developers>
+    <developer>
+      <id>jmte-oliver-zeigermann</id>
+      <name>Oliver.Zeigermann</name>
+      <email>oliver.zeiger....@gmail.com</email>
+    </developer>
+    <developer>
+     <id>jmte-hpaluch</id>
+     <name>Henryk Paluch</name>
+     <email>hpal...@seznam.cz</email>     
+    </developer>
+  </developers>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
