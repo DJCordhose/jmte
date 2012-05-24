@@ -123,4 +123,8 @@ Release 3.0
   
 * partially fixed Issue 12: Date Junit Tests fail on different Timezone and/or Locale than MEZ/Germany
   (workaround for CET (Czech) and MET (Germany) Time Zones, but probably fail elsewhere)
+
+Release 3.1pre
+==============
+
     
