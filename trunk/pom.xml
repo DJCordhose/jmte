@@ -8,7 +8,7 @@
   <groupId>com.floreysoft</groupId>
   <artifactId>jmte</artifactId>
   <packaging>jar</packaging>
-  <version>3.0</version>
+  <version>3.1-SNAPSHOT</version>
   <name>Java Minimal Template Engine</name>
   <description>
    To build and locally install jar, javadoc and sources, please use:
@@ -24,9 +24,9 @@
     </license>    
   </licenses>
   <scm>
-    <connection>scm:svn:http://jmte.googlecode.com/svn/tags/jmte-3.0</connection>
-    <developerConnection>scm:svn:https://jmte.googlecode.com/svn/tags/jmte-3.0</developerConnection>
-    <url>http://jmte.googlecode.com/svn/tags/jmte-3.0</url>  
+    <connection>scm:svn:http://jmte.googlecode.com/svn/trunk/</connection>
+    <developerConnection>scm:svn:https://jmte.googlecode.com/svn/trunk/</developerConnection>
+    <url>http://jmte.googlecode.com/svn/trunk/</url>  
   </scm>
   <developers>
     <developer>
