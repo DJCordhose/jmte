@@ -4,8 +4,7 @@
     <groupId>org.sonatype.oss</groupId>
     <artifactId>oss-parent</artifactId>
     <version>7</version>  
-  </parent>
-  
+  </parent>  
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.floreysoft</groupId>
   <artifactId>jmte</artifactId>
