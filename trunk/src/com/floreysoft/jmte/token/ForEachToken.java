@@ -36,7 +36,7 @@ public class ForEachToken extends ExpressionToken {
 	public String getText() {
 		if (text == null) {
 			text = FOREACH + " " + getExpression() + " " + varName
-					+ (separator == null ? "" : " " + separator);
+					+ ((separator == null || separator.isEmpty()) ? "" : " " + separator);
 		}
 		return text;
 	}
