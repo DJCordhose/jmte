@@ -1,11 +1,5 @@
 package com.floreysoft.jmte.token;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-
-
 public abstract class AbstractToken implements Token {
 
 	protected String text;
@@ -93,6 +87,11 @@ public abstract class AbstractToken implements Token {
 		return getText();
 	}
 
+	@Override
+	public String emit() {
+		return getText();
+	}
+	
 	public void setSourceName(String sourceName) {
 		this.sourceName = sourceName;
 	}
@@ -110,5 +109,12 @@ public abstract class AbstractToken implements Token {
 	public void setTokenIndex(int tokenIndex) {
 		this.tokenIndex = tokenIndex;
 	}
-
+	
+	public Object clone() {
+		try {
+			return super.clone();
+		} catch (CloneNotSupportedException e) {
+			return null;
+		}
+	}
 }

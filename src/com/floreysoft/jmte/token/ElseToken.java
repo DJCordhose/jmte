@@ -35,4 +35,8 @@ public class ElseToken extends AbstractToken {
 		return ifToken;
 	}
 
+	@Override
+	public String emit() {
+		return ELSE;
+	}
 }

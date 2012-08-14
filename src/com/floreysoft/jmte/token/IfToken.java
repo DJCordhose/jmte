@@ -65,8 +65,7 @@ public class IfToken extends ExpressionToken {
 	}
 
 	@Override
-	public String toString() {
-		// TODO Auto-generated method stub
-		return super.toString();
+	public String emit() {
+		return getText();
 	}
 }

@@ -111,4 +111,26 @@ public class StringToken extends ExpressionToken {
 	public String getParameters() {
 		return parameters;
 	}
+
+  @Override
+  public String emit() {
+    StringBuilder sb = new StringBuilder();
+    if ( prefix != null ) {
+      sb.append(prefix).append(',');
+    }
+    sb.append(getExpression());
+    if ( defaultValue != null ) {
+      sb.append('(').append(defaultValue).append(')');
+    }
+    if ( suffix != null ) {
+      sb.append(',').append(suffix);
+    }
+    if ( rendererName != null ) {
+      sb.append(';').append(rendererName);
+    }
+    if ( parameters != null ) {
+      sb.append('(').append(parameters).append(')');
+    }
+    return sb.toString();
+  }
 }

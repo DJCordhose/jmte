@@ -8,7 +8,7 @@ import com.floreysoft.jmte.TemplateContext;
  * Internal structure returned by the {@link Lexer} passing parsed information
  * into the {@link Engine}.
  */
-public interface Token {
+public interface Token extends Cloneable {
 
 	/**
 	 * Returns the text of the token.
@@ -26,4 +26,6 @@ public interface Token {
 	public Object evaluate(TemplateContext context);
 	
 	public int getTokenIndex();
+	
+	public String emit();
 }
