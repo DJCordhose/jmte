@@ -728,6 +728,14 @@ public abstract class AbstractEngineTest {
 	}
 
 	@Test
+	public void simpleForeachIgnoredNewlinesInsideTags() throws Exception {
+		String output = newEngine().transform(
+				"${\nforeach list item}${item}${\nend\n}", DEFAULT_MODEL);
+		assertEquals("1.1, 1.2" + "2.1, 2.2", output);
+		assertNull(DEFAULT_MODEL.get("item"));
+	}
+
+	@Test
 	public void foreachSingletonAsList() throws Exception {
 		// if the variable we want to iterate over is atomic, we simply wrap
 		// it into a singleton list
