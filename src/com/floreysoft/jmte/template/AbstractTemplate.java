@@ -11,6 +11,7 @@ import com.floreysoft.jmte.token.ForEachToken;
 
 public abstract class AbstractTemplate implements Template {
 
+	public static final String SPECIAL_ITERATOR_VARIABLE = "_it";
 	public static final String ODD_PREFIX = "odd_";
 	public static final String EVEN_PREFIX = "even_";
 	public static final String LAST_PREFIX = "last_";
@@ -24,6 +25,14 @@ public abstract class AbstractTemplate implements Template {
 	protected void addSpecialVariables(ForEachToken feToken,
 			Map<String, Object> model) {
 		String suffix = feToken.getVarName();
+		addSpecialVariables(feToken, model, suffix);
+		
+		// special _it variable as an alias for run variable in inner loop
+		model.put(SPECIAL_ITERATOR_VARIABLE, model.get(feToken.getVarName()));
+		addSpecialVariables(feToken, model, SPECIAL_ITERATOR_VARIABLE);
+	}
+
+	private void addSpecialVariables(ForEachToken feToken, Map<String, Object> model, String suffix) {
 		model.put(FIRST_PREFIX + suffix, feToken.isFirst());
 		model.put(LAST_PREFIX + suffix, feToken.isLast());
 		model.put(EVEN_PREFIX + suffix, feToken.getIndex() % 2 == 0);
