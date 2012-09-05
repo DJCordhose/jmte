@@ -119,7 +119,7 @@ Release 3.0
 * Added Issue 8, fixed Issue 9: add pom.xml to support Maven builds
 
 * fixed Issue 11: Duplicate fields in InterpretedTemplate may cause NPE under some circumstances
-  (note: it has impact only if case of some code refactoring)
+  (note: it has impact only in case of some code refactoring)
   
 * partially fixed Issue 12: Date Junit Tests fail on different Timezone and/or Locale than MEZ/Germany
   (workaround for CET (Czech) and MET (Germany) Time Zones, but probably fail elsewhere)
@@ -127,4 +127,4 @@ Release 3.0
 Release 3.1pre
 ==============
 
-    
+* Iteration variable "_it" introduced in foreach loop, e.g.${foreach list i}${_it}${end} is the same as ${foreach list i}${i}${end}    

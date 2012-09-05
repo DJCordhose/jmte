@@ -1180,4 +1180,24 @@ public abstract class AbstractEngineTest {
 				model);
 		assertEquals("back\\slash for all: Hello \\ world!", output);
 	}
+	
+	@Test
+	public void forachIterator() throws Exception {
+		String actual = newEngine().transform("${foreach list i}${_it.property1}${end}", DEFAULT_MODEL);
+		String output = newEngine().transform("${foreach list i}${i.property1}${end}", DEFAULT_MODEL);
+		assertEquals(output, actual);
+	}
+	
+	@Test		
+	public void forachIteratorNested() throws Exception {
+		String actual = newEngine()
+				.transform(
+						"${foreach list item}${foreach _it.list item2}${_it.property1}${end}\n${end}",
+						DEFAULT_MODEL);
+		String output = newEngine()
+				.transform(
+						"${foreach list item}${foreach item.list item2}${item2.property1}${end}\n${end}",
+						DEFAULT_MODEL);
+		assertEquals(output, actual);
+	}
 }
