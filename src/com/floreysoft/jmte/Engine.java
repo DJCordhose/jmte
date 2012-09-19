@@ -9,6 +9,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import com.floreysoft.jmte.encoder.Encoder;
 import com.floreysoft.jmte.message.DefaultErrorHandler;
 import com.floreysoft.jmte.message.SilentErrorHandler;
 import com.floreysoft.jmte.renderer.DefaultCollectionRenderer;
@@ -110,6 +111,7 @@ public final class Engine implements RendererRegistry {
 	private boolean useCompilation = false;
 	private boolean enabledInterpretedTemplateCache = true;
 	private ModelAdaptor modelAdaptor = new DefaultModelAdaptor();
+	private Encoder encoder = null;
 
 	// compiler plus all compiled classes live as long as this engine
 	private TemplateCompiler compiler = new DynamicBytecodeCompiler();
@@ -368,6 +370,14 @@ public final class Engine implements RendererRegistry {
 		return resolvedRenderer;
 	}
 
+	public synchronized void setEncoder(Encoder encoder) {
+		this.encoder = encoder;
+	}
+	
+	public synchronized Encoder getEncoder() {
+		return encoder;
+	}
+	
 	public synchronized void setErrorHandler(ErrorHandler errorHandler) {
 		this.errorHandler = errorHandler;
 	}

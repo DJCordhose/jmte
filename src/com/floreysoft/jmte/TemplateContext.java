@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Locale;
 
 import com.floreysoft.jmte.ProcessListener.Action;
+import com.floreysoft.jmte.encoder.Encoder;
 import com.floreysoft.jmte.token.Token;
 
 /**
@@ -110,6 +111,10 @@ public class TemplateContext {
 
 	public NamedRenderer resolveNamedRenderer(String rendererName) {
 		return engine.resolveNamedRenderer(rendererName);
+	}
+	
+	public Encoder getEncoder() {
+		return engine.getEncoder();
 	}
 
 }

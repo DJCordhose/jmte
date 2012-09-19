@@ -5,6 +5,7 @@ import java.util.List;
 import com.floreysoft.jmte.NamedRenderer;
 import com.floreysoft.jmte.Renderer;
 import com.floreysoft.jmte.TemplateContext;
+import com.floreysoft.jmte.encoder.Encoder;
 
 public class StringToken extends ExpressionToken {
 	// ${<h1>,address(NIX),</h1>;long(full)}
@@ -99,8 +100,14 @@ public class StringToken extends ExpressionToken {
 		if (renderedResult == null || renderedResult.equals("")) {
 			return renderedResult;
 		} else {
-			return (prefix != null ? prefix : "") + renderedResult
-					+ (suffix != null ? suffix : "");
+			final String prefixedRenderedResult = (prefix != null ? prefix : "") + renderedResult + (suffix != null ? suffix : "");
+			Encoder encoder = context.getEncoder();
+			if (encoder != null) {
+				final String encodedPrefixedRenderedResult = encoder.encode(prefixedRenderedResult);
+				return encodedPrefixedRenderedResult;
+			} else {
+				return prefixedRenderedResult;
+			}
 		}
 	}
 

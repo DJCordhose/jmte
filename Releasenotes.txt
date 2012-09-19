@@ -127,4 +127,8 @@ Release 3.0
 Release 3.1pre
 ==============
 
-* Iteration variable "_it" introduced in foreach loop, e.g.${foreach list i}${_it}${end} is the same as ${foreach list i}${i}${end}    
+* Iteration variable "_it" introduced in foreach loop, e.g.${foreach list i}${_it}${end} is the same as ${foreach list i}${i}${end}
+
+* Introduced new encoder concept that optionally encodes all rendered strings
+
+* Supplied first encoder for XML
