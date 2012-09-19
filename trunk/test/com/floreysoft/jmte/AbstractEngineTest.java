@@ -20,6 +20,7 @@ import java.util.concurrent.Callable;
 
 import org.junit.Test;
 
+import com.floreysoft.jmte.encoder.XMLEncoder;
 import com.floreysoft.jmte.message.AbstractErrorHandler;
 import com.floreysoft.jmte.message.Message;
 import com.floreysoft.jmte.message.ParseException;
@@ -1200,4 +1201,17 @@ public abstract class AbstractEngineTest {
 						DEFAULT_MODEL);
 		assertEquals(output, actual);
 	}
+	
+	@Test
+	public void xmlEncoder() throws Exception {
+		Engine engine = newEngine();
+		engine.setEncoder(new XMLEncoder());
+
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put("toEncode", "&<>'\"");
+
+		String actual = engine.transform("${toEncode}", model);
+		assertEquals("&amp;&lt;&gt;&apos;&quot;", actual);
+	}
+
 }
