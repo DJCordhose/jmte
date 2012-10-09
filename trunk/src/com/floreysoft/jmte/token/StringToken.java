@@ -6,6 +6,7 @@ import com.floreysoft.jmte.NamedRenderer;
 import com.floreysoft.jmte.Renderer;
 import com.floreysoft.jmte.TemplateContext;
 import com.floreysoft.jmte.encoder.Encoder;
+import com.floreysoft.jmte.renderer.RawRenderer;
 
 public class StringToken extends ExpressionToken {
 	// ${<h1>,address(NIX),</h1>;long(full)}
@@ -70,6 +71,7 @@ public class StringToken extends ExpressionToken {
 	@SuppressWarnings("unchecked")
 	@Override
 	public Object evaluate(TemplateContext context) {
+		boolean rawRendering = false;
 		final Object value = evaluatePlain(context);
 
 		final String renderedResult;
@@ -81,6 +83,9 @@ public class StringToken extends ExpressionToken {
 				final NamedRenderer rendererForName = context
 						.resolveNamedRenderer(rendererName);
 				if (rendererForName != null) {
+					if (rendererForName instanceof RawRenderer) {
+						rawRendering = true;
+					}
 					namedRendererResult = rendererForName.render(value, parameters, context.locale);
 				}
 			}
@@ -90,6 +95,9 @@ public class StringToken extends ExpressionToken {
 				final Renderer<Object> rendererForClass = (Renderer<Object>) context
 						.resolveRendererForClass(value.getClass());
 				if (rendererForClass != null) {
+					if (rendererForClass instanceof RawRenderer) {
+						rawRendering = true;
+					}
 					renderedResult = rendererForClass.render(value, context.locale);
 				} else {
 					renderedResult = value.toString();
@@ -102,7 +110,7 @@ public class StringToken extends ExpressionToken {
 		} else {
 			final String prefixedRenderedResult = (prefix != null ? prefix : "") + renderedResult + (suffix != null ? suffix : "");
 			Encoder encoder = context.getEncoder();
-			if (encoder != null) {
+			if (!rawRendering && encoder != null) {
 				final String encodedPrefixedRenderedResult = encoder.encode(prefixedRenderedResult);
 				return encodedPrefixedRenderedResult;
 			} else {

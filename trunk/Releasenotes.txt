@@ -132,3 +132,5 @@ Release 3.1pre
 * Introduced new encoder concept that optionally encodes all rendered strings
 
 * Supplied first encoder for XML
+
+* Introduced RawRenderer interface that lets renderer be unaffected by configured encoder
