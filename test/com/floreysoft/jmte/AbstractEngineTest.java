@@ -26,6 +26,7 @@ import com.floreysoft.jmte.message.Message;
 import com.floreysoft.jmte.message.ParseException;
 import com.floreysoft.jmte.message.ResourceBundleMessage;
 import com.floreysoft.jmte.realLife.RealLiveTest;
+import com.floreysoft.jmte.renderer.RawRenderer;
 import com.floreysoft.jmte.sample.NamedDateRenderer;
 import com.floreysoft.jmte.sample.NamedStringRenderer;
 import com.floreysoft.jmte.sample.SampleCompiledSequenceTemplate;
@@ -107,6 +108,37 @@ public abstract class AbstractEngineTest {
 
 	private static final MyBean MyBean1 = new MyBean("1.1", "1.2");
 	private static final MyBean MyBean2 = new MyBean("2.1", "2.2");
+
+	private static final class RawNoopRenderer implements Renderer<String>, RawRenderer {
+		@Override
+		public String render(String o, Locale locale) {
+			return o;
+		}
+	}
+
+	private static final class RawNamedNoopRenderer implements NamedRenderer, RawRenderer {
+
+		@Override
+		public String render(Object o, String format, Locale locale) {
+			return o.toString();
+		}
+
+		@Override
+		public String getName() {
+			return "raw";
+		}
+
+		@Override
+		public RenderFormatInfo getFormatInfo() {
+			return null;
+		}
+
+		@Override
+		public Class<?>[] getSupportedClasses() {
+			Class<?>[] clazzes = { String.class };
+			return clazzes;
+		}
+	}
 
 	private static class MyIterable implements Iterable {
 		List<Object> list = new ArrayList<Object>();
@@ -1212,6 +1244,34 @@ public abstract class AbstractEngineTest {
 
 		String actual = engine.transform("${toEncode}", model);
 		assertEquals("&amp;&lt;&gt;&apos;&quot;", actual);
+	}
+
+	@Test
+	public void xmlEncoderRawRenderer() throws Exception {
+		Renderer<String> rawRenderer = new RawNoopRenderer();
+		Engine engine = newEngine();
+		engine.registerRenderer(String.class, rawRenderer);
+		engine.setEncoder(new XMLEncoder());
+
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put("toEncode", "&<>'\"");
+
+		String actual = engine.transform("${toEncode}", model);
+		assertEquals("&<>'\"", actual);
+	}
+
+	@Test
+	public void xmlEncoderRawNamedRenderer() throws Exception {
+		NamedRenderer rawRenderer = new RawNamedNoopRenderer();
+		Engine engine = newEngine();
+		engine.registerNamedRenderer(rawRenderer);
+		engine.setEncoder(new XMLEncoder());
+
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put("toEncode", "&<>'\"");
+
+		String actual = engine.transform("${toEncode;raw}", model);
+		assertEquals("&<>'\"", actual);
 	}
 
 }
