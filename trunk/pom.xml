@@ -8,7 +8,7 @@
   <groupId>com.floreysoft</groupId>
   <artifactId>jmte</artifactId>
   <packaging>jar</packaging>
-  <version>3.1-SNAPSHOT</version>
+  <version>3.1</version>
   <name>Java Minimal Template Engine</name>
   <description>
    To build and locally install jar, javadoc and sources, please use:
