@@ -127,10 +127,13 @@ Release 3.0
 Release 3.1pre
 ==============
 
-* Iteration variable "_it" introduced in foreach loop, e.g.${foreach list i}${_it}${end} is the same as ${foreach list i}${i}${end}
+* New Feature: Iteration variable "_it" introduced in foreach loop, e.g. ${foreach list i}${_it}${end} is the same as ${foreach list i}${i}${end}
 
-* Introduced new encoder concept that optionally encodes all rendered strings
+* New Feature: Introduced new encoder concept that optionally encodes all rendered strings
 
 * Supplied first encoder for XML
 
-* Introduced RawRenderer interface that lets renderer be unaffected by configured encoder
+* New Feature: Introduced RawRenderer interface that lets renderer be unaffected by configured encoder
+
+* New Feature: Added one-based iteration variable "index_..."in foreach loop, e.g. ${foreach array item \n}${index_item}. ${item}${end}
+  (proposed by http://code.google.com/u/bchoii/)
