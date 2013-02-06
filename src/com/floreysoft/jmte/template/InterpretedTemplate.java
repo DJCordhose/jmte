@@ -117,7 +117,9 @@ public class InterpretedTemplate extends AbstractTemplate {
 	private void foreach(boolean inheritedSkip) {
 		ForEachToken feToken = (ForEachToken) tokenStream.currentToken();
 		Iterable iterable = (Iterable) feToken.evaluate(context);
+		// begin a fresh iteration with a reset index
 		feToken.setIterator(iterable.iterator());
+		feToken.resetIndex();
 		tokenStream.consume();
 
 		context.model.enterScope();

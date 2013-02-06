@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.floreysoft.jmte.encoder.XMLEncoder;
@@ -1234,6 +1235,122 @@ public abstract class AbstractEngineTest {
 		assertEquals(output, actual);
 	}
 	
+	@Test
+	public void forachIndex() throws Exception {
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put("array", new String[] { "item A", "item B", "item C" });
+
+		Engine engine = newEngine();
+		String actual = engine.transform("${foreach array item \n}${index_item}. ${item}${end}", model);
+		String expected = "1. item A\n" + "2. item B\n" + "3. item C";
+		assertEquals(expected, actual);
+	}
+	
+	@Test
+	public void nestedForachIndex() throws Exception {
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put("array", new String[] { "outer#1", "outer#2"});
+		model.put("array2", new String[] { "inner#1", "inner#2"});
+
+		Engine engine = newEngine();
+		String actual = engine.transform("${foreach array item \n}${index_item;index} ${item}\n${foreach array2 inner \n}${index_inner;index(a)} ${inner}${end}${end}", model);
+		String expected = "1 outer#1\n" + "1 inner#1\n" +"2 inner#2\n" + "2 outer#2\n"+ "1 inner#1\n" +"2 inner#2";
+		assertEquals(expected, actual);
+	}
+
+
+	private static NamedRenderer indexRenderer = new NamedRenderer() {
+		
+		@Override
+		public String render(Object o, String format, Locale locale) {
+			if (format != null && format.length() > 0 && Character.isLetter(format.charAt(0))) {
+				// format is character, use small letter alpha formatter
+				String string = o.toString();
+				try {
+					int parsedInt = Integer.parseInt(string);
+					if (parsedInt > 0 && parsedInt <= 26) {
+						return "abcdefghijklmnopqrstuvwxyz".charAt(parsedInt - 1) + ".";
+					}
+				} catch (NumberFormatException nfe) {
+					// do nothing, simply fall back to default formatting
+				}
+			}
+			// suppose we have a number a index, use it with a bit of formatting 
+			return "(" + o.toString() + ")";
+		}
+		
+		@Override
+		public Class<?>[] getSupportedClasses() {
+			return new Class[]{String.class};
+		}
+		
+		@Override
+		public String getName() {
+			return "index";
+		}
+		
+		@Override
+		public RenderFormatInfo getFormatInfo() {
+			return null;
+		}
+	};
+
+	@Test
+	public void forachIndexWithRenderer() throws Exception {
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put("array", new String[] { "item A", "item B", "item C" });
+
+		Engine engine = newEngine();
+		// sample renderer that can do number and letter bullet points
+		// can easily be extended to any other format
+		engine.registerNamedRenderer(indexRenderer);
+		
+		String actual = engine.transform("${foreach array item \n}${index_item;index} ${item}${end}", model);
+		String expected = "(1) item A\n" + "(2) item B\n" + "(3) item C";
+		assertEquals(expected, actual);
+	}
+
+	@Test
+	public void nestedForachIndexWithRenderer() throws Exception {
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put("array", new String[] { "outer#1", "outer#2"});
+		model.put("array2", new String[] { "inner#1", "inner#2"});
+
+		Engine engine = newEngine();
+		// sample renderer that can do number and letter bullet points
+		// can easily be extended to any other format
+		engine.registerNamedRenderer(indexRenderer);
+		
+		String actual = engine.transform("${foreach array item \n}${index_item;index} ${item}\n${foreach array2 inner \n}${index_inner;index(a)} ${inner}${end}${end}", model);
+		String expected = "(1) outer#1\n" + "a. inner#1\n" +"b. inner#2\n" + "(2) outer#2\n"+ "a. inner#1\n" +"b. inner#2";
+		assertEquals(expected, actual);
+	}
+
+	@Test
+	@Ignore
+	public void spacedIdentifier() throws Exception {
+		Map<String, Object> model = new HashMap<String, Object>();
+		// used to reference a column/field in a certain table in Google Spreadsheet
+		model.put("‘Mein Blatt 1’!B2", "Huhn");
+		Engine engine = newEngine();
+//		engine.setQuoteCharacter('\'');
+		String actual = engine.transform("${‘Mein Blatt 1’!B2}", model);
+		String expected = "Huhn";
+		assertEquals(expected, actual);
+	}
+	
+	@Test
+	@Ignore
+	public void forachSpaceIdentifier() throws Exception {
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put("‘Mein Blatt 1’!B2", new String[] { "item A", "item B", "item C" });
+		Engine engine = newEngine();
+//		engine.setQuoteCharacter('\'');
+		String actual = engine.transform("${foreach ‘Mein Blatt 1’!B2 item \n}${item}${end}", model);
+		String expected = "item A\n" + "item B\n" + "item C";
+		assertEquals(expected, actual);
+	}
+		
 	@Test
 	public void xmlEncoder() throws Exception {
 		Engine engine = newEngine();

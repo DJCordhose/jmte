@@ -86,10 +86,6 @@ public class ForEachToken extends ExpressionToken {
 		return index == 0;
 	}
 
-	public void setIndex(int index) {
-		this.index = index;
-	}
-
 	public int getIndex() {
 		return index;
 	}
@@ -109,5 +105,9 @@ public class ForEachToken extends ExpressionToken {
 	public Object advance() {
 		index++;
 		return iterator.next();
+	}
+
+	public void resetIndex() {
+		index = -1;
 	}
 }

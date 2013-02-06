@@ -16,7 +16,8 @@ public abstract class AbstractTemplate implements Template {
 	public static final String EVEN_PREFIX = "even_";
 	public static final String LAST_PREFIX = "last_";
 	public static final String FIRST_PREFIX = "first_";
-
+	public static final String INDEX_PREFIX = "index_";
+	
 	protected Engine engine;
 	protected String template;
 	protected String sourceName;
@@ -37,6 +38,7 @@ public abstract class AbstractTemplate implements Template {
 		model.put(LAST_PREFIX + suffix, feToken.isLast());
 		model.put(EVEN_PREFIX + suffix, feToken.getIndex() % 2 == 0);
 		model.put(ODD_PREFIX + suffix, feToken.getIndex() % 2 == 1);
+		model.put(INDEX_PREFIX + suffix, feToken.getIndex() + 1);
 	}
 
 	/**
