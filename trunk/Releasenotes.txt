@@ -137,3 +137,7 @@ Release 3.1
 
 * New Feature: Added one-based iteration variable "index_..."in foreach loop, e.g. ${foreach array item \n}${index_item}. ${item}${end}
   (proposed by http://code.google.com/u/bchoii/)
+
+Release 3.2pre
+==============
+  
