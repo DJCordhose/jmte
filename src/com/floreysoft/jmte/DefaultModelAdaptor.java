@@ -4,12 +4,15 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 
+import com.floreysoft.jmte.message.NoLogErrorHandler;
+import com.floreysoft.jmte.token.InvalidToken;
 import com.floreysoft.jmte.token.Token;
 
 /**
@@ -31,6 +34,16 @@ public class DefaultModelAdaptor implements ModelAdaptor {
 
 	protected Map<Class<?>, Map<String, Member>> cache = new HashMap<Class<?>, Map<String, Member>>();
 
+	public Object getValue(Map<String, Object> model, String expression) {
+		String[] split = expression.split("\\.");
+		List<String> segments = Arrays.asList(split);
+		ErrorHandler errorHandler = new NoLogErrorHandler();
+		Token token = new InvalidToken();
+		Object value = traverse(segments, model, errorHandler, token);
+		return value;
+	}
+	
+	
 	@Override
 	@SuppressWarnings("rawtypes")
 	public Object getValue(TemplateContext context, Token token,
