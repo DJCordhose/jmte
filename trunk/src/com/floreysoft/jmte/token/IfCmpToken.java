@@ -34,7 +34,7 @@ public class IfCmpToken extends IfToken {
 	@Override
 	public Object evaluate(TemplateContext context) {
 		final Object value = evaluatePlain(context);
-		final boolean condition = getOperand().equals(value.toString());
+		final boolean condition = value != null && getOperand().equals(value.toString());
 		final Object evaluated = negated ? !condition : condition;
 		return evaluated;
 	}
