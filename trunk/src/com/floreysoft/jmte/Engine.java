@@ -20,7 +20,6 @@ import com.floreysoft.jmte.template.DynamicBytecodeCompiler;
 import com.floreysoft.jmte.template.InterpretedTemplate;
 import com.floreysoft.jmte.template.Template;
 import com.floreysoft.jmte.template.TemplateCompiler;
-import com.floreysoft.jmte.token.ExpressionToken;
 import com.floreysoft.jmte.token.IfToken;
 import com.floreysoft.jmte.token.Token;
 import com.floreysoft.jmte.util.Tool;
@@ -113,8 +112,7 @@ public final class Engine implements RendererRegistry {
 	private ModelAdaptor modelAdaptor = new DefaultModelAdaptor();
 	private Encoder encoder = null;
 
-	// compiler plus all compiled classes live as long as this engine
-	private TemplateCompiler compiler = new DynamicBytecodeCompiler();
+	private TemplateCompiler compiler;
 
 	// compiled templates cache lives as long as this engine
 	private final Map<String, Template> compiledTemplates = new HashMap<String, Template>();
@@ -459,6 +457,9 @@ public final class Engine implements RendererRegistry {
 		if (useCompilation) {
 			templateImpl = compiledTemplates.get(template);
 			if (templateImpl == null) {
+				if (compiler == null) {
+					compiler = new DynamicBytecodeCompiler();
+				}
 				templateImpl = compiler.compile(template, sourceName, this);
 				compiledTemplates.put(template, templateImpl);
 			}
