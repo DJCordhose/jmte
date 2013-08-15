@@ -140,4 +140,7 @@ Release 3.1
 
 Release 3.2pre
 ==============
+
+* Fixed Issue 22 (https://code.google.com/p/jmte/issues/detail?id=22): Dependency to ASM again optional
+
   
