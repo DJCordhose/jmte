@@ -1,10 +1,6 @@
 package com.floreysoft.jmte;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -1353,6 +1349,23 @@ public abstract class AbstractEngineTest {
 		assertEquals(expected, actual);
 	}
 		
+	// Bug: https://code.google.com/p/jmte/issues/detail?id=23
+	@Test
+	public void slashWrappedInside() throws Exception {
+		Map<String, Object> model = new HashMap<String, Object>();
+		Object book = new Object() {
+			@SuppressWarnings("unused")
+			public String getTitle() {
+				return "whatever";
+			}
+		};
+		model.put("book", book);
+		Engine engine = newEngine();
+		String actual = engine.transform("<input type='text' name='title' value=${book.title}/>", model);
+		String expected = "<input type='text' name='title' value=whatever/>";
+		assertEquals(expected, actual);
+	}
+	
 	@Test
 	public void xmlEncoder() throws Exception {
 		Engine engine = newEngine();
