@@ -11,10 +11,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.Callable;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.floreysoft.jmte.encoder.XMLEncoder;
@@ -267,7 +265,7 @@ public abstract class AbstractEngineTest {
 		Map<String, Object> simpleModel = new HashMap<String, Object>();
 		simpleModel
 				.put("http://www.google.com/m8/feeds/groups/daniel.florey%40gmail.com/base/16e7715c8a9e5849",
-						"true");
+                        "true");
 		simpleModel
 				.put("http://www.google.com/m8/feeds/groups/daniel.florey%40gmail.com/base/6",
 						"true");
@@ -282,7 +280,7 @@ public abstract class AbstractEngineTest {
 	@Test
 	public void format() throws Exception {
 		String output = newEngine().format("${if 1}${1}${else}${2}${end}",
-				"arg1", "arg2");
+                "arg1", "arg2");
 		assertEquals("arg1", output);
 		// just to prove that shortcut for false-branch works
 		newEngine().format("${if 1}${1}${else}${2}${end}", "arg1");
@@ -435,7 +433,7 @@ public abstract class AbstractEngineTest {
 	@Test
 	public void ifNullTrueExpression() throws Exception {
 		String output = newEngine().transform(
-				"${if address}${address}${else}NIX${end}", DEFAULT_MODEL);
+                "${if address}${address}${else}NIX${end}", DEFAULT_MODEL);
 		assertEquals(DEFAULT_MODEL.get("address"), output);
 	}
 
@@ -605,8 +603,8 @@ public abstract class AbstractEngineTest {
 	@Test
 	public void stringEqNotElse() throws Exception {
 		String output = newEngine().transform(
-				"${if !address='Filbert'}${address}${else}NIX${end}",
-				DEFAULT_MODEL);
+                "${if !address='Filbert'}${address}${else}NIX${end}",
+                DEFAULT_MODEL);
 		assertEquals("NIX", output);
 	}
 
@@ -614,23 +612,23 @@ public abstract class AbstractEngineTest {
 	public void stringEqInForeach() throws Exception {
 		String output = newEngine()
 				.transform(
-						"${foreach strings string}${if string='String2'}${string}${end}${end}",
-						DEFAULT_MODEL);
+                        "${foreach strings string}${if string='String2'}${string}${end}${end}",
+                        DEFAULT_MODEL);
 		assertEquals("String2", output);
 	}
 
 	@Test
 	public void ifBooleanTrueExpression() throws Exception {
 		String output = newEngine().transform(
-				"${if bean.trueCond}${address}${else}NIX${end}", DEFAULT_MODEL);
+                "${if bean.trueCond}${address}${else}NIX${end}", DEFAULT_MODEL);
 		assertEquals(DEFAULT_MODEL.get("address"), output);
 	}
 
 	@Test
 	public void ifBooleanObjTrueExpression() throws Exception {
 		String output = newEngine().transform(
-				"${if bean.trueCondObj}${address}${else}NIX${end}",
-				DEFAULT_MODEL);
+                "${if bean.trueCondObj}${address}${else}NIX${end}",
+                DEFAULT_MODEL);
 		assertEquals(DEFAULT_MODEL.get("address"), output);
 	}
 
@@ -638,7 +636,7 @@ public abstract class AbstractEngineTest {
 	public void ifBooleanFalseExpression() throws Exception {
 		String output = newEngine()
 				.transform("${if bean.falseCond}${address}${else}NIX${end}",
-						DEFAULT_MODEL);
+                        DEFAULT_MODEL);
 		assertEquals("NIX", output);
 	}
 
@@ -649,7 +647,7 @@ public abstract class AbstractEngineTest {
 		assertEquals("false", falseString);
 		model.put("falseString", falseString);
 		String output = newEngine().transform("${if falseString}NO${end}",
-				model);
+                model);
 		assertEquals("", output);
 	}
 
@@ -736,7 +734,7 @@ public abstract class AbstractEngineTest {
 	@Test
 	public void ifPrimitiveArrayTrueExpression() throws Exception {
 		String output = newEngine().transform(
-				"${if intArray}${address}${else}NIX${end}", DEFAULT_MODEL);
+                "${if intArray}${address}${else}NIX${end}", DEFAULT_MODEL);
 		assertEquals(DEFAULT_MODEL.get("address"), output);
 	}
 
@@ -744,7 +742,7 @@ public abstract class AbstractEngineTest {
 	public void ifPrimitiveArrayFalseExpression() throws Exception {
 		String output = newEngine()
 				.transform("${if emptyIntArray }${address}${else}NIX${end}",
-						DEFAULT_MODEL);
+                        DEFAULT_MODEL);
 		assertEquals("NIX", output);
 	}
 
@@ -752,16 +750,16 @@ public abstract class AbstractEngineTest {
 	public void nestedIfExpression() throws Exception {
 		String output = newEngine()
 				.transform(
-						"${if hugo}${address}${else}${if address}${address}${else}NIX${end}${end}",
-						DEFAULT_MODEL);
+                        "${if hugo}${address}${else}${if address}${address}${else}NIX${end}${end}",
+                        DEFAULT_MODEL);
 		assertEquals(DEFAULT_MODEL.get("address"), output);
 	}
 
 	@Test
 	public void nestedIfSkip() throws Exception {
 		String output = newEngine().transform(
-				"${if nix}Something${if address}${address}${end}${end}",
-				DEFAULT_MODEL);
+                "${if nix}Something${if address}${address}${end}${end}",
+                DEFAULT_MODEL);
 		assertEquals("", output);
 	}
 
@@ -769,15 +767,15 @@ public abstract class AbstractEngineTest {
 	public void nestedIfElseSkip() throws Exception {
 		String output = newEngine()
 				.transform(
-						"${if something}${else}${if something}${else}Something${if address}${address}${end}${end}${end}",
-						DEFAULT_MODEL);
+                        "${if something}${else}${if something}${else}Something${if address}${address}${end}${end}${end}",
+                        DEFAULT_MODEL);
 		assertEquals("", output);
 	}
 
 	@Test
 	public void simpleForeach() throws Exception {
 		String output = newEngine().transform(
-				"${foreach list item}${item}\n${end}", DEFAULT_MODEL);
+                "${foreach list item}${item}\n${end}", DEFAULT_MODEL);
 		assertEquals("1.1, 1.2\n" + "2.1, 2.2\n", output);
 		assertNull(DEFAULT_MODEL.get("item"));
 	}
@@ -823,10 +821,29 @@ public abstract class AbstractEngineTest {
 				DEFAULT_MODEL);
 		assertEquals("mapEntry1=mapValue1\n" + "mapEntry2=mapValue2\n", output);
 		assertNull(DEFAULT_MODEL.get("item"));
-
 	}
 
-	@Test
+    @Test
+    public void loopModeArrayforeachMap() throws Exception {
+        Engine engine = newEngine();
+        engine.setModelAdaptor(new DefaultModelAdaptor(DefaultModelAdaptor.LoopMode.LIST));
+        String output = engine.transform(
+                "${foreach map entry}${entry.mapEntry1}, ${entry.mapEntry2}${end}",
+                DEFAULT_MODEL);
+        assertEquals("mapValue1, mapValue2", output);
+    }
+
+    @Test
+    public void loopModeArrayForeachArray() throws Exception {
+        Engine engine = newEngine();
+        engine.setModelAdaptor(new DefaultModelAdaptor(DefaultModelAdaptor.LoopMode.LIST));
+        String output = engine.transform(
+                "${foreach array item}${item}\n${end}", DEFAULT_MODEL);
+        assertEquals("1.1, 1.2\n" + "2.1, 2.2\n", output);
+        assertNull(DEFAULT_MODEL.get("item"));
+    }
+
+    @Test
 	public void specialForeachVariables() throws Exception {
 		String output = newEngine()
 				.transform(
@@ -850,7 +867,7 @@ public abstract class AbstractEngineTest {
 	public void crazyForeachSeparator() throws Exception {
 		String output = newEngine()
 				.transform("${ foreach list item  }${item.property1}${end}",
-						DEFAULT_MODEL);
+                        DEFAULT_MODEL);
 		assertEquals("1.1 2.1", output);
 		assertNull(DEFAULT_MODEL.get("item"));
 	}
@@ -867,7 +884,7 @@ public abstract class AbstractEngineTest {
 	@Test
 	public void propertyForeach() throws Exception {
 		String output = newEngine().transform(
-				"${foreach list item}${item.property1}\n${end}", DEFAULT_MODEL);
+                "${foreach list item}${item.property1}\n${end}", DEFAULT_MODEL);
 		assertEquals("1.1\n" + "2.1\n", output);
 		assertNull(DEFAULT_MODEL.get("item"));
 	}
@@ -887,16 +904,16 @@ public abstract class AbstractEngineTest {
 	public void ifInNestedForeach() throws Exception {
 		String output = newEngine()
 				.transform(
-						"${foreach list item}${foreach item.list item2}${if item}${item2.property1}${end}${end}\n${end}",
-						DEFAULT_MODEL);
+                        "${foreach list item}${foreach item.list item2}${if item}${item2.property1}${end}${end}\n${end}",
+                        DEFAULT_MODEL);
 		assertEquals("1.12.1\n" + "1.12.1\n", output);
 	}
 
 	@Test
 	public void emptyForeach() throws Exception {
 		String output = newEngine().transform(
-				"${foreach emptyList item}${item.property1}\n${end}",
-				DEFAULT_MODEL);
+                "${foreach emptyList item}${item.property1}\n${end}",
+                DEFAULT_MODEL);
 		assertEquals("", output);
 		assertNull(DEFAULT_MODEL.get("item"));
 	}
@@ -915,8 +932,8 @@ public abstract class AbstractEngineTest {
 	public void elseInForeach() throws Exception {
 		String output = newEngine()
 				.transform(
-						"${foreach strings string , }${if string=String1}nada${else}nüscht${end}${end}",
-						DEFAULT_MODEL);
+                        "${foreach strings string , }${if string=String1}nada${else}nüscht${end}${end}",
+                        DEFAULT_MODEL);
 		assertEquals("nada, nüscht, nüscht", output);
 	}
 
@@ -933,8 +950,8 @@ public abstract class AbstractEngineTest {
 	public void foreachDoubleVarName() throws Exception {
 		String output = newEngine()
 				.transform(
-						"${foreach list item  }${item}:${foreach strings item ,}${item}${end}${end}",
-						DEFAULT_MODEL);
+                        "${foreach list item  }${item}:${foreach strings item ,}${item}${end}${end}",
+                        DEFAULT_MODEL);
 		assertEquals(
 				"1.1, 1.2:String1,String2,String3 2.1, 2.2:String1,String2,String3",
 				output);
@@ -956,8 +973,8 @@ public abstract class AbstractEngineTest {
 	public void complexEscaping() throws Exception {
 		String output = newEngine()
 				.transform(
-						"${foreach list item \\${\n \\},}${item.property1}${end}\n\\\\",
-						DEFAULT_MODEL);
+                        "${foreach list item \\${\n \\},}${item.property1}${end}\n\\\\",
+                        DEFAULT_MODEL);
 		assertEquals("1.1${\n },2.1\n\\", output);
 	}
 
@@ -971,8 +988,8 @@ public abstract class AbstractEngineTest {
 	public void renderer() throws Exception {
 		String output = ENGINE_WITH_CUSTOM_RENDERERS
 				.transform(
-						"${bean} and ${bean;long} and ${address;this is the format(no matter what I type; - this is part of the format)}",
-						DEFAULT_MODEL);
+                        "${bean} and ${bean;long} and ${address;this is the format(no matter what I type; - this is part of the format)}",
+                        DEFAULT_MODEL);
 		assertEquals(
 				"Render=propertyValue1 and Render=propertyValue1 and Object=Filbert",
 				output);
@@ -994,7 +1011,7 @@ public abstract class AbstractEngineTest {
 				"${if address}${address;long(full)}${else}NIX${end}",
 				DEFAULT_MODEL);
 		String shortCut = ENGINE_WITH_CUSTOM_RENDERERS.transform(
-				"${address(NIX);long(full)}", DEFAULT_MODEL);
+                "${address(NIX);long(full)}", DEFAULT_MODEL);
 		assertEquals(full, shortCut);
 	}
 
@@ -1025,7 +1042,7 @@ public abstract class AbstractEngineTest {
 		Map<String, Object> model = new HashMap<String, Object>();
 		model.put("date", date);
 		String output = ENGINE_WITH_NAMED_RENDERERS.transform(
-				"${date;date(yyyy.MM.dd HH:mm:ss z)}", model);
+                "${date;date(yyyy.MM.dd HH:mm:ss z)}", model);
 		assertEquals(clearTimezone("1970.01.01 01:00:00 MEZ"), clearTimezone(output));
 	}
 
@@ -1066,7 +1083,7 @@ public abstract class AbstractEngineTest {
 		Map<String, Object> model = new HashMap<String, Object>();
 		model.put("foreach", foreach);
 		String output = newEngine().transform(
-				"${foreach foreach item , }${item}${end}", model);
+                "${foreach foreach item , }${item}${end}", model);
 		assertEquals("i1, i2, i3", output);
 	}
 
@@ -1084,7 +1101,7 @@ public abstract class AbstractEngineTest {
 	public void compiledComplexSample() throws Exception {
 		String input = "${<h1>,address(NIX),</h1>;long(full)}";
 		String interpretedOutput = ENGINE_WITH_CUSTOM_RENDERERS.transform(
-				input, DEFAULT_MODEL);
+                input, DEFAULT_MODEL);
 		String compiledOutput = new SampleComplexExpressionCompiledTemplate(
 				ENGINE_WITH_CUSTOM_RENDERERS).transform(DEFAULT_MODEL,
 				DEFAULT_LOCALE, MODEL_ADAPTOR, null);
@@ -1107,7 +1124,7 @@ public abstract class AbstractEngineTest {
 		String interpretedOutput = newEngine().transform(input, DEFAULT_MODEL);
 		String compiledOutput = new SampleNewlineForeachSeparatorCompiledTemplate(
 				newEngine()).transform(DEFAULT_MODEL, DEFAULT_LOCALE,
-				MODEL_ADAPTOR, null);
+                MODEL_ADAPTOR, null);
 		assertEquals(interpretedOutput, compiledOutput);
 	}
 
@@ -1126,7 +1143,7 @@ public abstract class AbstractEngineTest {
 		String interpretedOutput = newEngine().transform(input, DEFAULT_MODEL);
 		String compiledOutput = new SampleNestedExpressionCompiledTemplate(
 				newEngine()).transform(DEFAULT_MODEL, DEFAULT_LOCALE,
-				MODEL_ADAPTOR, null);
+                MODEL_ADAPTOR, null);
 		assertEquals(interpretedOutput, compiledOutput);
 	}
 
@@ -1143,8 +1160,8 @@ public abstract class AbstractEngineTest {
 	public void longList() throws Exception {
 		String output = newEngine()
 				.transform(
-						"${foreach longList item}STUFF${item}MORE_STUFF${item}\n${end}",
-						DEFAULT_MODEL);
+                        "${foreach longList item}STUFF${item}MORE_STUFF${item}\n${end}",
+                        DEFAULT_MODEL);
 		StringBuilder expected = new StringBuilder();
 		for (int i = 0; i < SIZE_LONG_LIST; i++) {
 			String item = "list_entry_" + i;
@@ -1213,16 +1230,16 @@ public abstract class AbstractEngineTest {
 		Engine engine = newEngine();
 		engine.registerAnnotationProcessor(new AnnotationProcessor<String>() {
 
-			@Override
-			public String eval(AnnotationToken token, TemplateContext context) {
-				return token.getArguments();
-			}
+            @Override
+            public String eval(AnnotationToken token, TemplateContext context) {
+                return token.getArguments();
+            }
 
-			@Override
-			public String getType() {
-				return "sample";
-			}
-		});
+            @Override
+            public String getType() {
+                return "sample";
+            }
+        });
 		String output = engine.transform(input, DEFAULT_MODEL);
 		assertEquals("argument1.1, 2.1", output);
 	}
@@ -1247,8 +1264,8 @@ public abstract class AbstractEngineTest {
 	public void forachIteratorNested() throws Exception {
 		String actual = newEngine()
 				.transform(
-						"${foreach list item}${foreach _it.list item2}${_it.property1}${end}\n${end}",
-						DEFAULT_MODEL);
+                        "${foreach list item}${foreach _it.list item2}${_it.property1}${end}\n${end}",
+                        DEFAULT_MODEL);
 		String output = newEngine()
 				.transform(
 						"${foreach list item}${foreach item.list item2}${item2.property1}${end}\n${end}",

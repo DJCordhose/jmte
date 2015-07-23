@@ -42,28 +42,9 @@ public class ForEachToken extends ExpressionToken {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public Object evaluate(TemplateContext context) {
 		Object value = evaluatePlain(context);
-
-		final Iterable<Object> iterable;
-		if (value == null) {
-			iterable = Collections.emptyList();
-		} else if (value instanceof Map) {
-			iterable = ((Map) value).entrySet();
-		} else if (value instanceof Iterable) {
-			iterable = ((Iterable) value);
-		} else {
-			List<Object> arrayAsList = Util.arrayAsList(value);
-			if (arrayAsList != null) {
-				iterable = arrayAsList;
-			} else {
-				// we have a single value here and simply wrap it in a List
-				iterable = Collections.singletonList(value);
-			}
-		}
-
-		return iterable;
+        return context.modelAdaptor.getIterable(value);
 	}
 
 	public Iterator<Object> iterator() {

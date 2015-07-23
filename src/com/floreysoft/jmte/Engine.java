@@ -241,7 +241,12 @@ public final class Engine implements RendererRegistry {
 				return args[index];
 			}
 
-		};
+            @Override
+            public Iterable<Object> getIterable(Object value) {
+                return null;
+            }
+
+        };
 
 		String output = transformInternal(pattern, null, model, modelAdaptor, null);
 		return output;

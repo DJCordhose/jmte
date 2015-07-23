@@ -4,16 +4,14 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 
 import com.floreysoft.jmte.message.NoLogErrorHandler;
 import com.floreysoft.jmte.token.InvalidToken;
 import com.floreysoft.jmte.token.Token;
+import com.floreysoft.jmte.util.Util;
 
 /**
  * Default implementation of the model adapter.
@@ -23,7 +21,7 @@ import com.floreysoft.jmte.token.Token;
  * case the final resolved value is computed by calling those executable
  * objects.
  * </p>
- * 
+ * <p/>
  * <p>
  * Inherit from this adapter if you want a slight change of this behavior and
  * set your new adaptor on the engine
@@ -32,150 +30,189 @@ import com.floreysoft.jmte.token.Token;
  */
 public class DefaultModelAdaptor implements ModelAdaptor {
 
-	protected Map<Class<?>, Map<String, Member>> cache = new HashMap<Class<?>, Map<String, Member>>();
+    public enum LoopMode {
+        DEFAULT,
+        /**
+         * Treat everything as a list when looping over it in for each.
+         */
+        LIST
+    }
 
-	public Object getValue(Map<String, Object> model, String expression) {
-		String[] split = expression.split("\\.");
-		List<String> segments = Arrays.asList(split);
-		ErrorHandler errorHandler = new NoLogErrorHandler();
-		Token token = new InvalidToken();
-		Object value = traverse(segments, model, errorHandler, token);
-		return value;
-	}
-	
-	
-	@Override
-	@SuppressWarnings("rawtypes")
-	public Object getValue(TemplateContext context, Token token,
-			List<String> segments, String expression) {
-		Object value = traverse(segments, context.model, context.errorHandler, token);
-		// if value implements both, we use the more specialized implementation
-		if (value instanceof Processor) {
-			value = ((Processor) value).eval(context);
-		} else if (value instanceof Callable) {
-			try {
-				value = ((Callable) value).call();
-			} catch (Exception e) {
-			}
-		}
-		return value;
-	}
+    protected Map<Class<?>, Map<String, Member>> cache = new HashMap<Class<?>, Map<String, Member>>();
+    private LoopMode loopMode;
 
-	protected Object traverse(List<String> segments, Map<String, Object> model,
-			ErrorHandler errorHandler, Token token) {
-		if (segments.size() == 0) {
-			return null;
-		}
-		String objectName = segments.get(0);
-		Object value = model.get(objectName);
+    public DefaultModelAdaptor() {
+        this(LoopMode.DEFAULT);
+    }
 
-		value = traverse(value, segments, 1, errorHandler, token);
-		return value;
-	}
+    public DefaultModelAdaptor(LoopMode loopMode) {
+        this.loopMode = loopMode;
+    }
 
-	protected Object traverse(Object o, List<String> attributeNames, int index,
-			ErrorHandler errorHandler, Token token) {
-		Object result;
-		if (index >= attributeNames.size()) {
-			result = o;
-		} else {
-			if (o == null) {
-				return null;
-			}
-			String attributeName = attributeNames.get(index);
-			Object nextStep = nextStep(o, attributeName, errorHandler, token);
-			result = traverse(nextStep, attributeNames, index + 1,
-					errorHandler, token);
-		}
-		return result;
-	}
+    public Object getValue(Map<String, Object> model, String expression) {
+        String[] split = expression.split("\\.");
+        List<String> segments = Arrays.asList(split);
+        ErrorHandler errorHandler = new NoLogErrorHandler();
+        Token token = new InvalidToken();
+        Object value = traverse(segments, model, errorHandler, token);
+        return value;
+    }
 
-	@SuppressWarnings("rawtypes")
-	protected Object nextStep(Object o, String attributeName,
-			ErrorHandler errorHandler, Token token) {
-		Object result;
-		if (o instanceof String) {
-			errorHandler.error("no-call-on-string", token, new ModelBuilder(
-					"receiver", o.toString()).build());
-			return o;
-		} else if (o instanceof Map) {
-			Map map = (Map) o;
-			result = map.get(attributeName);
-		} else {
-			try {
-				result = getPropertyValue(o, attributeName);
-			} catch (Exception e) {
-				errorHandler.error("property-access-error", token,
-						new ModelBuilder("property", attributeName, "object",
-								o, "exception", e).build());
-				result = "";
-			}
-		}
-		return result;
-	}
 
-	@SuppressWarnings("rawtypes")
-	protected Object getPropertyValue(Object o, String propertyName) {
-		try {
-			// XXX this is so strange, can not call invoke on key and value for
-			// Map.Entry, so we have to get this done like this:
-			if (o instanceof Map.Entry) {
-				final Map.Entry entry = (Entry) o;
-				if (propertyName.equals("key")) {
-					final Object result = entry.getKey();
-					return result;
-				} else if (propertyName.equals("value")) {
-					final Object result = entry.getValue();
-					return result;
-				}
+    @Override
+    @SuppressWarnings("rawtypes")
+    public Object getValue(TemplateContext context, Token token,
+                           List<String> segments, String expression) {
+        Object value = traverse(segments, context.model, context.errorHandler, token);
+        // if value implements both, we use the more specialized implementation
+        if (value instanceof Processor) {
+            value = ((Processor) value).eval(context);
+        } else if (value instanceof Callable) {
+            try {
+                value = ((Callable) value).call();
+            } catch (Exception e) {
+            }
+        }
+        return value;
+    }
 
-			}
-			boolean valueSet = false;
-			Object value = null;
-			Member member = null;
-			final Class<?> clazz = o.getClass();
-			Map<String, Member> members = cache.get(clazz);
-			if (members == null) {
-				members = new HashMap<String, Member>();
-				cache.put(clazz, members);
-			} else {
-				member = members.get(propertyName);
-				if (member != null) {
-					if (member.getClass() == Method.class)
-						return ((Method) member).invoke(o);
-					if (member.getClass() == Field.class)
-						return ((Field) member).get(o);
-				}
-			}
+    @Override
+    @SuppressWarnings("unchecked")
+    public Iterable<Object> getIterable(Object value) {
+        final Iterable<Object> iterable;
+        if (value == null) {
+            iterable = Collections.emptyList();
+        } else if (value instanceof Map) {
+            iterable = this.loopMode == LoopMode.LIST ? Collections.singletonList(value) : ((Map) value).entrySet();
+        } else if (value instanceof Iterable) {
+            iterable = ((Iterable) value);
+        } else {
+            List<Object> arrayAsList = Util.arrayAsList(value);
+            if (arrayAsList != null) {
+                iterable = arrayAsList;
+            } else {
+                // we have a single value here and simply wrap it in a List
+                iterable = Collections.singletonList(value);
+            }
+        }
+        return iterable;
+    }
 
-			final String suffix = Character.toUpperCase(propertyName.charAt(0))
-					+ propertyName.substring(1);
-			final Method[] declaredMethods = clazz.getMethods();
-			for (Method method : declaredMethods) {
-				if (Modifier.isPublic(method.getModifiers())
-						&& (method.getName().equals("get" + suffix) || method
-								.getName().equals("is" + suffix))) {
-					value = method.invoke(o, (Object[]) null);
-					valueSet = true;
-					member = method;
-					break;
+    protected Object traverse(List<String> segments, Map<String, Object> model,
+                              ErrorHandler errorHandler, Token token) {
+        if (segments.size() == 0) {
+            return null;
+        }
+        String objectName = segments.get(0);
+        Object value = model.get(objectName);
 
-				}
-			}
-			if (!valueSet) {
-				final Field field = clazz.getField(propertyName);
-				if (Modifier.isPublic(field.getModifiers())) {
-					value = field.get(o);
-					member = field;
-					valueSet = true;
-				}
-			}
-			if (valueSet) {
-				members.put(propertyName, member);
-			}
-			return value;
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
+        value = traverse(value, segments, 1, errorHandler, token);
+        return value;
+    }
+
+    protected Object traverse(Object o, List<String> attributeNames, int index,
+                              ErrorHandler errorHandler, Token token) {
+        Object result;
+        if (index >= attributeNames.size()) {
+            result = o;
+        } else {
+            if (o == null) {
+                return null;
+            }
+            String attributeName = attributeNames.get(index);
+            Object nextStep = nextStep(o, attributeName, errorHandler, token);
+            result = traverse(nextStep, attributeNames, index + 1,
+                    errorHandler, token);
+        }
+        return result;
+    }
+
+    @SuppressWarnings("rawtypes")
+    protected Object nextStep(Object o, String attributeName,
+                              ErrorHandler errorHandler, Token token) {
+        Object result;
+        if (o instanceof String) {
+            errorHandler.error("no-call-on-string", token, new ModelBuilder(
+                    "receiver", o.toString()).build());
+            return o;
+        } else if (o instanceof Map) {
+            Map map = (Map) o;
+            result = map.get(attributeName);
+        } else {
+            try {
+                result = getPropertyValue(o, attributeName);
+            } catch (Exception e) {
+                errorHandler.error("property-access-error", token,
+                        new ModelBuilder("property", attributeName, "object",
+                                o, "exception", e).build());
+                result = "";
+            }
+        }
+        return result;
+    }
+
+    @SuppressWarnings("rawtypes")
+    protected Object getPropertyValue(Object o, String propertyName) {
+        try {
+            // XXX this is so strange, can not call invoke on key and value for
+            // Map.Entry, so we have to get this done like this:
+            if (o instanceof Map.Entry) {
+                final Map.Entry entry = (Entry) o;
+                if (propertyName.equals("key")) {
+                    final Object result = entry.getKey();
+                    return result;
+                } else if (propertyName.equals("value")) {
+                    final Object result = entry.getValue();
+                    return result;
+                }
+
+            }
+            boolean valueSet = false;
+            Object value = null;
+            Member member = null;
+            final Class<?> clazz = o.getClass();
+            Map<String, Member> members = cache.get(clazz);
+            if (members == null) {
+                members = new HashMap<String, Member>();
+                cache.put(clazz, members);
+            } else {
+                member = members.get(propertyName);
+                if (member != null) {
+                    if (member.getClass() == Method.class)
+                        return ((Method) member).invoke(o);
+                    if (member.getClass() == Field.class)
+                        return ((Field) member).get(o);
+                }
+            }
+
+            final String suffix = Character.toUpperCase(propertyName.charAt(0))
+                    + propertyName.substring(1);
+            final Method[] declaredMethods = clazz.getMethods();
+            for (Method method : declaredMethods) {
+                if (Modifier.isPublic(method.getModifiers())
+                        && (method.getName().equals("get" + suffix) || method
+                        .getName().equals("is" + suffix))) {
+                    value = method.invoke(o, (Object[]) null);
+                    valueSet = true;
+                    member = method;
+                    break;
+
+                }
+            }
+            if (!valueSet) {
+                final Field field = clazz.getField(propertyName);
+                if (Modifier.isPublic(field.getModifiers())) {
+                    value = field.get(o);
+                    member = field;
+                    valueSet = true;
+                }
+            }
+            if (valueSet) {
+                members.put(propertyName, member);
+            }
+            return value;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

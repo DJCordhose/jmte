@@ -1,7 +1,6 @@
 package com.floreysoft.jmte;
 
 import java.util.List;
-
 import com.floreysoft.jmte.token.Token;
 
 /**
@@ -26,4 +25,13 @@ public interface ModelAdaptor {
 	 */
 	public Object getValue(TemplateContext context, Token token,
 			List<String> segments, String expression);
+
+    /**
+     * Gets an iterable for an arbitrary value.
+     *
+     * @param value the value to get the iterable for
+     * @return a matching iterable
+     */
+    public Iterable<Object> getIterable(Object value);
+
 }
