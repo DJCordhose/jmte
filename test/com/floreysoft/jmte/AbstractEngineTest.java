@@ -241,6 +241,7 @@ public abstract class AbstractEngineTest {
 	static {
 		DEFAULT_MODEL.put("something", "something");
 		DEFAULT_MODEL.put("address", "Filbert");
+		DEFAULT_MODEL.put("addressWithSpace", "Filbert Street");
 		DEFAULT_MODEL.put("map", MAP);
 		DEFAULT_MODEL.put("list", LIST);
 		DEFAULT_MODEL.put("longList", LONG_LIST);
@@ -300,7 +301,7 @@ public abstract class AbstractEngineTest {
 	@Test
 	public void formatNamed() throws Exception {
 		String output = newEngine().transform("${if 1}${2}${else}broken${end}",
-				new ModelBuilder("1", "arg1", "2", "arg2").build());
+                new ModelBuilder("1", "arg1", "2", "arg2").build());
 		assertEquals("arg2", output);
 	}
 
@@ -345,8 +346,8 @@ public abstract class AbstractEngineTest {
 
 		}
 		assertTrue(
-				"Position not found in exception message or exception not thrown",
-				foundPosition);
+                "Position not found in exception message or exception not thrown",
+                foundPosition);
 	}
 
 	@Test
@@ -360,7 +361,7 @@ public abstract class AbstractEngineTest {
 	@Test
 	public void propertyExpressionGetter() throws Exception {
 		String output = newEngine().transform("${bean.property1}",
-				DEFAULT_MODEL);
+                DEFAULT_MODEL);
 		assertEquals(BEAN.getProperty1().toString(), output);
 
 	}
@@ -464,7 +465,7 @@ public abstract class AbstractEngineTest {
 		String full = newEngine().transform(
 				"${if address}${address}${else}NIX${end}", DEFAULT_MODEL);
 		String shortCut = newEngine().transform("${address(NIX)}",
-				DEFAULT_MODEL);
+                DEFAULT_MODEL);
 		assertEquals(full, shortCut);
 	}
 
@@ -553,13 +554,37 @@ public abstract class AbstractEngineTest {
 		assertEquals("NIX", output);
 	}
 
-	@Test
-	public void stringEq() throws Exception {
+    @Test
+	public void stringEqQuoteWithSpace() throws Exception {
+		String output = newEngine().transform(
+				"${if addressWithSpace='Filbert Street'}${addressWithSpace}${else}NIX${end}",
+				DEFAULT_MODEL);
+		assertEquals(DEFAULT_MODEL.get("addressWithSpace"), output);
+	}
+
+    @Test
+    public void stringEqWithSpace() throws Exception {
+        String output = newEngine().transform(
+                "${if addressWithSpace=Filbert Street}${addressWithSpace}${else}NIX${end}",
+                DEFAULT_MODEL);
+        assertEquals(DEFAULT_MODEL.get("addressWithSpace"), output);
+    }
+
+    @Test
+	public void stringEqQuote() throws Exception {
 		String output = newEngine().transform(
 				"${if address='Filbert'}${address}${else}NIX${end}",
 				DEFAULT_MODEL);
 		assertEquals(DEFAULT_MODEL.get("address"), output);
 	}
+
+    @Test
+    public void stringEqDobuleQuote() throws Exception {
+        String output = newEngine().transform(
+                "${if address=\"Filbert\"}${address}${else}NIX${end}",
+                DEFAULT_MODEL);
+        assertEquals(DEFAULT_MODEL.get("address"), output);
+    }
 
 	@Test
 	public void objectNeq() throws Exception {
@@ -1322,33 +1347,6 @@ public abstract class AbstractEngineTest {
 		assertEquals(expected, actual);
 	}
 
-	@Test
-	@Ignore
-	// TODO
-	public void spacedIdentifier() throws Exception {
-		Map<String, Object> model = new HashMap<String, Object>();
-		// used to reference a column/field in a certain table in Google Spreadsheet
-		model.put("‘Mein Blatt 1’!B2", "Huhn");
-		Engine engine = newEngine();
-//		engine.setQuoteCharacter('\'');
-		String actual = engine.transform("${‘Mein Blatt 1’!B2}", model);
-		String expected = "Huhn";
-		assertEquals(expected, actual);
-	}
-	
-	@Test
-	@Ignore
-	// TODO
-	public void forachSpaceIdentifier() throws Exception {
-		Map<String, Object> model = new HashMap<String, Object>();
-		model.put("‘Mein Blatt 1’!B2", new String[] { "item A", "item B", "item C" });
-		Engine engine = newEngine();
-//		engine.setQuoteCharacter('\'');
-		String actual = engine.transform("${foreach ‘Mein Blatt 1’!B2 item \n}${item}${end}", model);
-		String expected = "item A\n" + "item B\n" + "item C";
-		assertEquals(expected, actual);
-	}
-		
 	// Bug: https://code.google.com/p/jmte/issues/detail?id=23
 	@Test
 	public void slashWrappedInside() throws Exception {

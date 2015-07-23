@@ -143,4 +143,9 @@ Release 3.1.1
 
 * Fixed Issue 22 (https://code.google.com/p/jmte/issues/detail?id=22): Dependency to ASM again optional
 
-  
+Release 3.2.0
+=============
+
+* Fixed Bug: String literals in comparisons can now contain spaces
+* Now building for JDK 1.7
+

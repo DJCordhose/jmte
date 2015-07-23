@@ -61,7 +61,6 @@ public class Lexer {
 			if (cmd.equalsIgnoreCase(IfToken.IF)) {
 				final boolean negated;
 				final String ifExpression;
-				// TODO: Both '!' and '=' work only if there are no white space
 				// separators
 				if (objectExpression.startsWith("!")) {
 					negated = true;
@@ -73,7 +72,11 @@ public class Lexer {
 				if (!ifExpression.contains("=")) {
 					return new IfToken(ifExpression, negated);
 				} else {
-					final String[] ifSplit = ifExpression.split("=");
+                    // HACK: if the value we compare to contains a space, it is cut off
+                    // add the part that is cut off here
+                    final String completeIfExpression =
+                            ifExpression + input.substring(input.indexOf(ifExpression) + ifExpression.length());
+                    final String[] ifSplit = completeIfExpression.split("=");
 					final String variable = ifSplit[0];
 					String operand = ifSplit[1];
 					// remove optional quotations
