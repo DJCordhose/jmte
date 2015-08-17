@@ -30,6 +30,8 @@ import com.floreysoft.jmte.util.Util;
  */
 public class DefaultModelAdaptor implements ModelAdaptor {
 
+    private static final String DEFAULT_SPECIAL_ITERATOR_VARIABLE = "_it";
+
     public enum LoopMode {
         DEFAULT,
         /**
@@ -38,15 +40,21 @@ public class DefaultModelAdaptor implements ModelAdaptor {
         LIST
     }
 
-    protected Map<Class<?>, Map<String, Member>> cache = new HashMap<Class<?>, Map<String, Member>>();
-    private LoopMode loopMode;
+    protected final Map<Class<?>, Map<String, Member>> cache = new HashMap<Class<?>, Map<String, Member>>();
+    private final LoopMode loopMode;
+    private final String specialIteratorVariable;
 
     public DefaultModelAdaptor() {
         this(LoopMode.DEFAULT);
     }
 
     public DefaultModelAdaptor(LoopMode loopMode) {
+        this(loopMode, DEFAULT_SPECIAL_ITERATOR_VARIABLE);
+    }
+
+    public DefaultModelAdaptor(LoopMode loopMode, String specialIteratorVariable) {
         this.loopMode = loopMode;
+        this.specialIteratorVariable = specialIteratorVariable;
     }
 
     public Object getValue(Map<String, Object> model, String expression) {
@@ -96,6 +104,11 @@ public class DefaultModelAdaptor implements ModelAdaptor {
             }
         }
         return iterable;
+    }
+
+    @Override
+    public String getSpecialIteratorVariable() {
+        return specialIteratorVariable;
     }
 
     protected Object traverse(List<String> segments, Map<String, Object> model,

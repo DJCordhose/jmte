@@ -34,4 +34,12 @@ public interface ModelAdaptor {
      */
     public Iterable<Object> getIterable(Object value);
 
+    /**
+     * Gets the name of the special iterator variable which will be used as an alternative
+     * variable name of the iterator in a foreach loop. E.g. something like <em>it</em>.
+     *
+     * @return name of the special iterator variable
+     */
+    public String getSpecialIteratorVariable();
+
 }

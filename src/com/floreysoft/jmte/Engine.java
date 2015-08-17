@@ -246,6 +246,11 @@ public final class Engine implements RendererRegistry {
                 return null;
             }
 
+            @Override
+            public String getSpecialIteratorVariable() {
+                return null;
+            }
+
         };
 
 		String output = transformInternal(pattern, null, model, modelAdaptor, null);

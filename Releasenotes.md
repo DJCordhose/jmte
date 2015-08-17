@@ -150,4 +150,6 @@ Release 3.2.0
 * Now building for JDK 1.7
 * Transformation of model value to iterable for for each now done in ModelAdaptor
 * ModelAdapter can be configured to treat everything as a list when looping over it, prevents map to be iterated over as entries
+* ModelAdapter now manages special iterator alias, DefaultModelAdapter provides "_it" for backward compatibility 
+
 
