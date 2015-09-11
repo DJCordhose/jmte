@@ -220,7 +220,8 @@ public class DefaultModelAdaptor implements ModelAdaptor {
             for (Method method : declaredMethods) {
                 if (Modifier.isPublic(method.getModifiers())
                         && (method.getName().equals("get" + suffix) || method
-                        .getName().equals("is" + suffix))) {
+                        .getName().equals("is" + suffix))
+                        && method.getParameterTypes().length == 0) {
                     value = method.invoke(o, (Object[]) null);
                     valueSet = true;
                     member = method;
