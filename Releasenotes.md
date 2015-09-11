@@ -151,5 +151,5 @@ Release 3.2.0
 * Transformation of model value to iterable for for each now done in ModelAdaptor
 * ModelAdapter can be configured to treat everything as a list when looping over it, prevents map to be iterated over as entries
 * ModelAdapter now manages special iterator alias, DefaultModelAdapter provides "_it" for backward compatibility 
-
+* ModelAdapter now has a (slow) fallback to access maps with keys that are not strings (iterating through all keys, turning them to strings and compare), can be deactivated
 

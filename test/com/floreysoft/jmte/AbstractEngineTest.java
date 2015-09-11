@@ -152,7 +152,12 @@ public abstract class AbstractEngineTest {
 		}
 	}
 
+	public static enum MyType {
+		TYPE_A, TYPE_B;
+	}
+
 	public static class MyBean {
+		public Map<MyType, String> mapEnumAsKey = new HashMap<>();
 
 		private Object property1 = "propertyValue1";
 		public Object property2 = "propertyValue2";
@@ -165,6 +170,8 @@ public abstract class AbstractEngineTest {
 		}
 
 		public MyBean() {
+			mapEnumAsKey.put(MyType.TYPE_A, "A");
+			mapEnumAsKey.put(MyType.TYPE_B, "B");
 		}
 
 		public List getList() {
@@ -1419,6 +1426,13 @@ public abstract class AbstractEngineTest {
 
 		String actual = engine.transform("${toEncode;raw}", model);
 		assertEquals("&<>'\"", actual);
+	}
+
+	@Test
+	public void enumAsKey() throws Exception {
+		String output = newEngine().transform(
+				"${bean.mapEnumAsKey.TYPE_A}", DEFAULT_MODEL);
+		assertEquals("A", output);
 	}
 
 }

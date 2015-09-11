@@ -43,18 +43,20 @@ public class DefaultModelAdaptor implements ModelAdaptor {
     protected final Map<Class<?>, Map<String, Member>> cache = new HashMap<Class<?>, Map<String, Member>>();
     private final LoopMode loopMode;
     private final String specialIteratorVariable;
+    private final boolean enableSlowMapAccess;
 
     public DefaultModelAdaptor() {
         this(LoopMode.DEFAULT);
     }
 
     public DefaultModelAdaptor(LoopMode loopMode) {
-        this(loopMode, DEFAULT_SPECIAL_ITERATOR_VARIABLE);
+        this(loopMode, DEFAULT_SPECIAL_ITERATOR_VARIABLE, true);
     }
 
-    public DefaultModelAdaptor(LoopMode loopMode, String specialIteratorVariable) {
+    public DefaultModelAdaptor(LoopMode loopMode, String specialIteratorVariable, boolean enableSlowMapAccess) {
         this.loopMode = loopMode;
         this.specialIteratorVariable = specialIteratorVariable;
+        this.enableSlowMapAccess = enableSlowMapAccess;
     }
 
     public Object getValue(Map<String, Object> model, String expression) {
@@ -149,8 +151,7 @@ public class DefaultModelAdaptor implements ModelAdaptor {
                     "receiver", o.toString()).build());
             return o;
         } else if (o instanceof Map) {
-            Map map = (Map) o;
-            result = map.get(attributeName);
+            result = accessMap((Map) o, attributeName);
         } else {
             try {
                 result = getPropertyValue(o, attributeName);
@@ -159,6 +160,21 @@ public class DefaultModelAdaptor implements ModelAdaptor {
                         new ModelBuilder("property", attributeName, "object",
                                 o, "exception", e).build());
                 result = "";
+            }
+        }
+        return result;
+    }
+
+    protected Object accessMap(Map map, String key) {
+        Object result;
+        result = map.get(key);
+        if (result == null && enableSlowMapAccess) {
+            final Set<Map.Entry<?, ?>> entries = map.entrySet();
+            for (Map.Entry entry: entries) {
+                if (entry.getKey().toString().equals(key)) {
+                    result = entry.getValue();
+                    break;
+                }
             }
         }
         return result;
