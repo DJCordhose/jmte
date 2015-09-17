@@ -143,8 +143,8 @@ Release 3.1.1
 
 * Fixed Issue 22 (https://code.google.com/p/jmte/issues/detail?id=22): Dependency to ASM again optional
 
-Release 3.2.0
-=============
+Feature Release 3.2.0
+=====================
 
 * Fixed Bug: String literals in comparisons can now contain spaces
 * Now building for JDK 1.7
@@ -153,3 +153,7 @@ Release 3.2.0
 * ModelAdapter now manages special iterator alias, DefaultModelAdapter provides "_it" for backward compatibility 
 * ModelAdapter now has a (slow) fallback to access maps with keys that are not strings (iterating through all keys, turning them to strings and compare), can be deactivated
 
+Feature Release 3.3.0
+=====================
+
+* Improved Maven Build to include sources and javadoc

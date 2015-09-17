@@ -8,7 +8,7 @@
   <groupId>com.floreysoft</groupId>
   <artifactId>jmte</artifactId>
   <packaging>jar</packaging>
-  <version>3.2.0</version>
+  <version>3.3.0-SNAPSHOT</version>
   <name>Java Minimal Template Engine</name>
   <description>
    To build and locally install jar, javadoc and sources, please use:
@@ -121,6 +121,30 @@
            <mavenExecutorId>forked-path</mavenExecutorId>
         </configuration>
       </plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <executions>
+                <execution>
+                    <id>attach-sources</id>
+                    <goals>
+                        <goal>jar</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <executions>
+                <execution>
+                    <id>attach-javadocs</id>
+                    <goals>
+                        <goal>jar</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
     </plugins>
   </build>
   <profiles>
@@ -137,7 +161,7 @@
 	        <plugin>
 	          <groupId>org.apache.maven.plugins</groupId>
 	          <artifactId>maven-gpg-plugin</artifactId>
-	          <version>1.1</version>
+	          <version>1.5</version>
 	          <executions>
 	            <execution>
 	              <id>sign-artifacts</id>
