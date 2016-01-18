@@ -1,8 +1,6 @@
 package com.floreysoft.jmte.template;
 
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import com.floreysoft.jmte.Engine;
 import com.floreysoft.jmte.ModelAdaptor;
@@ -23,6 +21,19 @@ public abstract class AbstractCompiledTemplate extends AbstractTemplate {
 	@Override
 	public Set<String> getUsedVariables() {
 		return usedVariables;
+	}
+
+	@Override
+	public List<VariableDescription> getUsedVariableDescriptions() {
+		final List<VariableDescription> variableDescriptions = new ArrayList<>();
+		final Set<String> usedPlain = getUsedVariables();
+		if (usedPlain != null) {
+			for (String name : usedPlain) {
+				final VariableDescription variableDescription = new VariableDescription(name, null);
+				variableDescriptions.add(variableDescription);
+			}
+		}
+		return variableDescriptions;
 	}
 
 	@Override

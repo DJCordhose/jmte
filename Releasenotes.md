@@ -157,3 +157,4 @@ Feature Release 3.3.0
 =====================
 
 * Improved Maven Build to include sources and javadoc
+* Added Engine#getUsedVariableDescriptions to get more detailed descriptions of used variables

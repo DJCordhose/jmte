@@ -1,5 +1,6 @@
 package com.floreysoft.jmte.template;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -47,5 +48,7 @@ public interface Template {
 	public String transform(Map<String, Object> model, Locale locale);
 
 	public Set<String> getUsedVariables();
+
+	public List<VariableDescription> getUsedVariableDescriptions();
 
 }

@@ -4,8 +4,10 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.List;
 import java.util.Set;
 
+import com.floreysoft.jmte.template.VariableDescription;
 import org.junit.Test;
 
 
@@ -14,7 +16,13 @@ public final class HelperTest {
 		final Engine engine = new Engine();
 		return engine;
 	}
-	
+
+	protected Engine newCompiledEngine() {
+		final Engine engine = new Engine();
+		engine.setUseCompilation(true);
+		return engine;
+	}
+
 	@Test
 	public void variablesAvailable() throws Exception {
 		boolean variablesAvailable = newEngine().variablesAvailable(AbstractEngineTest.DEFAULT_MODEL, "something", "bean.property1");
@@ -52,6 +60,17 @@ public final class HelperTest {
 						"${foreach strings string}${if string='String2'}${string}${adresse}${end}${end}${if !int}${date}${end}");
 		// string is a local variable and should not be included here
 		assertArrayEquals(new String[] { "adresse", "date", "int", "strings" }, output.toArray());
+	}
+
+	@Test
+	public void allVariableDescriptions() throws Exception {
+		List<VariableDescription> output = newCompiledEngine()
+				.getUsedVariableDescriptions(
+						"${foreach strings string}${if string='String2'}${string}${adresse}${end}${end}${if !int}${date}${end}");
+		// string is a local variable and should not be included here
+		assertArrayEquals(new VariableDescription[]{new VariableDescription("adresse"),
+				new VariableDescription("date"), new VariableDescription("int"),
+				new VariableDescription("strings")}, output.toArray());
 	}
 
 }

@@ -16,10 +16,7 @@ import com.floreysoft.jmte.renderer.DefaultCollectionRenderer;
 import com.floreysoft.jmte.renderer.DefaultIterableRenderer;
 import com.floreysoft.jmte.renderer.DefaultMapRenderer;
 import com.floreysoft.jmte.renderer.DefaultObjectRenderer;
-import com.floreysoft.jmte.template.DynamicBytecodeCompiler;
-import com.floreysoft.jmte.template.InterpretedTemplate;
-import com.floreysoft.jmte.template.Template;
-import com.floreysoft.jmte.template.TemplateCompiler;
+import com.floreysoft.jmte.template.*;
 import com.floreysoft.jmte.token.IfToken;
 import com.floreysoft.jmte.token.Token;
 import com.floreysoft.jmte.util.Tool;
@@ -263,6 +260,14 @@ public final class Engine implements RendererRegistry {
 	public synchronized Set<String> getUsedVariables(String template) {
 		Template templateImpl = getTemplate(template, null);
 		return templateImpl.getUsedVariables();
+	}
+
+	/**
+	 * Gets all variables used in the given template as a detailed description.
+	 */
+	public synchronized List<VariableDescription> getUsedVariableDescriptions(String template) {
+		Template templateImpl = getTemplate(template, null);
+		return templateImpl.getUsedVariableDescriptions();
 	}
 
 	@Override

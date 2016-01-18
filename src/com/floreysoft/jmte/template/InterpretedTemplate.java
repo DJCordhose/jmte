@@ -1,10 +1,6 @@
 package com.floreysoft.jmte.template;
 
-import java.util.Collections;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 import com.floreysoft.jmte.DefaultModelAdaptor;
 import com.floreysoft.jmte.Engine;
@@ -30,6 +26,21 @@ public class InterpretedTemplate extends AbstractTemplate {
 	protected transient StringBuilder output;
 	protected transient TemplateContext context;
 
+	// a variable is local if any enclosing foreach has it as a step
+	// variable
+	private static boolean isLocal(TemplateContext context, String variable) {
+		for (Token token : context.scopes) {
+			if (token instanceof ForEachToken) {
+				String foreachVarName = ((ForEachToken) token)
+						.getVarName();
+				if (foreachVarName.equals(variable)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	public InterpretedTemplate(String template, String sourceName, Engine engine) {
 		this.template = template;
 		this.engine = engine;
@@ -47,44 +58,38 @@ public class InterpretedTemplate extends AbstractTemplate {
 		}
 
 		this.usedVariables = new TreeSet<String>();
+		final List<VariableDescription> variableDescriptions = this.getUsedVariableDescriptions();
+		for (VariableDescription variableDescription : variableDescriptions) {
+			this.usedVariables.add(variableDescription.name);
+		}
+		return this.usedVariables;
+	}
+
+	@Override
+	public List<VariableDescription> getUsedVariableDescriptions() {
+		final List<VariableDescription> variableDescriptions = new ArrayList<>();
 		final Engine engine = new Engine();
 		final ScopedMap scopedMap = new ScopedMap(Collections.EMPTY_MAP);
 
-		ProcessListener processListener = new ProcessListener() {
+		final ProcessListener processListener = new ProcessListener() {
 
 			@Override
 			public void log(TemplateContext context, Token token, Action action) {
 				if (token instanceof ExpressionToken) {
-					String variable = ((ExpressionToken) token).getExpression();
-					if (!isLocal(variable)) {
-						usedVariables.add(variable);
+					String name = ((ExpressionToken) token).getExpression();
+					if (!InterpretedTemplate.isLocal(context, name)) {
+						variableDescriptions.add(new VariableDescription(name));
 					}
 				}
-			}
-
-			// a variable is local if any enclosing foreach has it as a step
-			// variable
-			private boolean isLocal(String variable) {
-				for (Token token : context.scopes) {
-					if (token instanceof ForEachToken) {
-						String foreachVarName = ((ForEachToken) token)
-								.getVarName();
-						if (foreachVarName.equals(variable)) {
-							return true;
-						}
-					}
-				}
-				return false;
-
 			}
 
 		};
 		final Locale locale = Locale.getDefault();
-		context = new TemplateContext(template, locale, sourceName, scopedMap,
+		this.context = new TemplateContext(this.template, locale, this.sourceName, scopedMap,
 				new DefaultModelAdaptor(), engine, engine.getErrorHandler(), processListener);
+		transformPure(this.context);
 
-		transformPure(context);
-		return usedVariables;
+		return variableDescriptions;
 	}
 
 	@Override
