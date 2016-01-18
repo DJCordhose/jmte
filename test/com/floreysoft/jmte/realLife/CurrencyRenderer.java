@@ -5,6 +5,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.Map;
 
 import com.floreysoft.jmte.NamedRenderer;
 import com.floreysoft.jmte.RenderFormatInfo;
@@ -31,7 +32,7 @@ public class CurrencyRenderer implements NamedRenderer {
 	}
 
 	@Override
-	public String render(Object o, String format, Locale locale) {
+	public String render(Object o, String format, Locale locale, Map<String, Object> model) {
 		if (o instanceof BigDecimal) {
 			final NumberFormat numberFormat;
 			if (format == null) {

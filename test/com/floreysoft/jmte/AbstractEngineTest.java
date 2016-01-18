@@ -86,13 +86,13 @@ public abstract class AbstractEngineTest {
 			Object.class, new Renderer<Object>() {
 
 				@Override
-				public String render(Object o, Locale locale) {
+				public String render(Object o, Locale locale, Map<String,Object> model) {
 					return "Object=" + o.toString();
 				}
 			}).registerRenderer(MyBean.class, new Renderer<MyBean>() {
 
 		@Override
-		public String render(MyBean o, Locale locale) {
+		public String render(MyBean o, Locale locale, Map<String,Object> model) {
 			return "Render=" + o.property1.toString();
 		}
 
@@ -106,7 +106,7 @@ public abstract class AbstractEngineTest {
 
 	private static final class RawNoopRenderer implements Renderer<String>, RawRenderer {
 		@Override
-		public String render(String o, Locale locale) {
+		public String render(String o, Locale locale, Map<String,Object> model) {
 			return o;
 		}
 	}
@@ -114,7 +114,7 @@ public abstract class AbstractEngineTest {
 	private static final class RawNamedNoopRenderer implements NamedRenderer, RawRenderer {
 
 		@Override
-		public String render(Object o, String format, Locale locale) {
+		public String render(Object o, String format, Locale locale, Map<String,Object> model) {
 			return o.toString();
 		}
 
@@ -1307,7 +1307,7 @@ public abstract class AbstractEngineTest {
 	private static NamedRenderer indexRenderer = new NamedRenderer() {
 		
 		@Override
-		public String render(Object o, String format, Locale locale) {
+		public String render(Object o, String format, Locale locale, Map<String,Object> model) {
 			if (format != null && format.length() > 0 && Character.isLetter(format.charAt(0))) {
 				// format is character, use small letter alpha formatter
 				String string = o.toString();

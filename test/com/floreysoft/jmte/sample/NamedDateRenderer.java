@@ -5,6 +5,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Map;
 
 import com.floreysoft.jmte.NamedRenderer;
 import com.floreysoft.jmte.RenderFormatInfo;
@@ -48,7 +49,7 @@ public final class NamedDateRenderer implements NamedRenderer {
 	}
 
 	@Override
-	public String render(Object o, String pattern, Locale locale) {
+	public String render(Object o, String pattern, Locale locale, Map<String, Object> model) {
 		String patternToUse = pattern != null ? pattern : DEFAULT_PATTERN;
 		try {
 			DateFormat dateFormat =  new SimpleDateFormat(patternToUse);

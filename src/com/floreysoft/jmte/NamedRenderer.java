@@ -1,6 +1,7 @@
 package com.floreysoft.jmte;
 
 import java.util.Locale;
+import java.util.Map;
 
 
 /**
@@ -21,7 +22,7 @@ public interface NamedRenderer {
 	 *            the locale used in transformation
 	 * @return the rendered object
 	 */
-	public String render(Object o, String format, Locale locale);
+	public String render(Object o, String format, Locale locale, Map<String,Object> model);
 
 	/**
 	 * Gets the name of the renderer.

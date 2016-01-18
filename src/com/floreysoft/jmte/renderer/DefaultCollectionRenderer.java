@@ -2,6 +2,7 @@ package com.floreysoft.jmte.renderer;
 
 import java.util.Collection;
 import java.util.Locale;
+import java.util.Map;
 
 import com.floreysoft.jmte.Renderer;
 
@@ -9,7 +10,7 @@ import com.floreysoft.jmte.Renderer;
 public class DefaultCollectionRenderer implements Renderer<Collection> {
 
 	@Override
-	public String render(Collection collection, Locale locale) {
+	public String render(Collection collection, Locale locale, Map<String, Object> model) {
 		final String renderedResult;
 
 		if (collection.size() == 0) {

@@ -2,15 +2,15 @@ package com.floreysoft.jmte.renderer;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import com.floreysoft.jmte.Renderer;
-import com.floreysoft.jmte.TemplateContext;
 import com.floreysoft.jmte.util.Util;
 
 public class DefaultObjectRenderer implements Renderer<Object> {
 
 	@Override
-	public String render(Object value, Locale locale) {
+	public String render(Object value, Locale locale, Map<String, Object> model) {
 		final String renderedResult;
 
 		if (value instanceof String) {

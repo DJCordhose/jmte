@@ -86,7 +86,7 @@ public class StringToken extends ExpressionToken {
 					if (rendererForName instanceof RawRenderer) {
 						rawRendering = true;
 					}
-					namedRendererResult = rendererForName.render(value, parameters, context.locale);
+					namedRendererResult = rendererForName.render(value, parameters, context.locale, context.model);
 				}
 			}
 			if (namedRendererResult != null) {
@@ -98,7 +98,7 @@ public class StringToken extends ExpressionToken {
 					if (rendererForClass instanceof RawRenderer) {
 						rawRendering = true;
 					}
-					renderedResult = rendererForClass.render(value, context.locale);
+					renderedResult = rendererForClass.render(value, context.locale, context.model);
 				} else {
 					renderedResult = value.toString();
 				}

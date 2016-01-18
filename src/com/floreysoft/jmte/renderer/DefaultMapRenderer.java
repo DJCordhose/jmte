@@ -10,7 +10,7 @@ import com.floreysoft.jmte.Renderer;
 public class DefaultMapRenderer implements Renderer<Map> {
 
 	@Override
-	public String render(Map map, Locale locale) {
+	public String render(Map map, Locale locale, Map<String, Object> model) {
 		final String renderedResult;
 
 		if (map.size() == 0) {
