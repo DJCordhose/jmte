@@ -63,14 +63,26 @@ public final class HelperTest {
 	}
 
 	@Test
-	public void allVariableDescriptions() throws Exception {
+	public void allVariableDescriptionsCompiledFallback() throws Exception {
 		List<VariableDescription> output = newCompiledEngine()
 				.getUsedVariableDescriptions(
-						"${foreach strings string}${if string='String2'}${string}${adresse}${end}${end}${if !int}${date}${end}");
+						"${foreach strings string}${if string='String2'}${string}${adresse;text}${end}${end}${if !int}${date}${end}");
 		// string is a local variable and should not be included here
 		assertArrayEquals(new VariableDescription[]{new VariableDescription("adresse"),
 				new VariableDescription("date"), new VariableDescription("int"),
 				new VariableDescription("strings")}, output.toArray());
+	}
+	@Test
+	public void allVariableDescriptions() throws Exception {
+		List<VariableDescription> output = newEngine()
+				.getUsedVariableDescriptions(
+						"${foreach strings string}${if string='String2'}${string}${adresse;text}${end}${end}${if !int}${date;number(whatever=Huhn)}${end}");
+		// string is a local variable and should not be included here
+		assertArrayEquals(new VariableDescription[]{new VariableDescription("strings", VariableDescription.Context.FOR_EACH),
+				new VariableDescription("adresse", "text", null, VariableDescription.Context.TEXT),
+				new VariableDescription("int", VariableDescription.Context.IF),
+				new VariableDescription("date", "number", "whatever=Huhn", VariableDescription.Context.TEXT)
+		}, output.toArray());
 	}
 
 }

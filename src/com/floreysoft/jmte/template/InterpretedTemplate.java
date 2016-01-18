@@ -76,9 +76,21 @@ public class InterpretedTemplate extends AbstractTemplate {
 			@Override
 			public void log(TemplateContext context, Token token, Action action) {
 				if (token instanceof ExpressionToken) {
-					String name = ((ExpressionToken) token).getExpression();
+					final String name = ((ExpressionToken) token).getExpression();
+					String renderer = null;
+					String pattern = null;
+					VariableDescription.Context variableContext = null;
+					if (token instanceof StringToken) {
+						renderer = ((StringToken) token).getRendererName();
+						pattern = ((StringToken) token).getParameters();
+						variableContext = VariableDescription.Context.TEXT;
+					} else if (token instanceof IfToken) {
+						variableContext = VariableDescription.Context.IF;
+					} else if (token instanceof ForEachToken) {
+						variableContext = VariableDescription.Context.FOR_EACH;
+					}
 					if (!InterpretedTemplate.isLocal(context, name)) {
-						variableDescriptions.add(new VariableDescription(name));
+						variableDescriptions.add(new VariableDescription(name, renderer, pattern, variableContext));
 					}
 				}
 			}
