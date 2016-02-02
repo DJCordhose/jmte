@@ -29,7 +29,7 @@ public abstract class AbstractCompiledTemplate extends AbstractTemplate {
 		final Set<String> usedPlain = getUsedVariables();
 		if (usedPlain != null) {
 			for (String name : usedPlain) {
-				final VariableDescription variableDescription = new VariableDescription(name, null);
+				final VariableDescription variableDescription = new VariableDescription(name);
 				variableDescriptions.add(variableDescription);
 			}
 		}
