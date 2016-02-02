@@ -5,7 +5,6 @@ import java.util.Map;
 
 import com.floreysoft.jmte.NamedRenderer;
 import com.floreysoft.jmte.RenderFormatInfo;
-import com.floreysoft.jmte.TemplateContext;
 import com.floreysoft.jmte.renderer.OptionRenderFormatInfo;
 
 public final class NamedStringRenderer implements NamedRenderer {

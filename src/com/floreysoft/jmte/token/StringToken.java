@@ -6,6 +6,7 @@ import com.floreysoft.jmte.NamedRenderer;
 import com.floreysoft.jmte.Renderer;
 import com.floreysoft.jmte.TemplateContext;
 import com.floreysoft.jmte.encoder.Encoder;
+import com.floreysoft.jmte.renderer.NullRenderer;
 import com.floreysoft.jmte.renderer.RawRenderer;
 
 public class StringToken extends ExpressionToken {
@@ -71,52 +72,68 @@ public class StringToken extends ExpressionToken {
 	@SuppressWarnings("unchecked")
 	@Override
 	public Object evaluate(TemplateContext context) {
-		boolean rawRendering = false;
-		final Object value = evaluatePlain(context);
 
+		// step 1: get value or default
+		final Object value = resolveDefault(evaluatePlain(context));
+
+		// step 2: using named renderer (if present), type renderer (if present), just toString (if not null) or null (in that order)
+		// if there is a renderer, determine if it outputs a raw value
 		final String renderedResult;
-		if (value == null || value.equals("")) {
-			renderedResult = defaultValue != null ? defaultValue : "";
-		} else {
-			String namedRendererResult = null;
-			if (rendererName != null && !rendererName.equals("")) {
-				final NamedRenderer rendererForName = context
-						.resolveNamedRenderer(rendererName);
-				if (rendererForName != null) {
-					if (rendererForName instanceof RawRenderer) {
-						rawRendering = true;
-					}
-					namedRendererResult = rendererForName.render(value, parameters, context.locale, context.model);
-				}
+		boolean rawRendering = false;
+		final NamedRenderer rendererForName = this.resolveNamedRenderer(context);
+		if (rendererForName != null && (value != null || rendererForName instanceof NullRenderer)) {
+			if (rendererForName instanceof RawRenderer) {
+				rawRendering = true;
 			}
-			if (namedRendererResult != null) {
-				renderedResult = namedRendererResult;
+			renderedResult = rendererForName.render(value, parameters, context.locale, context.model);
+		} else if (value != null) {
+			final Renderer<Object> rendererForClass = (Renderer<Object>) context
+					.resolveRendererForClass(value.getClass());
+			if (rendererForClass != null) {
+				if (rendererForClass instanceof RawRenderer) {
+					rawRendering = true;
+				}
+				renderedResult = rendererForClass.render(value, context.locale, context.model);
 			} else {
-				final Renderer<Object> rendererForClass = (Renderer<Object>) context
-						.resolveRendererForClass(value.getClass());
-				if (rendererForClass != null) {
-					if (rendererForClass instanceof RawRenderer) {
-						rawRendering = true;
-					}
-					renderedResult = rendererForClass.render(value, context.locale, context.model);
-				} else {
-					renderedResult = value.toString();
-				}
+				renderedResult = value.toString();
 			}
+		} else {
+			renderedResult = null;
 		}
 
+		// shortcut: if rendered result is empty, do not perform subsequent steps
 		if (renderedResult == null || renderedResult.equals("")) {
-			return renderedResult;
+			return "";
+		}
+
+		// step 3: apply prefix / suffix
+		final String prefixedRenderedResult = (prefix != null ? prefix : "") + renderedResult + (suffix != null ? suffix : "");
+
+		// step 4: encode if there is an encoder and it is not rendered as raw
+		final Encoder encoder = context.getEncoder();
+		if (!rawRendering && encoder != null) {
+			final String encodedPrefixedRenderedResult = encoder.encode(prefixedRenderedResult);
+			return encodedPrefixedRenderedResult;
 		} else {
-			final String prefixedRenderedResult = (prefix != null ? prefix : "") + renderedResult + (suffix != null ? suffix : "");
-			Encoder encoder = context.getEncoder();
-			if (!rawRendering && encoder != null) {
-				final String encodedPrefixedRenderedResult = encoder.encode(prefixedRenderedResult);
-				return encodedPrefixedRenderedResult;
-			} else {
-				return prefixedRenderedResult;
+			return prefixedRenderedResult;
+		}
+	}
+
+	private NamedRenderer resolveNamedRenderer(TemplateContext context) {
+		if (this.rendererName != null && !this.rendererName.equals("")) {
+			return context.resolveNamedRenderer(rendererName);
+		} else {
+			return null;
+		}
+	}
+
+	private Object resolveDefault(Object value) {
+		if (value == null || value.equals("")) {
+			if (this.defaultValue != null) {
+				value = defaultValue;
 			}
 		}
+		return value;
 	}
 
 	public String getRendererName() {

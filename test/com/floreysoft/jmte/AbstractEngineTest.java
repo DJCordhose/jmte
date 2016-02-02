@@ -13,6 +13,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import com.floreysoft.jmte.renderer.NullRenderer;
+import com.floreysoft.jmte.renderer.SimpleNamedRenderer;
 import org.junit.Test;
 
 import com.floreysoft.jmte.encoder.XMLEncoder;
@@ -1029,8 +1031,82 @@ public abstract class AbstractEngineTest {
 						"\"${date;date(yyyy.MM.dd HH:mm:ss z)}\" and \"${int;date}\" and ${bean;date(long)} and ${address;string(this is the format(no matter what I type; - this is part of the format))}",
 						DEFAULT_MODEL);
 		assertEquals(
-				clearTimezone("\"1970.01.01 01:00:00 MEZ\" and \"01.01.1970 01:00:00 +0100\" and Render=propertyValue1 and String=Filbert(this is the format(no matter what I type; - this is part of the format))"),
+				clearTimezone("\"1970.01.01 01:00:00 MEZ\" and \"01.01.1970 01:00:00 +0100\" and  and String=Filbert(this is the format(no matter what I type; - this is part of the format))"),
 				clearTimezone(output));
+	}
+
+	@Test
+	public void namedRendererHasPrecedence() throws Exception {
+		final Engine engine = newEngine();
+		engine.registerRenderer(String.class, new Renderer<String>() {
+			@Override
+			public String render(String o, Locale locale, Map<String, Object> model) {
+				return "typed="+o;
+			}
+		});
+		engine.registerNamedRenderer(new SimpleNamedRenderer("string") {
+			@Override
+			public String render(Object o, String format, Locale locale, Map<String, Object> model) {
+				if (o instanceof String) {
+					return "named="+o;
+				}
+				return null;
+			}
+		});
+		final Map<String, Object> model = new HashMap<>();
+		model.put("string","string");
+		String output = engine.transform(
+						"${string;string}",
+						model);
+		assertEquals(
+				"named=string",
+				output);
+	}
+
+	@Test
+	public void nullNotPassedIntoRenderer() throws Exception {
+		final Engine engine = newEngine();
+		engine.registerNamedRenderer(new SimpleNamedRenderer("string") {
+			@Override
+			public String render(Object o, String format, Locale locale, Map<String, Object> model) {
+				return "named="+o;
+			}
+		});
+		final Map<String, Object> model = new HashMap<>();
+		// no value
+//		model.put("string","string");
+		String output = engine.transform(
+				"${string;string}",
+				model);
+		assertEquals(
+				"",
+				output);
+	}
+
+	private static class NullStringRenderer extends SimpleNamedRenderer implements NullRenderer {
+		public NullStringRenderer() {
+			super("string");
+		}
+
+		@Override
+		public String render(Object o, String format, Locale locale, Map<String, Object> model) {
+			return "named="+o;
+		}
+	}
+
+	@Test
+	public void nullPassedIntoNullRenderer() throws Exception {
+		final Engine engine = newEngine();
+		engine.registerNamedRenderer(new NullStringRenderer());
+		final Map<String, Object> model = new HashMap<>();
+		// no value
+//		model.put("string","string");
+		String output = engine.transform(
+				"${string;string}",
+				model);
+		assertEquals(
+				"named=null",
+				output);
 	}
 
 	private String clearTimezone(String timeString) {

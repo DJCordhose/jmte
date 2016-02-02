@@ -156,5 +156,6 @@ Feature Release 3.2.0
 Feature Release 3.3.0
 =====================
 
-* Improved Maven Build to include sources and javadoc
-* Added Engine#getUsedVariableDescriptions to get more detailed descriptions of used variables
+* Enhancement: Improved Maven Build to include sources and javadoc
+* New Feature: Added Engine#getUsedVariableDescriptions to get more detailed descriptions of used variables
+* New Feature: Renderer can now indicate that they can accept null values using a marker interface NullRenderer
