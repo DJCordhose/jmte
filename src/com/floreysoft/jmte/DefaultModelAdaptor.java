@@ -28,6 +28,7 @@ import com.floreysoft.jmte.util.Util;
 public class DefaultModelAdaptor implements ModelAdaptor {
 
     private static final String DEFAULT_SPECIAL_ITERATOR_VARIABLE = "_it";
+    private static final String ERROR_STRING = "";
 
     public enum LoopMode {
         DEFAULT,
@@ -137,8 +138,10 @@ public class DefaultModelAdaptor implements ModelAdaptor {
                               ErrorHandler errorHandler, Token token) {
         Object result;
         if (o instanceof String) {
-            errorHandler.error("no-call-on-string", token, new ModelBuilder(
-                    "receiver", o.toString()).build());
+            if (o != ERROR_STRING) {
+                errorHandler.error("no-call-on-string", token, new ModelBuilder(
+                        "receiver", o.toString()).build());
+            }
             return o;
         }
 
@@ -161,10 +164,12 @@ public class DefaultModelAdaptor implements ModelAdaptor {
             try {
                 result = getPropertyValue(o, rawAttributeName);
             } catch (Exception e) {
-                errorHandler.error("property-access-error", token,
-                        new ModelBuilder("property", rawAttributeName, "object",
-                                o, "exception", e).build());
-                return "";
+                if (o != ERROR_STRING) {
+                    errorHandler.error("property-access-error", token,
+                            new ModelBuilder("property", rawAttributeName, "object",
+                                    o, "exception", e).build());
+                }
+                return ERROR_STRING;
             }
         }
         if (arrayAccess) {
@@ -187,28 +192,36 @@ public class DefaultModelAdaptor implements ModelAdaptor {
                             index = arrayAsList.size() - 1;
                             return arrayAsList.get(index);
                         } else {
-                            errorHandler.error("index-out-of-bounds-error", token,
-                                    new ModelBuilder("arrayIndex", arrayIndex, "array", array.toString()).build());
-                            return "";
+                            if (array != ERROR_STRING) {
+                                errorHandler.error("index-out-of-bounds-error", token,
+                                        new ModelBuilder("arrayIndex", arrayIndex, "array", array.toString()).build());
+                            }
+                            return ERROR_STRING;
                         }
                     } else {
                         index = Integer.parseInt(arrayIndex);
                         return arrayAsList.get(index);
                     }
                 } catch (NumberFormatException nfe) {
-                    errorHandler.error("invalid-index-error", token,
-                            new ModelBuilder("arrayIndex", arrayIndex, "array", array.toString()).build());
-                    return "";
+                    if (array != ERROR_STRING) {
+                        errorHandler.error("invalid-index-error", token,
+                                new ModelBuilder("arrayIndex", arrayIndex, "array", array.toString()).build());
+                    }
+                    return ERROR_STRING;
                 }
             } else {
-                errorHandler.error("not-array-error", token,
-                        new ModelBuilder("array", array.toString()).build());
+                if (array != ERROR_STRING) {
+                    errorHandler.error("not-array-error", token,
+                            new ModelBuilder("array", array.toString()).build());
+                }
                 return array;
             }
         } catch (IndexOutOfBoundsException e) {
-            errorHandler.error("index-out-of-bounds-error", token,
-                    new ModelBuilder("arrayIndex", arrayIndex, "array", array).build());
-            return "";
+            if (array != ERROR_STRING) {
+                errorHandler.error("index-out-of-bounds-error", token,
+                        new ModelBuilder("arrayIndex", arrayIndex, "array", array.toString()).build());
+            }
+            return ERROR_STRING;
         }
     }
 
