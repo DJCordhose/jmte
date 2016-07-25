@@ -457,7 +457,6 @@ public abstract class AbstractEngineTest {
 	}
 
 	@Test
-	@Ignore
 	public void indexedLastArrayAccess() throws Exception {
 		final Map<String, Object> model = createIndexArrayMock();
 

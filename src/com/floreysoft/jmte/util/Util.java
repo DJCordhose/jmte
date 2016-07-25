@@ -207,6 +207,9 @@ public class Util {
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static List<Object> arrayAsList(Object value) {
+		if (value instanceof List) {
+			return (List<Object>) value;
+		}
 		List list = null;
 		if (value instanceof int[]) {
 			list = new ArrayList();
@@ -264,23 +267,22 @@ public class Util {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static Object getIndexFromArray(Object array, int index) {
-		if (array instanceof List) {
-			List list = (List) array;
-			try {
-				return list.get(index);
-			} catch (IndexOutOfBoundsException e) {
-
-			}
-		} else {
-			List<Object> arrayAsList = arrayAsList(array);
-			try {
-				if (arrayAsList != null) {
+	public static Object getIndexFromArray(Object array, String arrayIndex) {
+		List<Object> arrayAsList = arrayAsList(array);
+		try {
+			if (arrayAsList != null && arrayAsList.size() > 0) {
+				try {
+					final int index;
+					if (arrayIndex.equalsIgnoreCase("last")) {
+						index = arrayAsList.size() - 1;
+					} else {
+						index = Integer.parseInt(arrayIndex);
+					}
 					return arrayAsList.get(index);
+				} catch (NumberFormatException nfe) {
 				}
-			} catch (IndexOutOfBoundsException e) {
-
 			}
+		} catch (IndexOutOfBoundsException e) {
 		}
 		// fallback
 		return array;

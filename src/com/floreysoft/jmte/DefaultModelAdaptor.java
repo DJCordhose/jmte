@@ -165,12 +165,7 @@ public class DefaultModelAdaptor implements ModelAdaptor {
         }
         if (arrayAccess) {
             final String arrayIndex = Util.extractArrayIndex(attributeName);
-            try {
-                final int index = Integer.parseInt(arrayIndex);
-                result = Util.getIndexFromArray(result, index);
-            } catch (NumberFormatException nfe) {
-                // todo: check for special 'last'
-            }
+            result = Util.getIndexFromArray(result, arrayIndex);
         }
 
         return result;
