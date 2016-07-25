@@ -15,6 +15,7 @@ import java.util.concurrent.Callable;
 
 import com.floreysoft.jmte.renderer.NullRenderer;
 import com.floreysoft.jmte.renderer.SimpleNamedRenderer;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.floreysoft.jmte.encoder.XMLEncoder;
@@ -430,6 +431,81 @@ public abstract class AbstractEngineTest {
 		// string
 		String output = newEngine().transform("${emptyArray}", DEFAULT_MODEL);
 		assertEquals("", output);
+	}
+
+	@Test
+	public void indexedArrayAccess() throws Exception {
+		final Map<String, Object> model = createIndexArrayMock();
+
+		String output = newEngine().transform("${array[1].name}", model);
+		assertEquals("Olli", output);
+	}
+
+	@Test
+	@Ignore
+	public void indexOutOfBoundsArrayAccess() throws Exception {
+		final Map<String, Object> model = createIndexArrayMock();
+
+		String output = newEngine().transform("${array[3].name}", model);
+		assertEquals("", output);
+	}
+
+	@Test
+	@Ignore
+	public void indexedLastArrayAccess() throws Exception {
+		final Map<String, Object> model = createIndexArrayMock();
+
+		String output = newEngine().transform("${array[last].name}", model);
+		assertEquals("Olli", output);
+	}
+
+	@Test
+	@Ignore
+	public void arrayLengthAccess() throws Exception {
+		final Map<String, Object> model = createIndexArrayMock();
+
+		String output = newEngine().transform("${array.length}", model);
+		assertEquals("2", output);
+	}
+
+	@Test
+	@Ignore
+	public void notArrayIndexAccess() throws Exception {
+		final Map<String, Object> model = new HashMap<String, Object>();
+		final Map<String, Object> el1 = new HashMap<String, Object>();
+		el1.put("name", "Olli");
+		model.put("notArray", el1);
+
+		final Engine engine = newEngine();
+		String output = engine.transform("${notArray[1].name}", model);
+		assertEquals("Olli", output);
+		// TODO: check warning (not yet implemented)
+		fail();
+	}
+
+	@Test
+	@Ignore
+	public void notArrayLengthAccess() throws Exception {
+		final Map<String, Object> model = new HashMap<String, Object>();
+		final Map<String, Object> el1 = new HashMap<String, Object>();
+		el1.put("name", "Olli");
+		el1.put("length", 25);
+		model.put("notArray", el1);
+
+		String output = newEngine().transform("${notArray.length}", model);
+		assertEquals("25", output);
+	}
+
+	private Map<String, Object> createIndexArrayMock() {
+		final Map<String, Object> model = new HashMap<String, Object>();
+		final List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+		final Map<String, Object> el0 = new HashMap<String, Object>();
+		list.add(el0);
+		final Map<String, Object> el1 = new HashMap<String, Object>();
+		el1.put("name", "Olli");
+		list.add(el1);
+		model.put("array", list);
+		return model;
 	}
 
 	@Test

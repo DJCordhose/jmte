@@ -263,6 +263,42 @@ public class Util {
 		return list;
 	}
 
+	@SuppressWarnings("rawtypes")
+	public static Object getIndexFromArray(Object array, int index) {
+		if (array instanceof List) {
+			List list = (List) array;
+			try {
+				return list.get(index);
+			} catch (IndexOutOfBoundsException e) {
+
+			}
+		} else {
+			List<Object> arrayAsList = arrayAsList(array);
+			try {
+				if (arrayAsList != null) {
+					return arrayAsList.get(index);
+				}
+			} catch (IndexOutOfBoundsException e) {
+
+			}
+		}
+		// fallback
+		return array;
+	}
+
+
+	public static String extractArrayIndex(String objectName) {
+		return objectName.substring(objectName.indexOf("[") + 1, objectName.indexOf("]"));
+	}
+
+	public static String extractArrayName(String objectName) {
+		return objectName.substring(0, objectName.indexOf("["));
+	}
+
+	public static boolean isArrayAccess(String objectName) {
+		return objectName.contains("[");
+	}
+
 	/**
 	 * Trims off white space from the beginning of a string.
 	 * 

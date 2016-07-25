@@ -1,9 +1,6 @@
 package com.floreysoft.jmte;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Member;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.Callable;
@@ -118,8 +115,24 @@ public class DefaultModelAdaptor implements ModelAdaptor {
         if (segments.size() == 0) {
             return null;
         }
-        String objectName = segments.get(0);
-        Object value = model.get(objectName);
+        final String objectName = segments.get(0);
+        Object value;
+        final boolean arrayAccess = Util.isArrayAccess(objectName);
+        if (!arrayAccess) {
+            value = model.get(objectName);
+        } else {
+            // TODO: what do we do with multi-level access like array[1][2].name[3]
+            // should we create an expression parser?
+            final String arrayName = Util.extractArrayName(objectName);
+            final String arrayIndex = Util.extractArrayIndex(objectName);
+            value = model.get(arrayName);
+            try {
+                final int index = Integer.parseInt(arrayIndex);
+                value = Util.getIndexFromArray(value, index);
+            } catch (NumberFormatException nfe) {
+                    // todo: check for special 'last'
+            }
+        }
 
         value = traverse(value, segments, 1, errorHandler, token);
         return value;

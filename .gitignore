@@ -2,3 +2,4 @@ dist
 target
 bin
 doc/api
+.idea/workspace.xml

@@ -159,3 +159,8 @@ Feature Release 3.3.0
 * Enhancement: Improved Maven Build to include sources and javadoc
 * New Feature: Added Engine#getUsedVariableDescriptions to get more detailed descriptions of used variables
 * New Feature: Renderer can now indicate that they can accept null values using a marker interface NullRenderer
+
+Feature Release 3.4.0
+=====================
+
+* New Feature: Arrays now accept indices and have a computed length property
