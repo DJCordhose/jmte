@@ -13,16 +13,13 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import com.floreysoft.jmte.message.*;
 import com.floreysoft.jmte.renderer.NullRenderer;
 import com.floreysoft.jmte.renderer.SimpleNamedRenderer;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import com.floreysoft.jmte.encoder.XMLEncoder;
-import com.floreysoft.jmte.message.AbstractErrorHandler;
-import com.floreysoft.jmte.message.Message;
-import com.floreysoft.jmte.message.ParseException;
-import com.floreysoft.jmte.message.ResourceBundleMessage;
 import com.floreysoft.jmte.realLife.RealLiveTest;
 import com.floreysoft.jmte.renderer.RawRenderer;
 import com.floreysoft.jmte.sample.NamedDateRenderer;
@@ -443,32 +440,23 @@ public abstract class AbstractEngineTest {
 
 	@Test
 	public void indexedArrayAccessOfIndexedArray() throws Exception {
-		final Map<String, Object> model = new HashMap<String, Object>();
-		final List<Map<String, Object>> array1 = new ArrayList<Map<String, Object>>();
-		final List<Map<String, Object>> array2 = new ArrayList<Map<String, Object>>();
-		final Map<String, Object> el1_0 = new HashMap<String, Object>();
-		el1_0.put("array2", array2);
-		array1.add(el1_0);
-		final Map<String, Object> el2_0 = new HashMap<String, Object>();
-		el2_0.put("name", "Olli");
-		array2.add(el2_0);
-		model.put("array1", array1);
+		final Map<String, Object> model = createIndexArrayMock();
 
 		String output = newEngine().transform("${array1[0].array2[0].name}", model);
 		assertEquals("Olli", output);
 	}
 
 	@Test
-	@Ignore
 	public void indexOutOfBoundsArrayAccess() throws Exception {
 		final Map<String, Object> model = createIndexArrayMock();
 
-		String output = newEngine().transform("${array[3].name}", model);
+		final Engine engine = newEngine();
+		engine.setErrorHandler(new ProductionErrorHandler());
+		String output = engine.transform("${array[3].name}", model);
 		assertEquals("", output);
 	}
 
 	@Test
-	@Ignore
 	public void indexedLastArrayAccess() throws Exception {
 		final Map<String, Object> model = createIndexArrayMock();
 
@@ -522,6 +510,17 @@ public abstract class AbstractEngineTest {
 		el1.put("name", "Olli");
 		list.add(el1);
 		model.put("array", list);
+
+		final List<Map<String, Object>> array1 = new ArrayList<Map<String, Object>>();
+		final List<Map<String, Object>> array2 = new ArrayList<Map<String, Object>>();
+		final Map<String, Object> el1_0 = new HashMap<String, Object>();
+		el1_0.put("array2", array2);
+		array1.add(el1_0);
+		final Map<String, Object> el2_0 = new HashMap<String, Object>();
+		el2_0.put("name", "Olli");
+		array2.add(el2_0);
+		model.put("array1", array1);
+
 		return model;
 	}
 
