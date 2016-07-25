@@ -110,32 +110,9 @@ public class DefaultModelAdaptor implements ModelAdaptor {
         return specialIteratorVariable;
     }
 
-    // TODO: refactor out common parts between this and nextStep
     protected Object traverse(List<String> segments, Map<String, Object> model,
                               ErrorHandler errorHandler, Token token) {
-        if (segments.size() == 0) {
-            return null;
-        }
-        final String objectName = segments.get(0);
-        Object value;
-        final boolean arrayAccess = Util.isArrayAccess(objectName);
-        if (!arrayAccess) {
-            value = model.get(objectName);
-        } else {
-            // we do not allow multi-level access like array[1][2].name
-            final String arrayName = Util.extractArrayName(objectName);
-            final String arrayIndex = Util.extractArrayIndex(objectName);
-            value = model.get(arrayName);
-            try {
-                final int index = Integer.parseInt(arrayIndex);
-                value = Util.getIndexFromArray(value, index);
-            } catch (NumberFormatException nfe) {
-                    // todo: check for special 'last'
-            }
-        }
-
-        value = traverse(value, segments, 1, errorHandler, token);
-        return value;
+        return traverse(model, segments, 0, errorHandler, token);
     }
 
     protected Object traverse(Object o, List<String> attributeNames, int index,
@@ -202,7 +179,7 @@ public class DefaultModelAdaptor implements ModelAdaptor {
     protected Object accessMap(Map map, String key) {
         Object result;
         result = map.get(key);
-        if (result == null && enableSlowMapAccess) {
+        if (result == null && enableSlowMapAccess && !(map instanceof ScopedMap)) {
             final Set<Map.Entry<?, ?>> entries = map.entrySet();
             for (Map.Entry entry: entries) {
                 if (entry.getKey().toString().equals(key)) {
