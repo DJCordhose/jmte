@@ -465,7 +465,6 @@ public abstract class AbstractEngineTest {
 	}
 
 	@Test
-	@Ignore
 	public void arrayLengthAccess() throws Exception {
 		final Map<String, Object> model = createIndexArrayMock();
 
@@ -474,7 +473,18 @@ public abstract class AbstractEngineTest {
 	}
 
 	@Test
-	@Ignore
+	public void notArrayLengthAccess() throws Exception {
+		final Map<String, Object> model = new HashMap<String, Object>();
+		final Map<String, Object> el1 = new HashMap<String, Object>();
+		el1.put("name", "Olli");
+		el1.put("length", 25);
+		model.put("notArray", el1);
+
+		String output = newEngine().transform("${notArray.length}", model);
+		assertEquals("25", output);
+	}
+
+	@Test
 	public void notArrayIndexAccess() throws Exception {
 		final Map<String, Object> model = new HashMap<String, Object>();
 		final Map<String, Object> el1 = new HashMap<String, Object>();
@@ -485,20 +495,6 @@ public abstract class AbstractEngineTest {
 		String output = engine.transform("${notArray[1].name}", model);
 		assertEquals("Olli", output);
 		// TODO: check warning (not yet implemented)
-		fail();
-	}
-
-	@Test
-	@Ignore
-	public void notArrayLengthAccess() throws Exception {
-		final Map<String, Object> model = new HashMap<String, Object>();
-		final Map<String, Object> el1 = new HashMap<String, Object>();
-		el1.put("name", "Olli");
-		el1.put("length", 25);
-		model.put("notArray", el1);
-
-		String output = newEngine().transform("${notArray.length}", model);
-		assertEquals("25", output);
 	}
 
 	private Map<String, Object> createIndexArrayMock() {

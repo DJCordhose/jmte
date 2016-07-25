@@ -154,6 +154,10 @@ public class DefaultModelAdaptor implements ModelAdaptor {
         if (o instanceof Map) {
             result = accessMap((Map) o, rawAttributeName);
         } else {
+            List<Object> arrayAsList = Util.arrayAsList(o);
+            if (arrayAsList != null && !arrayAccess && rawAttributeName.equalsIgnoreCase("length")) {
+                return arrayAsList.size();
+            }
             try {
                 result = getPropertyValue(o, rawAttributeName);
             } catch (Exception e) {
