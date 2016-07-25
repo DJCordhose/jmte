@@ -442,6 +442,23 @@ public abstract class AbstractEngineTest {
 	}
 
 	@Test
+	public void indexedArrayAccessOfIndexedArray() throws Exception {
+		final Map<String, Object> model = new HashMap<String, Object>();
+		final List<Map<String, Object>> array1 = new ArrayList<Map<String, Object>>();
+		final List<Map<String, Object>> array2 = new ArrayList<Map<String, Object>>();
+		final Map<String, Object> el1_0 = new HashMap<String, Object>();
+		el1_0.put("array2", array2);
+		array1.add(el1_0);
+		final Map<String, Object> el2_0 = new HashMap<String, Object>();
+		el2_0.put("name", "Olli");
+		array2.add(el2_0);
+		model.put("array1", array1);
+
+		String output = newEngine().transform("${array1[0].array2[0].name}", model);
+		assertEquals("Olli", output);
+	}
+
+	@Test
 	@Ignore
 	public void indexOutOfBoundsArrayAccess() throws Exception {
 		final Map<String, Object> model = createIndexArrayMock();

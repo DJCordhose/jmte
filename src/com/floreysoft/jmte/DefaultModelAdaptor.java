@@ -110,6 +110,7 @@ public class DefaultModelAdaptor implements ModelAdaptor {
         return specialIteratorVariable;
     }
 
+    // TODO: refactor out common parts between this and nextStep
     protected Object traverse(List<String> segments, Map<String, Object> model,
                               ErrorHandler errorHandler, Token token) {
         if (segments.size() == 0) {
@@ -121,8 +122,7 @@ public class DefaultModelAdaptor implements ModelAdaptor {
         if (!arrayAccess) {
             value = model.get(objectName);
         } else {
-            // TODO: what do we do with multi-level access like array[1][2].name[3]
-            // should we create an expression parser?
+            // we do not allow multi-level access like array[1][2].name
             final String arrayName = Util.extractArrayName(objectName);
             final String arrayIndex = Util.extractArrayIndex(objectName);
             value = model.get(arrayName);
@@ -163,18 +163,39 @@ public class DefaultModelAdaptor implements ModelAdaptor {
             errorHandler.error("no-call-on-string", token, new ModelBuilder(
                     "receiver", o.toString()).build());
             return o;
-        } else if (o instanceof Map) {
-            result = accessMap((Map) o, attributeName);
+        }
+
+        final String rawAttributeName;
+        final boolean arrayAccess = Util.isArrayAccess(attributeName);
+        if (!arrayAccess) {
+            rawAttributeName = attributeName;
+        } else {
+            final String arrayName = Util.extractArrayName(attributeName);
+            rawAttributeName = arrayName;
+        }
+
+        if (o instanceof Map) {
+            result = accessMap((Map) o, rawAttributeName);
         } else {
             try {
-                result = getPropertyValue(o, attributeName);
+                result = getPropertyValue(o, rawAttributeName);
             } catch (Exception e) {
                 errorHandler.error("property-access-error", token,
-                        new ModelBuilder("property", attributeName, "object",
+                        new ModelBuilder("property", rawAttributeName, "object",
                                 o, "exception", e).build());
-                result = "";
+                return "";
             }
         }
+        if (arrayAccess) {
+            final String arrayIndex = Util.extractArrayIndex(attributeName);
+            try {
+                final int index = Integer.parseInt(arrayIndex);
+                result = Util.getIndexFromArray(result, index);
+            } catch (NumberFormatException nfe) {
+                // todo: check for special 'last'
+            }
+        }
+
         return result;
     }
 
