@@ -169,11 +169,50 @@ public class DefaultModelAdaptor implements ModelAdaptor {
         }
         if (arrayAccess) {
             final String arrayIndex = Util.extractArrayIndex(attributeName);
-            result = Util.getIndexFromArray(result, arrayIndex);
+            result = getIndexFromArray(result, arrayIndex, errorHandler, token);
         }
 
         return result;
     }
+
+    @SuppressWarnings("rawtypes")
+    protected Object getIndexFromArray(Object array, String arrayIndex, ErrorHandler errorHandler, Token token) {
+        List<Object> arrayAsList = Util.arrayAsList(array);
+        try {
+            if (arrayAsList != null) {
+                try {
+                    final int index;
+                    if (arrayIndex.equalsIgnoreCase("last")) {
+                        if (arrayAsList.size() > 0) {
+                            index = arrayAsList.size() - 1;
+                            return arrayAsList.get(index);
+                        } else {
+                            errorHandler.error("index-out-of-bounds-error", token,
+                                    new ModelBuilder("arrayIndex", arrayIndex, "array", array.toString()).build());
+                            return "";
+                        }
+                    } else {
+                        index = Integer.parseInt(arrayIndex);
+                        return arrayAsList.get(index);
+                    }
+                } catch (NumberFormatException nfe) {
+                    errorHandler.error("invalid-index-error", token,
+                            new ModelBuilder("arrayIndex", arrayIndex, "array", array.toString()).build());
+                    return "";
+                }
+            } else {
+                errorHandler.error("not-array-error", token,
+                        new ModelBuilder("array", array.toString()).build());
+                return array;
+            }
+        } catch (IndexOutOfBoundsException e) {
+            errorHandler.error("index-out-of-bounds-error", token,
+                    new ModelBuilder("arrayIndex", arrayIndex, "array", array).build());
+            return "";
+        }
+    }
+
+
 
     protected Object accessMap(Map map, String key) {
         Object result;

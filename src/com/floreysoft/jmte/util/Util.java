@@ -266,29 +266,6 @@ public class Util {
 		return list;
 	}
 
-	@SuppressWarnings("rawtypes")
-	public static Object getIndexFromArray(Object array, String arrayIndex) {
-		List<Object> arrayAsList = arrayAsList(array);
-		try {
-			if (arrayAsList != null && arrayAsList.size() > 0) {
-				try {
-					final int index;
-					if (arrayIndex.equalsIgnoreCase("last")) {
-						index = arrayAsList.size() - 1;
-					} else {
-						index = Integer.parseInt(arrayIndex);
-					}
-					return arrayAsList.get(index);
-				} catch (NumberFormatException nfe) {
-				}
-			}
-		} catch (IndexOutOfBoundsException e) {
-		}
-		// fallback
-		return array;
-	}
-
-
 	public static String extractArrayIndex(String objectName) {
 		return objectName.substring(objectName.indexOf("[") + 1, objectName.indexOf("]"));
 	}

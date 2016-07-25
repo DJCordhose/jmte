@@ -164,3 +164,4 @@ Feature Release 3.4.0
 =====================
 
 * New Feature: Arrays now accept indices and have a computed length property
+* New Feature: Added journaling error handler (JournalingErrorHandler)

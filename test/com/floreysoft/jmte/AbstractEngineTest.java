@@ -451,9 +451,12 @@ public abstract class AbstractEngineTest {
 		final Map<String, Object> model = createIndexArrayMock();
 
 		final Engine engine = newEngine();
-		engine.setErrorHandler(new SilentErrorHandler());
+		final JournalingErrorHandler errorHandler = new JournalingErrorHandler();
+		engine.setErrorHandler(errorHandler);
 		String output = engine.transform("${array[3].name}", model);
 		assertEquals("", output);
+//		assertEquals(1, errorHandler.entries.size());
+//		assertEquals("Error while parsing 'array[3].name' at location (1:3): Index '3' on array '[{}, {name=Olli}]' does not exist", errorHandler.entries.get(0).formattedMessage.format());
 	}
 
 	@Test
@@ -492,9 +495,12 @@ public abstract class AbstractEngineTest {
 		model.put("notArray", el1);
 
 		final Engine engine = newEngine();
+		final JournalingErrorHandler errorHandler = new JournalingErrorHandler();
+		engine.setErrorHandler(errorHandler);
 		String output = engine.transform("${notArray[1].name}", model);
 		assertEquals("Olli", output);
-		// TODO: check warning (not yet implemented)
+		assertEquals(1, errorHandler.entries.size());
+		assertEquals("Error while parsing 'notArray[1].name' at location (1:3): You can not access non-array '{name=Olli}' as an array", errorHandler.entries.get(0).formattedMessage.format());
 	}
 
 	private Map<String, Object> createIndexArrayMock() {
