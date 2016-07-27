@@ -12,9 +12,9 @@
 
 	<property name="creator" value="floreysoft GmbH" />
 	<property name="final.name" value="${name}-${version}" />
-	<property name="nocompiler.name" value="${name}-unbundled-${version}" />
+	<property name="nocompiler.name" value="${final.name}" />
 	<property name="dist.name" value="${name}-${version}-full.zip" />
-	<property name="jar.name" value="${final.name}.jar" />
+	<property name="jar.name" value="${final.name}-bundled.jar" />
 	<property name="nocompiler.jar.name" value="${nocompiler.name}.jar" />
 	<property name="asm" value="lib/asm-3.3.1.jar" />
 
@@ -139,7 +139,7 @@
 
 	<target name="deploy" description="Deploys jar" if="deploy.dir">
 		<copy todir="${deploy.dir}">
-			<fileset file="${dist.dir}/${jar.name}" />
+			<fileset file="${dist.dir}/${nocompiler.jar.name}" />
 		</copy>
 	</target>
 
