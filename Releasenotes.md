@@ -160,8 +160,10 @@ Feature Release 3.3.0
 * New Feature: Added Engine#getUsedVariableDescriptions to get more detailed descriptions of used variables
 * New Feature: Renderer can now indicate that they can accept null values using a marker interface NullRenderer
 
-Feature Release 3.4.0
-=====================
+Major Release 4.0.0
+===================
 
+* Breaking Change: Token can now contain annotations
+* Deprecation: Cached and Compiled Templates are deprecated and are no longer actively maintained - will be removed compeletely in next major version
 * New Feature: Arrays now accept indices and have a computed length property
 * New Feature: Added journaling error handler (JournalingErrorHandler)

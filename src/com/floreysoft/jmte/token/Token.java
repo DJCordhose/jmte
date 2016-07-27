@@ -28,4 +28,6 @@ public interface Token extends Cloneable {
 	public int getTokenIndex();
 	
 	public String emit();
+
+	public Object getAnnotation();
 }

@@ -179,7 +179,7 @@ public class InterpretedTemplate extends AbstractTemplate {
 						context.notifyProcessListener(contentToken, Action.END);
 					}
 					if (!feToken.isLast()) {
-						output.append(feToken.getSeparator());
+						engine.getOutputAppender().append(this.output, feToken.getSeparator(), feToken);
 					}
 				}
 			}
@@ -243,13 +243,13 @@ public class InterpretedTemplate extends AbstractTemplate {
 		if (token instanceof PlainTextToken) {
 			tokenStream.consume();
 			if (!skip) {
-				output.append(token.getText());
+				engine.getOutputAppender().append(this.output, token.getText(), token);
 			}
 		} else if (token instanceof StringToken) {
 			tokenStream.consume();
 			if (!skip) {
 				String expanded = (String) token.evaluate(context);
-				output.append(expanded);
+				engine.getOutputAppender().append(this.output, expanded, token);
 			}
 		} else if (token instanceof ForEachToken) {
 			foreach(skip);
@@ -268,7 +268,7 @@ public class InterpretedTemplate extends AbstractTemplate {
 			tokenStream.consume();
 			// what ever else there may be, we just evaluate it
 			String evaluated = (String) token.evaluate(context);
-			output.append(evaluated);
+			engine.getOutputAppender().append(this.output, evaluated, token);
 		}
 
 	}

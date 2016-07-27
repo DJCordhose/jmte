@@ -1605,4 +1605,41 @@ public abstract class AbstractEngineTest {
 		assertEquals("A", output);
 	}
 
+	@Test
+	public void i18nVarNames() throws Exception {
+		final Map<String, Object> model = new HashMap<String, Object>();
+		model.put("åäüøöß爱", "Olli");
+
+		String output = newEngine().transform("${åäüøöß爱}", model);
+		assertEquals("Olli", output);
+	}
+
+	@Test
+	public void i18nIfCondition() throws Exception {
+		final Map<String, Object> model = new HashMap<String, Object>();
+		model.put("åäüøöß爱", "åäüøöß爱");
+
+		String output = newEngine().transform("${if åäüøöß爱='åäüøöß爱'}${åäüøöß爱}${else}NIX${end}", model);
+		assertEquals("åäüøöß爱", output);
+	}
+
+	@Test
+	public void gracefulIfErrorSpaces() throws Exception {
+		final Map<String, Object> model = new HashMap<String, Object>();
+		model.put("n a m e", "Olli");
+
+		final Engine engine = newEngine();
+		engine.setErrorHandler(new JournalingErrorHandler());
+		String output = engine.transform("${if n a m e}NIX${end}", model);
+	}
+
+	@Test
+	public void gracefulErrorSpaces() throws Exception {
+		final Map<String, Object> model = new HashMap<String, Object>();
+		model.put("n a m e", "Olli");
+
+		final Engine engine = newEngine();
+		engine.setErrorHandler(new JournalingErrorHandler());
+		String output = engine.transform("${n a m e}", model);
+	}
 }

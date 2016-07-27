@@ -108,6 +108,7 @@ public final class Engine implements RendererRegistry {
 	private boolean enabledInterpretedTemplateCache = true;
 	private ModelAdaptor modelAdaptor = new DefaultModelAdaptor();
 	private Encoder encoder = null;
+	private OutputAppender outputAppender = new DefaultOutputAppender();
 
 	private TemplateCompiler compiler;
 
@@ -219,7 +220,7 @@ public final class Engine implements RendererRegistry {
 	}
 
 	/**
-	 * Replacement for {@link java.lang.String.format}. All arguments will be
+	 * Replacement for {@link java.lang.String.format()}. All arguments will be
 	 * put into the model having their index starting from 1 as their name.
 	 * 
 	 * @param pattern
@@ -499,5 +500,13 @@ public final class Engine implements RendererRegistry {
 
 	public TemplateCompiler getCompiler() {
 		return compiler;
+	}
+
+	public OutputAppender getOutputAppender() {
+		return outputAppender;
+	}
+
+	public void setOutputAppender(OutputAppender outputAppender) {
+		this.outputAppender = outputAppender;
 	}
 }

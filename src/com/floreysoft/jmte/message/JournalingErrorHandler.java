@@ -1,6 +1,7 @@
 package com.floreysoft.jmte.message;
 
 import com.floreysoft.jmte.ErrorHandler;
+import com.floreysoft.jmte.token.AbstractToken;
 import com.floreysoft.jmte.token.Token;
 
 import java.util.ArrayList;
@@ -32,6 +33,11 @@ public class JournalingErrorHandler extends AbstractErrorHandler implements Erro
                       Map<String, Object> parameters) throws ParseException {
         Message message = new ResourceBundleMessage(messageKey).withModel(
                 parameters).onToken(token);
-        entries.add(new Entry(message, messageKey, token, parameters));
+        final Entry entry = new Entry(message, messageKey, token, parameters);
+        if (token instanceof AbstractToken) {
+            AbstractToken abstractToken = (AbstractToken) token;
+            abstractToken.setAnnotation(entry);
+        }
+        entries.add(entry);
     }
 }

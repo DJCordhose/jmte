@@ -6,6 +6,7 @@ public abstract class AbstractToken implements Token {
 	protected int line;
 	protected int column;
 	protected String sourceName;
+	protected Object annotation;
 	private int tokenIndex;
 
 	public AbstractToken() {
@@ -80,6 +81,15 @@ public abstract class AbstractToken implements Token {
 				}
 			}
 		}
+	}
+
+	@Override
+	public Object getAnnotation() {
+		return this.annotation;
+	}
+
+	public void setAnnotation(Object annotation) {
+		this.annotation = annotation;
 	}
 
 	@Override
