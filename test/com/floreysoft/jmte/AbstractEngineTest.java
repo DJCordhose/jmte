@@ -16,6 +16,7 @@ import java.util.concurrent.Callable;
 import com.floreysoft.jmte.message.*;
 import com.floreysoft.jmte.renderer.NullRenderer;
 import com.floreysoft.jmte.renderer.SimpleNamedRenderer;
+import com.floreysoft.jmte.template.ErrorReportingOutputAppender;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -1642,4 +1643,5 @@ public abstract class AbstractEngineTest {
 		engine.setErrorHandler(new JournalingErrorHandler());
 		String output = engine.transform("${n a m e}", model);
 	}
+
 }

@@ -15,6 +15,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.floreysoft.jmte.message.JournalingErrorHandler;
+import com.floreysoft.jmte.template.ErrorReportingOutputAppender;
 import org.junit.Test;
 
 import com.floreysoft.jmte.renderer.OptionRenderFormatInfo;
@@ -155,4 +157,21 @@ public class InterpretedEngineTest extends AbstractEngineTest {
 				actions.toArray());
 
 	}
+
+	@Test
+	public void errorReportingAppender() throws Exception {
+		final Map<String, Object> model = new HashMap<String, Object>();
+		final Map<String, Object> el1 = new HashMap<String, Object>();
+		el1.put("name", "Olli");
+		model.put("notArray", el1);
+
+		final Engine engine = newEngine();
+		engine.setErrorHandler(new JournalingErrorHandler());
+		engine.setOutputAppender(new ErrorReportingOutputAppender());
+		String output = engine.transform("${notArray[1].name}", model);
+		assertEquals("[!!You can not access non-array '{name=Olli}' as an array|Olli!!]", output);
+	}
+
+
+
 }
