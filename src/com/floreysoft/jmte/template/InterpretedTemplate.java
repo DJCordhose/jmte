@@ -9,6 +9,7 @@ import com.floreysoft.jmte.ProcessListener;
 import com.floreysoft.jmte.ProcessListener.Action;
 import com.floreysoft.jmte.ScopedMap;
 import com.floreysoft.jmte.TemplateContext;
+import com.floreysoft.jmte.message.JournalingErrorHandler;
 import com.floreysoft.jmte.token.ElseToken;
 import com.floreysoft.jmte.token.EndToken;
 import com.floreysoft.jmte.token.ExpressionToken;
@@ -69,6 +70,7 @@ public class InterpretedTemplate extends AbstractTemplate {
 	public List<VariableDescription> getUsedVariableDescriptions() {
 		final List<VariableDescription> variableDescriptions = new ArrayList<>();
 		final Engine engine = new Engine();
+		engine.setErrorHandler(new JournalingErrorHandler());
 		final ScopedMap scopedMap = new ScopedMap(Collections.EMPTY_MAP);
 
 		final ProcessListener processListener = new ProcessListener() {

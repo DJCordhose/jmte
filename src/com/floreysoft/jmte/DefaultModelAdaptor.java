@@ -182,6 +182,11 @@ public class DefaultModelAdaptor implements ModelAdaptor {
 
     @SuppressWarnings("rawtypes")
     protected Object getIndexFromArray(Object array, String arrayIndex, ErrorHandler errorHandler, Token token) {
+        if ( array == null ) {
+            errorHandler.error("not-array-error", token,
+                    new ModelBuilder("array", "[null]").build());
+            return ERROR_STRING;
+        }
         List<Object> arrayAsList = Util.arrayAsList(array);
         try {
             if (arrayAsList != null) {
