@@ -234,7 +234,16 @@ public class DefaultModelAdaptor implements ModelAdaptor {
 
     protected Object accessMap(Map map, String key) {
         Object result;
-        result = map.get(key);
+        // special cases to select which iterable we are interested in
+        if ( key.equals("_entries") ) {
+            result = map.entrySet();
+        } else if ( key.equals("_keys") ) {
+            result = map.keySet();
+        } else if ( key.equals("_values") ) {
+            result = map.values();
+        } else {
+            result = map.get(key);
+        }
         if (result == null && enableSlowMapAccess && !(map instanceof ScopedMap)) {
             final Set<Map.Entry<?, ?>> entries = map.entrySet();
             for (Map.Entry entry: entries) {
