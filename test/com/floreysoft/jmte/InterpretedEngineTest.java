@@ -17,6 +17,7 @@ import java.util.Map;
 
 import com.floreysoft.jmte.message.JournalingErrorHandler;
 import com.floreysoft.jmte.template.ErrorReportingOutputAppender;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.floreysoft.jmte.renderer.OptionRenderFormatInfo;
@@ -158,20 +159,68 @@ public class InterpretedEngineTest extends AbstractEngineTest {
 
 	}
 
+	private Engine newInlineErrorEngine() {
+		final Engine engine = newEngine();
+		engine.setErrorHandler(new JournalingErrorHandler());
+		engine.setOutputAppender(new ErrorReportingOutputAppender());
+		return engine;
+	}
+
 	@Test
-	public void errorReportingAppender() throws Exception {
+	public void errorReportingAppenderNonArray() throws Exception {
 		final Map<String, Object> model = new HashMap<String, Object>();
 		final Map<String, Object> el1 = new HashMap<String, Object>();
 		el1.put("name", "Olli");
 		model.put("notArray", el1);
 
-		final Engine engine = newEngine();
-		engine.setErrorHandler(new JournalingErrorHandler());
-		engine.setOutputAppender(new ErrorReportingOutputAppender());
+		final Engine engine = newInlineErrorEngine();
 		String output = engine.transform("${notArray[1].name}", model);
 		assertEquals("[!!You can not access non-array '{name=Olli}' as an array|Olli!!]", output);
 	}
 
+	@Test
+	public void errorReportingOutputAppenderInvalidExpression() {
+		final Map<String, Object> model = new HashMap<String, Object>();
+		model.put("name", "Olli");
+
+		final Engine engine = newInlineErrorEngine();
+		String output = engine.transform("${sjhdjsdh ${name}", model);
+		assertEquals("[!!Invalid expression!|sjhdjsdh ${name!!]", output);
+	}
+
+	@Test
+	public void errorReportingOutputAppenderUnmatchedEnd() {
+		final Map<String, Object> model = new HashMap<String, Object>();
+		model.put("name", "Olli");
+
+		final Engine engine = newInlineErrorEngine();
+		String output = engine.transform("${name}${end}no end?", model);
+		assertEquals("Olli[!!Unmatched end|!!]no end?", output);
+	}
+
+	@Test
+	public void errorReportingOutputAppenderElseOutOfScope() {
+		final Map<String, Object> model = new HashMap<String, Object>();
+		model.put("name", "Olli");
+
+		final Engine engine = newInlineErrorEngine();
+		String output = engine.transform("${name}${else}no if?", model);
+		assertEquals("Olli[!!Can't use else outside of if block!|!!]no if?", output);
+	}
+
+	@Test
+	@Ignore
+	public void booleanIfRenderer() {
+		final Map<String, Object> model = new HashMap<String, Object>();
+		model.put("name", "Daniel Georg Florey");
+		model.put("mychar", " ");
+
+		final Engine engine = newInlineErrorEngine();
+		String output = engine.transform("${if name;string(fromAfterFirst= ;toBeforeLast=$mychar)=\"Georg\"}${name;string(fromAfterFirst=)}${end}", model);
+		assertEquals("Georg Florey", output);
+	}
 
 
 }
+
+

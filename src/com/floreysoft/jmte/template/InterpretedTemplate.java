@@ -260,12 +260,15 @@ public class InterpretedTemplate extends AbstractTemplate {
 		} else if (token instanceof ElseToken) {
 			tokenStream.consume();
 			engine.getErrorHandler().error("else-out-of-scope", token);
+			engine.getOutputAppender().append(this.output, "", token);
 		} else if (token instanceof EndToken) {
 			tokenStream.consume();
 			engine.getErrorHandler().error("unmatched-end", token);
+			engine.getOutputAppender().append(this.output, "", token);
 		} else if (token instanceof InvalidToken) {
 			tokenStream.consume();
 			engine.getErrorHandler().error("invalid-expression", token);
+			engine.getOutputAppender().append(this.output, token.getText(), token);
 		} else {
 			tokenStream.consume();
 			// what ever else there may be, we just evaluate it
