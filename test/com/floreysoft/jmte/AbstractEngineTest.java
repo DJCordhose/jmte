@@ -937,7 +937,37 @@ public abstract class AbstractEngineTest {
         assertEquals("mapValue1, mapValue2", output);
     }
 
-    @Test
+	@Test
+	public void loopModeArrayforeachEntriesMap() throws Exception {
+		Engine engine = newEngine();
+		engine.setModelAdaptor(new DefaultModelAdaptor(DefaultModelAdaptor.LoopMode.LIST));
+		String output = engine.transform(
+				"${foreach map._entries entry}${entry.key}=${entry.value}\n${end}",
+				DEFAULT_MODEL);
+		assertEquals("mapEntry1=mapValue1\n" + "mapEntry2=mapValue2\n", output);
+	}
+
+	@Test
+	public void loopModeArrayforeachKeysMap() throws Exception {
+		Engine engine = newEngine();
+		engine.setModelAdaptor(new DefaultModelAdaptor(DefaultModelAdaptor.LoopMode.LIST));
+		String output = engine.transform(
+				"${foreach map._keys entry}${entry}\n${end}",
+				DEFAULT_MODEL);
+		assertEquals("mapEntry1\n" + "mapEntry2\n", output);
+	}
+
+	@Test
+	public void loopModeArrayforeachValuesMap() throws Exception {
+		Engine engine = newEngine();
+		engine.setModelAdaptor(new DefaultModelAdaptor(DefaultModelAdaptor.LoopMode.LIST));
+		String output = engine.transform(
+				"${foreach map._values entry}${entry}\n${end}",
+				DEFAULT_MODEL);
+		assertEquals("mapValue1\n" + "mapValue2\n", output);
+	}
+
+	@Test
     public void loopModeArrayForeachArray() throws Exception {
         Engine engine = newEngine();
         engine.setModelAdaptor(new DefaultModelAdaptor(DefaultModelAdaptor.LoopMode.LIST));

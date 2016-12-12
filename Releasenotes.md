@@ -167,3 +167,4 @@ Major Release 4.0.0
 * Deprecation: Cached and Compiled Templates are deprecated and are no longer actively maintained - will be removed compeletely in next major version
 * New Feature: Arrays now accept indices and have a computed length property
 * New Feature: Added journaling error handler (JournalingErrorHandler)
+* New Feature: When iterating over maps you can not choose between values, keys, and entries (map._values, map._keys, map.entries) 
