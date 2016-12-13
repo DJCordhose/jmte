@@ -199,6 +199,16 @@ public class InterpretedEngineTest extends AbstractEngineTest {
 	}
 
 	@Test
+	public void noErrorReportingOutputAppenderMatchedEnd() {
+		final Map<String, Object> model = new HashMap<String, Object>();
+		model.put("name", "Olli");
+
+		final Engine engine = newInlineErrorEngine();
+		String output = engine.transform("${if name}${name}${end}no end?", model);
+		assertEquals("Ollino end?", output);
+	}
+
+	@Test
 	public void errorReportingOutputAppenderElseOutOfScope() {
 		final Map<String, Object> model = new HashMap<String, Object>();
 		model.put("name", "Olli");
@@ -209,6 +219,16 @@ public class InterpretedEngineTest extends AbstractEngineTest {
 	}
 
 	@Test
+	public void noErrorReportingOutputAppenderElseInScope() {
+		final Map<String, Object> model = new HashMap<String, Object>();
+		model.put("name", "Olli");
+
+		final Engine engine = newInlineErrorEngine();
+		String output = engine.transform("_start_${if name}${name}${else}no name${end}_end_", model);
+		assertEquals("_start_Olli_end_", output);
+	}
+
+	@Test
 	@Ignore
 	public void booleanIfRenderer() {
 		final Map<String, Object> model = new HashMap<String, Object>();
@@ -216,7 +236,7 @@ public class InterpretedEngineTest extends AbstractEngineTest {
 		model.put("mychar", " ");
 
 		final Engine engine = newInlineErrorEngine();
-		String output = engine.transform("${if name;string(fromAfterFirst= ;toBeforeLast=$mychar)=\"Georg\"}${name;string(fromAfterFirst=)}${end}", model);
+		String output = engine.transform("${if !name;string(fromAfterFirst= ;toBeforeLast=$mychar)=\"Georg\"}${name;string(fromAfterFirst=)}${end}", model);
 		assertEquals("Georg Florey", output);
 	}
 
