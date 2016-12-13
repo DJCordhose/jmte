@@ -236,7 +236,7 @@ public class InterpretedEngineTest extends AbstractEngineTest {
 		model.put("mychar", " ");
 
 		final Engine engine = newInlineErrorEngine();
-		String output = engine.transform("${if !name;string(fromAfterFirst= ;toBeforeLast=$mychar)=\"Georg\"}${name;string(fromAfterFirst=)}${end}", model);
+		String output = engine.transform("${if name;string(fromAfterFirst= ;toBeforeLast=$mychar)=\"Georg\"}${name;string(fromAfterFirst=)}${end}", model);
 		assertEquals("Georg Florey", output);
 	}
 
