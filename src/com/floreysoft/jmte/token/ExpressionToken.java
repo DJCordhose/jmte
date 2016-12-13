@@ -14,8 +14,12 @@ public abstract class ExpressionToken extends AbstractToken {
 	public final static String segmentsToString(List<String> segments,
 			int start, int end) {
 		if (start >= segments.size() || end > segments.size()) {
-			throw new IllegalArgumentException("Range is not inside segments");
-		}
+            final String errorMessage =
+                    String.format("Range %d -> %d is not inside segments: %d",
+                            start, end,
+                            segments.size());
+            throw new IllegalArgumentException(errorMessage);
+        }
 		StringBuilder builder = new StringBuilder();
 		for (int i = start; i < end; i++) {
 			String segment = segments.get(i);
