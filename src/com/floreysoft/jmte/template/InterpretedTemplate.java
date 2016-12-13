@@ -155,6 +155,7 @@ public class InterpretedTemplate extends AbstractTemplate {
 				}
 				if (contentToken == null) {
 					engine.getErrorHandler().error("missing-end", feToken);
+					engine.getOutputAppender().append(this.output, "", feToken);
 				} else {
 					tokenStream.consume();
 					context.notifyProcessListener(contentToken, Action.END);
@@ -176,7 +177,8 @@ public class InterpretedTemplate extends AbstractTemplate {
 					}
 					if (contentToken == null) {
 						engine.getErrorHandler().error("missing-end", feToken);
-					} else {
+                        engine.getOutputAppender().append(this.output, "", feToken);
+                    } else {
 						tokenStream.consume();
 						context.notifyProcessListener(contentToken, Action.END);
 					}
@@ -230,7 +232,8 @@ public class InterpretedTemplate extends AbstractTemplate {
 
 			if (contentToken == null) {
 				engine.getErrorHandler().error("missing-end", ifToken);
-			} else {
+                engine.getOutputAppender().append(this.output, "", ifToken);
+            } else {
 				tokenStream.consume();
 				context.notifyProcessListener(contentToken, Action.END);
 			}

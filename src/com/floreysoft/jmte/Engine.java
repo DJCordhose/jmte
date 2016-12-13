@@ -77,25 +77,34 @@ public final class Engine implements RendererRegistry {
 
 	public final static String VERSION = "@version@";
 
+	@Deprecated
 	public static Engine createCachingEngine() {
 		Engine engine = new Engine();
 		engine.setEnabledInterpretedTemplateCache(true);
 		return engine;
 	}
 
+	@Deprecated
 	public static Engine createNonCachingEngine() {
 		Engine engine = new Engine();
 		engine.setEnabledInterpretedTemplateCache(false);
 		return engine;
 	}
 
+	@Deprecated
 	public static Engine createCompilingEngine() {
 		Engine engine = new Engine();
 		engine.setUseCompilation(true);
 		return engine;
 	}
 
+	@Deprecated
 	public static Engine createDefaultEngine() {
+		Engine engine = new Engine();
+		return engine;
+	}
+
+	public static Engine createEngine() {
 		Engine engine = new Engine();
 		return engine;
 	}
@@ -105,7 +114,7 @@ public final class Engine implements RendererRegistry {
 	private double expansionSizeFactor = 2;
 	private ErrorHandler errorHandler = new DefaultErrorHandler();
 	private boolean useCompilation = false;
-	private boolean enabledInterpretedTemplateCache = true;
+	private boolean enabledInterpretedTemplateCache = false;
 	private ModelAdaptor modelAdaptor = new DefaultModelAdaptor();
 	private Encoder encoder = null;
 	private OutputAppender outputAppender = new DefaultOutputAppender();
@@ -440,10 +449,12 @@ public final class Engine implements RendererRegistry {
 		return modelAdaptor;
 	}
 
+	@Deprecated
 	public synchronized boolean isEnabledInterpretedTemplateCache() {
 		return enabledInterpretedTemplateCache;
 	}
 
+	@Deprecated
 	public synchronized void setEnabledInterpretedTemplateCache(boolean enabledInterpretedTemplateCache) {
 		this.enabledInterpretedTemplateCache = enabledInterpretedTemplateCache;
 	}

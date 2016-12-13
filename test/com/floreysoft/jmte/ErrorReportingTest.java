@@ -1,0 +1,135 @@
+package com.floreysoft.jmte;
+
+import com.floreysoft.jmte.message.JournalingErrorHandler;
+import com.floreysoft.jmte.renderer.OptionRenderFormatInfo;
+import com.floreysoft.jmte.template.ErrorReportingOutputAppender;
+import com.floreysoft.jmte.token.Token;
+import com.floreysoft.jmte.util.StartEndPair;
+import com.floreysoft.jmte.util.Util;
+import org.junit.Test;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.StringReader;
+import java.util.*;
+
+import static org.junit.Assert.*;
+
+public class ErrorReportingTest {
+
+	private Engine newInlineErrorEngine() {
+		final Engine engine = new Engine();
+		engine.setErrorHandler(new JournalingErrorHandler());
+		engine.setOutputAppender(new ErrorReportingOutputAppender());
+		return engine;
+	}
+
+	@Test
+	public void nonArray() throws Exception {
+		final Map<String, Object> model = new HashMap<String, Object>();
+		final Map<String, Object> el1 = new HashMap<String, Object>();
+		el1.put("name", "Olli");
+		model.put("notArray", el1);
+
+		final Engine engine = newInlineErrorEngine();
+		String output = engine.transform("${notArray[1].name}", model);
+		assertEquals("[!!not-array-error|You can not access non-array '{name=Olli}' as an array|Olli!!]", output);
+	}
+
+	@Test
+	public void invalidExpression() {
+		final Map<String, Object> model = new HashMap<String, Object>();
+		model.put("name", "Olli");
+
+		final Engine engine = newInlineErrorEngine();
+		String output = engine.transform("${sjhdjsdh ${name}", model);
+		assertEquals("[!!invalid-expression|Invalid expression!|sjhdjsdh ${name!!]", output);
+	}
+
+	@Test
+	public void unmatchedEnd() {
+		final Map<String, Object> model = new HashMap<String, Object>();
+		model.put("name", "Olli");
+
+		final Engine engine = newInlineErrorEngine();
+		String output = engine.transform("${name}${end}no end?", model);
+		assertEquals("Olli[!!unmatched-end|Unmatched end|!!]no end?", output);
+	}
+
+	@Test
+	public void noErrorMatchedEnd() {
+		final Map<String, Object> model = new HashMap<String, Object>();
+		model.put("name", "Olli");
+
+		final Engine engine = newInlineErrorEngine();
+		String output = engine.transform("${if name}${name}${end}no end?", model);
+		assertEquals("Ollino end?", output);
+	}
+
+	@Test
+	public void elseOutOfScope() {
+		final Map<String, Object> model = new HashMap<String, Object>();
+		model.put("name", "Olli");
+
+		final Engine engine = newInlineErrorEngine();
+		String output = engine.transform("${name}${else}no if?", model);
+		assertEquals("Olli[!!else-out-of-scope|Can't use else outside of if block!|!!]no if?", output);
+	}
+
+	@Test
+	public void noErrorElseInScope() {
+		final Map<String, Object> model = new HashMap<String, Object>();
+		model.put("name", "Olli");
+
+		final Engine engine = newInlineErrorEngine();
+		String output = engine.transform("_start_${if name}${name}${else}no name${end}_end_", model);
+		assertEquals("_start_Olli_end_", output);
+	}
+
+	@Test
+	public void missingEnd() {
+		final Map<String, Object> model = new HashMap<String, Object>();
+		model.put("name", "Olli");
+
+		final Engine engine = newInlineErrorEngine();
+		String output = engine.transform("${if name}${name}no end?", model);
+		assertEquals("Ollino end?[!!missing-end|Missing end|!!]", output);
+	}
+
+	@Test
+	public void callOnString() {
+		final Map<String, Object> model = new HashMap<String, Object>();
+		model.put("name", "Olli");
+
+		final Engine engine = newInlineErrorEngine();
+		String output = engine.transform("_start_${name.lastName}_end_", model);
+		assertEquals("_start_[!!no-call-on-string|You can not make property calls on string 'Olli'!|Olli!!]_end_", output);
+	}
+
+	@Test
+	public void arrayOutOfBounds() {
+		final Map<String, Object> model = new HashMap<String, Object>();
+		final List<String> el1 = new ArrayList<>();
+		el1.add("Olli");
+		model.put("array", el1);
+
+		final Engine engine = newInlineErrorEngine();
+		String output = engine.transform("${array[2]}", model);
+		assertEquals("[!!index-out-of-bounds-error|Index '2' on array '[Olli]' does not exist|!!]", output);
+	}
+
+	@Test
+	public void invalidIndex() {
+		final Map<String, Object> model = new HashMap<String, Object>();
+		final List<String> el1 = new ArrayList<>();
+		el1.add("Olli");
+		model.put("array", el1);
+
+		final Engine engine = newInlineErrorEngine();
+		String output = engine.transform("${array[NIX]}", model);
+		assertEquals("[!!invalid-index-error|'NIX' on array '[Olli]' is not a valid index|!!]", output);
+	}
+
+}
+
+

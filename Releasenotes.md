@@ -165,6 +165,8 @@ Major Release 4.0.0
 
 * Breaking Change: Token can now contain annotations
 * Deprecation: Cached and Compiled Templates are deprecated and are no longer actively maintained - will be removed compeletely in next major version
+* Breaking Change / Deprecation: Disabled enabledInterpretedTemplateCache and deprecated all uses in Engine
 * New Feature: Arrays now accept indices and have a computed length property
-* New Feature: Added journaling error handler (JournalingErrorHandler)
+* New Feature: Added journaling error handler (JournalingErrorHandler) and OutputAppender abstraction to embed error messages directly in output using ErrorReportingOutputAppender  (see ErrorReportingTest)
 * New Feature: When iterating over maps you can now choose between values, keys, and entries (map._values, map._keys, map.entries) 
+* New Feature: Allow renderers to be applied before comparing in if statements (see BooleanIfRendererTest)

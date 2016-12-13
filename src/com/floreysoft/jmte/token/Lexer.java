@@ -79,18 +79,18 @@ public class Lexer {
                     final int posFirstSemi = completeIfExpression.indexOf(';');
                     final int posFirstEq = completeIfExpression.indexOf('=');
                     final int posLastEq = completeIfExpression.lastIndexOf('=');
+                    String operand = completeIfExpression.substring(posLastEq + 1);
+                    // remove optional quotations
+                    if (operand.startsWith("'") || operand.startsWith("\"")) {
+                        operand = operand.substring(1, operand.length() - 1);
+                    }
                     // if there is a semicolon before an eq, this must be a renderer applied to the variable
-//                    if (posFirstSemi != -1 && posFirstEq != -1 && posFirstSemi < posFirstEq) {
-//
-//                    } else {
+                    if (posFirstSemi != -1 && posFirstEq != -1 && posFirstSemi < posFirstEq) {
+
+                    } else {
                         final String variable = completeIfExpression.substring(0, posLastEq);
-                        String operand = completeIfExpression.substring(posLastEq + 1);
-                        // remove optional quotations
-                        if (operand.startsWith("'") || operand.startsWith("\"")) {
-                            operand = operand.substring(1, operand.length() - 1);
-                        }
                         return new IfCmpToken(variable, operand, negated);
-//                    }
+                    }
 				}
 			}
 			if (cmd.equalsIgnoreCase(ForEachToken.FOREACH)) {
