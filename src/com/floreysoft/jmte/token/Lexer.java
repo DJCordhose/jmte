@@ -94,7 +94,12 @@ public class Lexer {
 				}
 			}
 			if (cmd.equalsIgnoreCase(ForEachToken.FOREACH)) {
-				final String varName = split.get(2);
+                final String varName;
+                if (split.size() < 3) {
+                    varName = ForEachToken.UNDEFINED_VARNAME;
+                } else {
+                    varName = split.get(2);
+                }
 				// we might also have
 				// separator
 				// data
@@ -123,8 +128,9 @@ public class Lexer {
 				if (separator !=null){
 					separator = Util.NO_QUOTE_MINI_PARSER.unescape(separator);
 				}
-				return new ForEachToken(objectExpression, varName, separator
-						.length() != 0 ? separator : null);
+                final ForEachToken forEachToken = new ForEachToken(objectExpression, varName, separator
+                        .length() != 0 ? separator : null);
+                return forEachToken;
 			}
 		}
 

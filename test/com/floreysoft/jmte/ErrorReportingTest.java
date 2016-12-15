@@ -145,6 +145,19 @@ public class ErrorReportingTest {
 		assertEquals("_start_[!!invalid-index-error|'NIX' on array '[Olli]' is not a valid index|${array[NIX]}!!]_end_", output);
 	}
 
+    @Test
+    public void missingForEachVariable() {
+        final Map<String, Object> model = new HashMap<String, Object>();
+        final List<String> el1 = new ArrayList<>();
+        el1.add("Olli");
+        model.put("array", el1);
+
+        final Engine engine = newInlineErrorEngine();
+        String output = engine.transform("${foreach array}${element}${end}", model);
+        assertEquals("[!!foreach-undefined-varname|Missing variable name in foreach|${foreach array}!!]", output);
+    }
+
+
 }
 
 

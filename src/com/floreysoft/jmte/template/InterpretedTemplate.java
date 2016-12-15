@@ -135,6 +135,10 @@ public class InterpretedTemplate extends AbstractTemplate {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void foreach(boolean inheritedSkip) {
 		ForEachToken feToken = (ForEachToken) tokenStream.currentToken();
+		if (feToken.getVarName() == ForEachToken.UNDEFINED_VARNAME) {
+            engine.getErrorHandler().error("foreach-undefined-varname", feToken);
+            engine.getOutputAppender().append(this.output, "", feToken);
+        }
 		Iterable iterable = (Iterable) feToken.evaluate(context);
 		// begin a fresh iteration with a reset index
 		feToken.setIterator(iterable.iterator());

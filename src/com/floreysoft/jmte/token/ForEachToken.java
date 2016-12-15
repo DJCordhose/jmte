@@ -11,6 +11,7 @@ import com.floreysoft.jmte.util.Util;
 
 public class ForEachToken extends ExpressionToken {
 	public static final String FOREACH = "foreach";
+	public static final String UNDEFINED_VARNAME = "_undefined";
 
 	private final String varName;
 	private final String separator;
