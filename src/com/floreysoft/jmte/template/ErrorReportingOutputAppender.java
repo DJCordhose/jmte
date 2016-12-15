@@ -6,6 +6,9 @@ import com.floreysoft.jmte.token.Token;
 public class ErrorReportingOutputAppender implements OutputAppender {
 
     private final static String ERROR_PATTERN = "[!!%s|%s|%s!!]";
+    private String prefix = "${";
+    private String suffix = "}";
+
     @Override
     public void append(StringBuilder builder, String text, Token token) {
         final String textToAppend;
@@ -13,7 +16,13 @@ public class ErrorReportingOutputAppender implements OutputAppender {
         if (annotation instanceof JournalingErrorHandler.Entry) {
             final JournalingErrorHandler.Entry entry = (JournalingErrorHandler.Entry) annotation;
             final String message = entry.formattedMessage.formatPlain();
-            textToAppend = String.format(ERROR_PATTERN, entry.messageKey, message, text);
+            final String expressionText;
+            if (text == null) {
+                expressionText = "";
+            } else {
+                expressionText = prefix + token.getText() + suffix;
+            }
+            textToAppend = String.format(ERROR_PATTERN, entry.messageKey, message, expressionText);
         } else {
             textToAppend = text;
         }

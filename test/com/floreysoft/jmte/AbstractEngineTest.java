@@ -499,7 +499,6 @@ public abstract class AbstractEngineTest {
 		final JournalingErrorHandler errorHandler = new JournalingErrorHandler();
 		engine.setErrorHandler(errorHandler);
 		String output = engine.transform("${notArray[1].name}", model);
-		assertEquals("Olli", output);
 		assertEquals(1, errorHandler.entries.size());
 		assertEquals("You can not access non-array '{name=Olli}' as an array", errorHandler.entries.get(0).formattedMessage.formatPlain());
 	}

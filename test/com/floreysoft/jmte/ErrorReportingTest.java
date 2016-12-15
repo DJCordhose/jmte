@@ -33,7 +33,7 @@ public class ErrorReportingTest {
 
 		final Engine engine = newInlineErrorEngine();
 		String output = engine.transform("${notArray[1].name}", model);
-		assertEquals("[!!not-array-error|You can not access non-array '{name=Olli}' as an array|Olli!!]", output);
+		assertEquals("[!!not-array-error|You can not access non-array '{name=Olli}' as an array|${notArray[1].name}!!]", output);
 	}
 
 	@Test
@@ -43,7 +43,7 @@ public class ErrorReportingTest {
 
 		final Engine engine = newInlineErrorEngine();
 		String output = engine.transform("${sjhdjsdh ${name}", model);
-		assertEquals("[!!invalid-expression|Invalid expression!|sjhdjsdh ${name!!]", output);
+		assertEquals("[!!invalid-expression|Invalid expression!|${sjhdjsdh ${name}!!]", output);
 	}
 
 	@Test
@@ -53,7 +53,7 @@ public class ErrorReportingTest {
 
 		final Engine engine = newInlineErrorEngine();
 		String output = engine.transform("${name}${end}no end?", model);
-		assertEquals("Olli[!!unmatched-end|Unmatched end|!!]no end?", output);
+		assertEquals("Olli[!!unmatched-end|Unmatched end|${end}!!]no end?", output);
 	}
 
 	@Test
@@ -73,7 +73,7 @@ public class ErrorReportingTest {
 
 		final Engine engine = newInlineErrorEngine();
 		String output = engine.transform("${name}${else}no if?", model);
-		assertEquals("Olli[!!else-out-of-scope|Can't use else outside of if block!|!!]no if?", output);
+		assertEquals("Olli[!!else-out-of-scope|Can't use else outside of if block!|${else}!!]no if?", output);
 	}
 
 	@Test
@@ -103,7 +103,22 @@ public class ErrorReportingTest {
 
 		final Engine engine = newInlineErrorEngine();
 		String output = engine.transform("_start_${name.lastName}_end_", model);
-		assertEquals("_start_[!!no-call-on-string|You can not make property calls on string 'Olli'!|Olli!!]_end_", output);
+		assertEquals("_start_[!!no-call-on-string|You can not make property calls on string 'Olli'!|${name.lastName}!!]_end_", output);
+	}
+
+	@Test
+	public void noSuchProperty() {
+		final Map<String, Object> model = new HashMap<String, Object>();
+		model.put("name", new Object() {
+            @Override
+            public String toString() {
+                return "myObject";
+            }
+        });
+
+		final Engine engine = newInlineErrorEngine();
+		String output = engine.transform("_start_${name.doesNotExist}_end_", model);
+		assertEquals("_start_[!!property-access-error|Property 'doesNotExist' on object 'myObject' can not be accessed: \"java.lang.NoSuchFieldException: doesNotExist\"!|${name.doesNotExist}!!]_end_", output);
 	}
 
 	@Test
@@ -114,8 +129,8 @@ public class ErrorReportingTest {
 		model.put("array", el1);
 
 		final Engine engine = newInlineErrorEngine();
-		String output = engine.transform("${array[2]}", model);
-		assertEquals("[!!index-out-of-bounds-error|Index '2' on array '[Olli]' does not exist|!!]", output);
+		String output = engine.transform("_start_${array[2]}_end_", model);
+		assertEquals("_start_[!!index-out-of-bounds-error|Index '2' on array '[Olli]' does not exist|${array[2]}!!]_end_", output);
 	}
 
 	@Test
@@ -126,8 +141,8 @@ public class ErrorReportingTest {
 		model.put("array", el1);
 
 		final Engine engine = newInlineErrorEngine();
-		String output = engine.transform("${array[NIX]}", model);
-		assertEquals("[!!invalid-index-error|'NIX' on array '[Olli]' is not a valid index|!!]", output);
+		String output = engine.transform("_start_${array[NIX]}_end_", model);
+		assertEquals("_start_[!!invalid-index-error|'NIX' on array '[Olli]' is not a valid index|${array[NIX]}!!]_end_", output);
 	}
 
 }

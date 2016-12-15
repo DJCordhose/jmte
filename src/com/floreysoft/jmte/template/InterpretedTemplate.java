@@ -232,7 +232,7 @@ public class InterpretedTemplate extends AbstractTemplate {
 
 			if (contentToken == null) {
 				engine.getErrorHandler().error("missing-end", ifToken);
-                engine.getOutputAppender().append(this.output, "", ifToken);
+                engine.getOutputAppender().append(this.output, null, ifToken);
             } else {
 				tokenStream.consume();
 				context.notifyProcessListener(contentToken, Action.END);
@@ -271,7 +271,7 @@ public class InterpretedTemplate extends AbstractTemplate {
 		} else if (token instanceof InvalidToken) {
 			tokenStream.consume();
 			engine.getErrorHandler().error("invalid-expression", token);
-			engine.getOutputAppender().append(this.output, token.getText(), token);
+			engine.getOutputAppender().append(this.output, "", token);
 		} else {
 			tokenStream.consume();
 			// what ever else there may be, we just evaluate it
