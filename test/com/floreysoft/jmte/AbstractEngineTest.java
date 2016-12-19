@@ -74,9 +74,9 @@ public abstract class AbstractEngineTest {
 		return new AbstractErrorHandler() {
 
 			@Override
-			public void error(String messageKey, Token token,
+			public void error(ErrorMessage errorMessage, Token token,
 					Map<String, Object> parameters) throws ParseException {
-				Message message = new ResourceBundleMessage(messageKey)
+				Message message = new ResourceBundleMessage(errorMessage.key)
 						.withModel(parameters).onToken(token);
 				throw new ParseException(message);
 			}

@@ -11,6 +11,7 @@ import java.util.Set;
 
 import com.floreysoft.jmte.encoder.Encoder;
 import com.floreysoft.jmte.message.DefaultErrorHandler;
+import com.floreysoft.jmte.message.ErrorEntry;
 import com.floreysoft.jmte.message.SilentErrorHandler;
 import com.floreysoft.jmte.renderer.DefaultCollectionRenderer;
 import com.floreysoft.jmte.renderer.DefaultIterableRenderer;
@@ -229,7 +230,7 @@ public final class Engine implements RendererRegistry {
 	}
 
 	/**
-	 * Replacement for {@link java.lang.String.format()}. All arguments will be
+	 * Replacement for {@link java.lang.String#format(String, Object...)}. All arguments will be
 	 * put into the model having their index starting from 1 as their name.
 	 * 
 	 * @param pattern
@@ -266,7 +267,10 @@ public final class Engine implements RendererRegistry {
 
 	/**
 	 * Gets all variables used in the given template.
+	 *
+	 * @deprecated use {@link #getUsedVariableDescriptions(String)} instead
 	 */
+	@Deprecated()
 	public synchronized Set<String> getUsedVariables(String template) {
 		Template templateImpl = getTemplate(template, null);
 		return templateImpl.getUsedVariables();
@@ -274,13 +278,19 @@ public final class Engine implements RendererRegistry {
 
 	/**
 	 * Gets all variables used in the given template as a detailed description.
+	 *
 	 */
 	public synchronized List<VariableDescription> getUsedVariableDescriptions(String template) {
 		Template templateImpl = getTemplate(template, null);
 		return templateImpl.getUsedVariableDescriptions();
 	}
 
-	@Override
+    public synchronized List<ErrorEntry> getStaticErrors(String template) {
+        Template templateImpl = getTemplate(template, null);
+        return templateImpl.getStaticErrors();
+    }
+
+    @Override
 	public synchronized Engine registerNamedRenderer(NamedRenderer renderer) {
 		namedRenderers.put(renderer.getName(), renderer);
 		Set<Class<?>> supportedClasses = Util.asSet(renderer.getSupportedClasses());

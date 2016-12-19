@@ -163,18 +163,27 @@ Feature Release 3.3.0
 Major Release 4.0.0
 ===================
 
-Date: 16.12.2016
+Date: so far only snapshot
 Tag: 4.0.0
 
 * Breaking Change: Token can now contain annotations
+* Breaking Change: ErrorHandler now takes newly introduced ErrorMessage enum  (instead of just a string)
 * Deprecation: Cached and Compiled Templates are deprecated and are no longer actively maintained - will be removed compeletely in next major version
+* Deprecation: Engine#getUsedVariables
 * Breaking Change / Deprecation: Disabled enabledInterpretedTemplateCache and deprecated all uses in Engine
 * New Feature: Arrays now accept indices and have a computed length property
-* New Feature: Added journaling error handler (JournalingErrorHandler) and OutputAppender abstraction to embed error messages directly in output using ErrorReportingOutputAppender  (see ErrorReportingTest)
+* New Feature: Added journaling error handler (JournalingErrorHandler) and OutputAppender abstraction to embed error messages directly in output using ErrorReportingOutputAppender (see ErrorReportingTest)
 * New Feature: When iterating over maps you can now choose between values, keys, and entries (map._values, map._keys, map.entries) 
-* New Feature: Allow renderers to be applied before comparing in if statements (see BooleanIfRendererTest)
-
-Release 4.1
-===========
+* New Feature: Engine#getStaticErrors exposing ErrorEntry refactored from JournalingErrorHandler.Entry
+* New Feature (in progress): Allow renderers to be applied before comparing in if statements (see BooleanIfRendererTest)
 
 Date: so far only snapshot
+
+
+
+
+Future Major Release 5.0.0
+==========================
+
+* Breaking Change: Completely removed Abstraktion over Template types, only interpreted survive
+* Breaking Change: Removed all API deprecated in version 4

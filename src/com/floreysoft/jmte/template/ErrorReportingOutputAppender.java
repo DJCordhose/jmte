@@ -1,6 +1,6 @@
 package com.floreysoft.jmte.template;
 
-import com.floreysoft.jmte.message.JournalingErrorHandler;
+import com.floreysoft.jmte.message.ErrorEntry;
 import com.floreysoft.jmte.token.Token;
 
 public class ErrorReportingOutputAppender implements OutputAppender {
@@ -13,8 +13,8 @@ public class ErrorReportingOutputAppender implements OutputAppender {
     public void append(StringBuilder builder, String text, Token token) {
         final String textToAppend;
         final Object annotation = token.getAnnotation();
-        if (annotation instanceof JournalingErrorHandler.Entry) {
-            final JournalingErrorHandler.Entry entry = (JournalingErrorHandler.Entry) annotation;
+        if (annotation instanceof ErrorEntry) {
+            final ErrorEntry entry = (ErrorEntry) annotation;
             final String message = entry.formattedMessage.formatPlain();
             final String expressionText;
             if (text == null) {
@@ -22,7 +22,7 @@ public class ErrorReportingOutputAppender implements OutputAppender {
             } else {
                 expressionText = prefix + token.getText() + suffix;
             }
-            textToAppend = String.format(ERROR_PATTERN, entry.messageKey, message, expressionText);
+            textToAppend = String.format(ERROR_PATTERN, entry.errorMessage.key, message, expressionText);
         } else {
             textToAppend = text;
         }

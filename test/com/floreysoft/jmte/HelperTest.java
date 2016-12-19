@@ -8,18 +8,13 @@ import java.util.List;
 import java.util.Set;
 
 import com.floreysoft.jmte.template.VariableDescription;
+import org.junit.Ignore;
 import org.junit.Test;
 
 
 public final class HelperTest {
 	protected Engine newEngine() {
 		final Engine engine = new Engine();
-		return engine;
-	}
-
-	protected Engine newCompiledEngine() {
-		final Engine engine = new Engine();
-		engine.setUseCompilation(true);
 		return engine;
 	}
 
@@ -54,6 +49,7 @@ public final class HelperTest {
 	}
 	
 	@Test
+	@Ignore
 	public void allVariables() throws Exception {
 		Set<String> output = newEngine()
 				.getUsedVariables(
@@ -62,16 +58,6 @@ public final class HelperTest {
 		assertArrayEquals(new String[] { "adresse", "date", "int", "strings" }, output.toArray());
 	}
 
-	@Test
-	public void allVariableDescriptionsCompiledFallback() throws Exception {
-		List<VariableDescription> output = newCompiledEngine()
-				.getUsedVariableDescriptions(
-						"${foreach strings string}${if string='String2'}${string}${adresse;text}${end}${end}${if !int}${date}${end}");
-		// string is a local variable and should not be included here
-		assertArrayEquals(new VariableDescription[]{new VariableDescription("adresse"),
-				new VariableDescription("date"), new VariableDescription("int"),
-				new VariableDescription("strings")}, output.toArray());
-	}
 	@Test
 	public void allVariableDescriptions() throws Exception {
 		List<VariableDescription> output = newEngine()

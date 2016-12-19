@@ -12,10 +12,12 @@ public class ProductionErrorHandler extends AbstractErrorHandler implements
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void error(String messageKey, Token token,
+	public void error(ErrorMessage errorMessage, Token token,
 			Map<String, Object> parameters) throws ParseException {
-		Message message = new ResourceBundleMessage(messageKey).withModel(
-				parameters).onToken(token);
-		logger.severe(message.format(locale));
+		if (errorMessage.isSevere()) {
+			Message message = new ResourceBundleMessage(errorMessage.key).withModel(
+					parameters).onToken(token);
+			logger.severe(message.format(locale));
+		}
 	}
 }

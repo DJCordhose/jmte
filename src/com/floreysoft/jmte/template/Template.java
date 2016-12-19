@@ -7,6 +7,7 @@ import java.util.Set;
 
 import com.floreysoft.jmte.ModelAdaptor;
 import com.floreysoft.jmte.ProcessListener;
+import com.floreysoft.jmte.message.ErrorEntry;
 
 public interface Template {
 	/**
@@ -47,8 +48,11 @@ public interface Template {
 	 */
 	public String transform(Map<String, Object> model, Locale locale);
 
+	@Deprecated()
 	public Set<String> getUsedVariables();
 
 	public List<VariableDescription> getUsedVariableDescriptions();
+
+	public List<ErrorEntry> getStaticErrors();
 
 }

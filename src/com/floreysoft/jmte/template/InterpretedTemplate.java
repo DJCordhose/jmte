@@ -1,6 +1,7 @@
 package com.floreysoft.jmte.template;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import com.floreysoft.jmte.DefaultModelAdaptor;
 import com.floreysoft.jmte.Engine;
@@ -9,6 +10,7 @@ import com.floreysoft.jmte.ProcessListener;
 import com.floreysoft.jmte.ProcessListener.Action;
 import com.floreysoft.jmte.ScopedMap;
 import com.floreysoft.jmte.TemplateContext;
+import com.floreysoft.jmte.message.ErrorEntry;
 import com.floreysoft.jmte.message.JournalingErrorHandler;
 import com.floreysoft.jmte.token.ElseToken;
 import com.floreysoft.jmte.token.EndToken;
@@ -20,6 +22,8 @@ import com.floreysoft.jmte.token.PlainTextToken;
 import com.floreysoft.jmte.token.StringToken;
 import com.floreysoft.jmte.token.Token;
 import com.floreysoft.jmte.token.TokenStream;
+
+import static com.floreysoft.jmte.message.ErrorMessage.*;
 
 public class InterpretedTemplate extends AbstractTemplate {
 
@@ -66,7 +70,27 @@ public class InterpretedTemplate extends AbstractTemplate {
 		return this.usedVariables;
 	}
 
-	@Override
+    @Override
+    public List<ErrorEntry> getStaticErrors() {
+        final Engine engine = new Engine();
+        final JournalingErrorHandler errorHandler = new JournalingErrorHandler();
+        engine.setErrorHandler(errorHandler);
+        final ScopedMap scopedMap = new ScopedMap(Collections.EMPTY_MAP);
+        final Locale locale = Locale.getDefault();
+        this.context = new TemplateContext(this.template, locale, this.sourceName, scopedMap,
+                new DefaultModelAdaptor(), engine, errorHandler, null);
+        transformPure(this.context);
+
+        final List<ErrorEntry> staticErrors = new ArrayList<>();
+        for (ErrorEntry entry: errorHandler.entries) {
+            if (entry.errorMessage.isStatic) {
+                staticErrors.add(entry);
+            }
+        }
+        return staticErrors;
+    }
+
+    @Override
 	public List<VariableDescription> getUsedVariableDescriptions() {
 		final List<VariableDescription> variableDescriptions = new ArrayList<>();
 		final Engine engine = new Engine();
@@ -136,8 +160,8 @@ public class InterpretedTemplate extends AbstractTemplate {
 	private void foreach(boolean inheritedSkip) {
 		ForEachToken feToken = (ForEachToken) tokenStream.currentToken();
 		if (feToken.getVarName() == ForEachToken.UNDEFINED_VARNAME) {
-            engine.getErrorHandler().error("foreach-undefined-varname", feToken);
-            engine.getOutputAppender().append(this.output, "", feToken);
+            this.context.engine.getErrorHandler().error(FOR_EACH_UNDEFINED_VARNAME, feToken);
+            this.context.engine.getOutputAppender().append(this.output, "", feToken);
         }
 		Iterable iterable = (Iterable) feToken.evaluate(context);
 		// begin a fresh iteration with a reset index
@@ -158,8 +182,8 @@ public class InterpretedTemplate extends AbstractTemplate {
 					content(true);
 				}
 				if (contentToken == null) {
-					engine.getErrorHandler().error("missing-end", feToken);
-					engine.getOutputAppender().append(this.output, "", feToken);
+					this.context.engine.getErrorHandler().error(MISSING_END, feToken);
+					this.context.engine.getOutputAppender().append(this.output, "", feToken);
 				} else {
 					tokenStream.consume();
 					context.notifyProcessListener(contentToken, Action.END);
@@ -180,14 +204,14 @@ public class InterpretedTemplate extends AbstractTemplate {
 						content(false);
 					}
 					if (contentToken == null) {
-						engine.getErrorHandler().error("missing-end", feToken);
-                        engine.getOutputAppender().append(this.output, "", feToken);
+						this.context.engine.getErrorHandler().error(MISSING_END, feToken);
+                        this.context.engine.getOutputAppender().append(this.output, "", feToken);
                     } else {
 						tokenStream.consume();
 						context.notifyProcessListener(contentToken, Action.END);
 					}
 					if (!feToken.isLast()) {
-						engine.getOutputAppender().append(this.output, feToken.getSeparator(), feToken);
+						this.context.engine.getOutputAppender().append(this.output, feToken.getSeparator(), feToken);
 					}
 				}
 			}
@@ -235,8 +259,8 @@ public class InterpretedTemplate extends AbstractTemplate {
 			}
 
 			if (contentToken == null) {
-				engine.getErrorHandler().error("missing-end", ifToken);
-                engine.getOutputAppender().append(this.output, null, ifToken);
+				this.context.engine.getErrorHandler().error(MISSING_END, ifToken);
+                this.context.engine.getOutputAppender().append(this.output, null, ifToken);
             } else {
 				tokenStream.consume();
 				context.notifyProcessListener(contentToken, Action.END);
@@ -252,13 +276,13 @@ public class InterpretedTemplate extends AbstractTemplate {
 		if (token instanceof PlainTextToken) {
 			tokenStream.consume();
 			if (!skip) {
-				engine.getOutputAppender().append(this.output, token.getText(), token);
+				this.context.engine.getOutputAppender().append(this.output, token.getText(), token);
 			}
 		} else if (token instanceof StringToken) {
 			tokenStream.consume();
 			if (!skip) {
 				String expanded = (String) token.evaluate(context);
-				engine.getOutputAppender().append(this.output, expanded, token);
+				this.context.engine.getOutputAppender().append(this.output, expanded, token);
 			}
 		} else if (token instanceof ForEachToken) {
 			foreach(skip);
@@ -266,21 +290,21 @@ public class InterpretedTemplate extends AbstractTemplate {
 			condition(skip);
 		} else if (token instanceof ElseToken) {
 			tokenStream.consume();
-			engine.getErrorHandler().error("else-out-of-scope", token);
-			engine.getOutputAppender().append(this.output, "", token);
+			this.context.engine.getErrorHandler().error(ELSE_OUT_OF_SCOPE, token);
+			this.context.engine.getOutputAppender().append(this.output, "", token);
 		} else if (token instanceof EndToken) {
 			tokenStream.consume();
-			engine.getErrorHandler().error("unmatched-end", token);
-			engine.getOutputAppender().append(this.output, "", token);
+			this.context.engine.getErrorHandler().error(UNMATCHED_END, token);
+			this.context.engine.getOutputAppender().append(this.output, "", token);
 		} else if (token instanceof InvalidToken) {
 			tokenStream.consume();
-			engine.getErrorHandler().error("invalid-expression", token);
-			engine.getOutputAppender().append(this.output, "", token);
+			this.context.engine.getErrorHandler().error(INVALID_EXPRESSION, token);
+			this.context.engine.getOutputAppender().append(this.output, "", token);
 		} else {
 			tokenStream.consume();
 			// what ever else there may be, we just evaluate it
 			String evaluated = (String) token.evaluate(context);
-			engine.getOutputAppender().append(this.output, evaluated, token);
+			this.context.engine.getOutputAppender().append(this.output, evaluated, token);
 		}
 
 	}

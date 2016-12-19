@@ -11,7 +11,7 @@ public class SilentErrorHandler extends AbstractErrorHandler implements ErrorHan
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void error(String messageKey, Token token, Map<String, Object> parameters) throws ParseException {
+	public void error(ErrorMessage errorMessage, Token token, Map<String, Object> parameters) throws ParseException {
 		// Silent by design
 	}
 }

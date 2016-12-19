@@ -10,6 +10,8 @@ import com.floreysoft.jmte.token.InvalidToken;
 import com.floreysoft.jmte.token.Token;
 import com.floreysoft.jmte.util.Util;
 
+import static com.floreysoft.jmte.message.ErrorMessage.*;
+
 /**
  * Default implementation of the model adapter.
  * <p>
@@ -139,7 +141,7 @@ public class DefaultModelAdaptor implements ModelAdaptor {
         Object result;
         if (o instanceof String) {
             if (o != ERROR_STRING) {
-                errorHandler.error("no-call-on-string", token, new ModelBuilder(
+                errorHandler.error(NO_CALL_ON_STRING, token, new ModelBuilder(
                         "receiver", o.toString()).build());
             }
             return o;
@@ -165,7 +167,7 @@ public class DefaultModelAdaptor implements ModelAdaptor {
                 result = getPropertyValue(o, rawAttributeName);
             } catch (Exception e) {
                 if (o != ERROR_STRING) {
-                    errorHandler.error("property-access-error", token,
+                    errorHandler.error(PROPERTY_ACCESS, token,
                             new ModelBuilder("property", rawAttributeName, "object",
                                     o, "exception", e).build());
                 }
@@ -183,7 +185,7 @@ public class DefaultModelAdaptor implements ModelAdaptor {
     @SuppressWarnings("rawtypes")
     protected Object getIndexFromArray(Object array, String arrayIndex, ErrorHandler errorHandler, Token token) {
         if ( array == null ) {
-            errorHandler.error("not-array-error", token,
+            errorHandler.error(NOT_ARRAY, token,
                     new ModelBuilder("array", "[null]").build());
             return ERROR_STRING;
         }
@@ -198,7 +200,7 @@ public class DefaultModelAdaptor implements ModelAdaptor {
                             return arrayAsList.get(index);
                         } else {
                             if (array != ERROR_STRING) {
-                                errorHandler.error("index-out-of-bounds-error", token,
+                                errorHandler.error(INDEX_OUT_OF_BOUNDS, token,
                                         new ModelBuilder("arrayIndex", arrayIndex, "array", array.toString()).build());
                             }
                             return ERROR_STRING;
@@ -209,21 +211,21 @@ public class DefaultModelAdaptor implements ModelAdaptor {
                     }
                 } catch (NumberFormatException nfe) {
                     if (array != ERROR_STRING) {
-                        errorHandler.error("invalid-index-error", token,
+                        errorHandler.error(INVALID_INDEX, token,
                                 new ModelBuilder("arrayIndex", arrayIndex, "array", array.toString()).build());
                     }
                     return ERROR_STRING;
                 }
             } else {
                 if (array != ERROR_STRING) {
-                    errorHandler.error("not-array-error", token,
+                    errorHandler.error(NOT_ARRAY, token,
                             new ModelBuilder("array", array.toString()).build());
                 }
                 return array;
             }
         } catch (IndexOutOfBoundsException e) {
             if (array != ERROR_STRING) {
-                errorHandler.error("index-out-of-bounds-error", token,
+                errorHandler.error(INDEX_OUT_OF_BOUNDS, token,
                         new ModelBuilder("arrayIndex", arrayIndex, "array", array.toString()).build());
             }
             return ERROR_STRING;

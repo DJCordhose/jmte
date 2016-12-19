@@ -1,11 +1,16 @@
 package com.floreysoft.jmte;
 
+import static com.floreysoft.jmte.message.ErrorMessage.*;
+
+import com.floreysoft.jmte.message.ErrorEntry;
+import com.floreysoft.jmte.message.ErrorMessage;
 import com.floreysoft.jmte.message.JournalingErrorHandler;
 import com.floreysoft.jmte.renderer.OptionRenderFormatInfo;
 import com.floreysoft.jmte.template.ErrorReportingOutputAppender;
 import com.floreysoft.jmte.token.Token;
 import com.floreysoft.jmte.util.StartEndPair;
 import com.floreysoft.jmte.util.Util;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -36,7 +41,13 @@ public class ErrorReportingTest {
 		assertEquals("[!!not-array-error|You can not access non-array '{name=Olli}' as an array|${notArray[1].name}!!]", output);
 	}
 
-	@Test
+    @Test
+    public void nonArrayIsNotStaticError() {
+        List<ErrorEntry>  staticErrors = new Engine().getStaticErrors("${notArray[1].name}");
+        assertEquals(0, staticErrors.size());
+    }
+
+    @Test
 	public void invalidExpression() {
 		final Map<String, Object> model = new HashMap<String, Object>();
 		model.put("name", "Olli");
@@ -46,7 +57,14 @@ public class ErrorReportingTest {
 		assertEquals("[!!invalid-expression|Invalid expression!|${sjhdjsdh ${name}!!]", output);
 	}
 
-	@Test
+    @Test
+    public void staticInvalidExpression() {
+        List<ErrorEntry>  staticErrors = new Engine().getStaticErrors("${sjhdjsdh ${name}");
+        assertEquals(1, staticErrors.size());
+        assertTrue(staticErrors.get(0).errorMessage == INVALID_EXPRESSION);
+    }
+
+    @Test
 	public void unmatchedEnd() {
 		final Map<String, Object> model = new HashMap<String, Object>();
 		model.put("name", "Olli");
@@ -54,6 +72,13 @@ public class ErrorReportingTest {
 		final Engine engine = newInlineErrorEngine();
 		String output = engine.transform("${name}${end}no end?", model);
 		assertEquals("Olli[!!unmatched-end|Unmatched end|${end}!!]no end?", output);
+	}
+
+	@Test
+	public void staticUnmatchedEnd() {
+		List<ErrorEntry>  staticErrors = new Engine().getStaticErrors("${name}${end}no end?");
+		assertEquals(1, staticErrors.size());
+        assertTrue(staticErrors.get(0).errorMessage == UNMATCHED_END);
 	}
 
 	@Test
@@ -156,7 +181,6 @@ public class ErrorReportingTest {
         String output = engine.transform("${foreach array}${element}${end}", model);
         assertEquals("[!!foreach-undefined-varname|Missing variable name in foreach|${foreach array}!!]", output);
     }
-
 
 }
 

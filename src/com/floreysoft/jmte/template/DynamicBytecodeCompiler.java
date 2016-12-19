@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.floreysoft.jmte.message.ErrorMessage;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
@@ -165,7 +166,7 @@ public class DynamicBytecodeCompiler implements TemplateCompiler {
 			content();
 		}
 		if (contentToken == null) {
-			engine.getErrorHandler().error("missing-end", feToken);
+			engine.getErrorHandler().error(ErrorMessage.MISSING_END, feToken);
 		} else {
 			tokenStream.consume();
 		}
@@ -209,7 +210,7 @@ public class DynamicBytecodeCompiler implements TemplateCompiler {
 		codeGenerateElseBranchEnd(finalLabel);
 
 		if (contentToken == null) {
-			engine.getErrorHandler().error("missing-end", ifToken);
+			engine.getErrorHandler().error(ErrorMessage.MISSING_END, ifToken);
 		} else {
 			tokenStream.consume();
 		}
@@ -236,13 +237,13 @@ public class DynamicBytecodeCompiler implements TemplateCompiler {
 			condition();
 		} else if (token instanceof ElseToken) {
 			tokenStream.consume();
-			engine.getErrorHandler().error("else-out-of-scope", token);
+			engine.getErrorHandler().error(ErrorMessage.ELSE_OUT_OF_SCOPE, token);
 		} else if (token instanceof EndToken) {
 			tokenStream.consume();
-			engine.getErrorHandler().error("unmatched-end", token, null);
+			engine.getErrorHandler().error(ErrorMessage.UNMATCHED_END, token, null);
 		} else if (token instanceof InvalidToken) {
 			tokenStream.consume();
-			engine.getErrorHandler().error("invalid-expression", token, null);
+			engine.getErrorHandler().error(ErrorMessage.INVALID_EXPRESSION, token, null);
 		} else if (token instanceof AnnotationToken) {
 			tokenStream.consume();
 			codeGenerateAnnotationToken((AnnotationToken) token);

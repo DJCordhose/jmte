@@ -7,6 +7,7 @@ import com.floreysoft.jmte.ModelAdaptor;
 import com.floreysoft.jmte.ProcessListener;
 import com.floreysoft.jmte.ScopedMap;
 import com.floreysoft.jmte.TemplateContext;
+import com.floreysoft.jmte.message.ErrorEntry;
 import com.floreysoft.jmte.util.Util;
 
 public abstract class AbstractCompiledTemplate extends AbstractTemplate {
@@ -77,4 +78,8 @@ public abstract class AbstractCompiledTemplate extends AbstractTemplate {
 		return template;
 	}
 
+    @Override
+    public final List<ErrorEntry> getStaticErrors() {
+        throw new UnsupportedOperationException("Compiled templates do not support static error detection");
+    }
 }

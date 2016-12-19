@@ -13,8 +13,8 @@ public abstract class AbstractErrorHandler implements ErrorHandler {
 	protected Locale locale = new Locale("en");
 
 	@Override
-	public void error(String messageKey, Token token) throws ParseException {
-		error(messageKey, token, null);
+	public void error(ErrorMessage errorMessage, Token token) throws ParseException {
+		error(errorMessage, token, null);
 	}
 
 	public void setLocale(Locale locale) {
