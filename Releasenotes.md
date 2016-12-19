@@ -177,10 +177,6 @@ Tag: 4.0.0
 * New Feature: Engine#getStaticErrors exposing ErrorEntry refactored from JournalingErrorHandler.Entry
 * New Feature (in progress): Allow renderers to be applied before comparing in if statements (see BooleanIfRendererTest)
 
-Date: so far only snapshot
-
-
-
 
 Future Major Release 5.0.0
 ==========================

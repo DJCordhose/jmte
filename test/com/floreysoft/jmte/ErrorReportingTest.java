@@ -42,7 +42,7 @@ public class ErrorReportingTest {
 	}
 
     @Test
-    public void nonArrayIsNotStaticError() {
+    public void noStaticErrorNonArray() {
         List<ErrorEntry>  staticErrors = new Engine().getStaticErrors("${notArray[1].name}");
         assertEquals(0, staticErrors.size());
     }
@@ -74,7 +74,7 @@ public class ErrorReportingTest {
 		assertEquals("Olli[!!unmatched-end|Unmatched end|${end}!!]no end?", output);
 	}
 
-	@Test
+    @Test
 	public void staticUnmatchedEnd() {
 		List<ErrorEntry>  staticErrors = new Engine().getStaticErrors("${name}${end}no end?");
 		assertEquals(1, staticErrors.size());
@@ -101,7 +101,14 @@ public class ErrorReportingTest {
 		assertEquals("Olli[!!else-out-of-scope|Can't use else outside of if block!|${else}!!]no if?", output);
 	}
 
-	@Test
+    @Test
+    public void staticElseOutOfScope() {
+        List<ErrorEntry>  staticErrors = new Engine().getStaticErrors("${name}${else}no if?");
+        assertEquals(1, staticErrors.size());
+        assertTrue(staticErrors.get(0).errorMessage == ELSE_OUT_OF_SCOPE);
+    }
+
+    @Test
 	public void noErrorElseInScope() {
 		final Map<String, Object> model = new HashMap<String, Object>();
 		model.put("name", "Olli");
@@ -111,7 +118,7 @@ public class ErrorReportingTest {
 		assertEquals("_start_Olli_end_", output);
 	}
 
-	@Test
+    @Test
 	public void missingEnd() {
 		final Map<String, Object> model = new HashMap<String, Object>();
 		model.put("name", "Olli");
@@ -121,7 +128,14 @@ public class ErrorReportingTest {
 		assertEquals("Ollino end?[!!missing-end|Missing end|!!]", output);
 	}
 
-	@Test
+    @Test
+    public void staticMissingEnd() {
+        List<ErrorEntry>  staticErrors = new Engine().getStaticErrors("${if name}${name}no end?");
+        assertEquals(1, staticErrors.size());
+        assertTrue(staticErrors.get(0).errorMessage == MISSING_END);
+    }
+
+    @Test
 	public void callOnString() {
 		final Map<String, Object> model = new HashMap<String, Object>();
 		model.put("name", "Olli");
@@ -131,7 +145,7 @@ public class ErrorReportingTest {
 		assertEquals("_start_[!!no-call-on-string|You can not make property calls on string 'Olli'!|${name.lastName}!!]_end_", output);
 	}
 
-	@Test
+    @Test
 	public void noSuchProperty() {
 		final Map<String, Object> model = new HashMap<String, Object>();
 		model.put("name", new Object() {
@@ -146,7 +160,7 @@ public class ErrorReportingTest {
 		assertEquals("_start_[!!property-access-error|Property 'doesNotExist' on object 'myObject' can not be accessed: \"java.lang.NoSuchFieldException: doesNotExist\"!|${name.doesNotExist}!!]_end_", output);
 	}
 
-	@Test
+    @Test
 	public void arrayOutOfBounds() {
 		final Map<String, Object> model = new HashMap<String, Object>();
 		final List<String> el1 = new ArrayList<>();
@@ -158,7 +172,13 @@ public class ErrorReportingTest {
 		assertEquals("_start_[!!index-out-of-bounds-error|Index '2' on array '[Olli]' does not exist|${array[2]}!!]_end_", output);
 	}
 
-	@Test
+    @Test
+    public void noStaticErrorArrayOutOfBounds() {
+        List<ErrorEntry>  staticErrors = new Engine().getStaticErrors("_start_${array[2]}_end_");
+        assertEquals(0, staticErrors.size());
+    }
+
+    @Test
 	public void invalidIndex() {
 		final Map<String, Object> model = new HashMap<String, Object>();
 		final List<String> el1 = new ArrayList<>();
@@ -171,6 +191,12 @@ public class ErrorReportingTest {
 	}
 
     @Test
+    public void noStaticErrorInvalidIndex() {
+        List<ErrorEntry>  staticErrors = new Engine().getStaticErrors("_start_${array[NIX]}_end_");
+        assertEquals(0, staticErrors.size());
+    }
+
+    @Test
     public void missingForEachVariable() {
         final Map<String, Object> model = new HashMap<String, Object>();
         final List<String> el1 = new ArrayList<>();
@@ -180,6 +206,13 @@ public class ErrorReportingTest {
         final Engine engine = newInlineErrorEngine();
         String output = engine.transform("${foreach array}${element}${end}", model);
         assertEquals("[!!foreach-undefined-varname|Missing variable name in foreach|${foreach array}!!]", output);
+    }
+
+    @Test
+    public void staticMissingForEachVariable() {
+        List<ErrorEntry>  staticErrors = new Engine().getStaticErrors("${foreach array}${element}${end}");
+        assertEquals(1, staticErrors.size());
+        assertTrue(staticErrors.get(0).errorMessage == FOR_EACH_UNDEFINED_VARNAME);
     }
 
 }
