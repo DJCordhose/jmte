@@ -1,8 +1,6 @@
 package com.floreysoft.jmte.template;
 
 import java.util.*;
-import java.util.stream.Collectors;
-
 import com.floreysoft.jmte.DefaultModelAdaptor;
 import com.floreysoft.jmte.Engine;
 import com.floreysoft.jmte.ModelAdaptor;

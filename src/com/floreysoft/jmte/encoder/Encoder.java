@@ -7,13 +7,13 @@ import com.floreysoft.jmte.Engine;
  * the model. Template remains unaffected. Useful e.g. for escaping special characters in output formats like XML or JSON.
  * 
  * @see XMLEncoder
- * @see Engine#setEncoder()
+ * @see Engine#setEncoder(Encoder)
  */
 public interface Encoder {
 	/**
 	 * Encodes a string into another one.
 	 * 
-	 * @param the
+	 * @param string
 	 *            string to encode
 	 * @return the encoded string
 	 */
