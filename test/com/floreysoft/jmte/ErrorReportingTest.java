@@ -190,7 +190,43 @@ public class ErrorReportingTest {
 		assertEquals("_start_[!!invalid-index-error|'NIX' on array '[Olli]' is not a valid index|${array[NIX]}!!]_end_", output);
 	}
 
-    @Test
+	@Test
+	public void invalidArraySyntaxInverse() {
+		final Map<String, Object> model = new HashMap<String, Object>();
+		final List<String> el1 = new ArrayList<>();
+		el1.add("Olli");
+		model.put("array", el1);
+
+		final Engine engine = newInlineErrorEngine();
+		String output = engine.transform("_start_${array]NIX[}_end_", model);
+		assertEquals("_start_[!!invalid-array-syntax|'array]NIX[' is not a valid array syntax|${array]NIX[}!!]_end_", output);
+	}
+
+	@Test
+	public void invalidArraySyntaxNoClose() {
+		final Map<String, Object> model = new HashMap<String, Object>();
+		final List<String> el1 = new ArrayList<>();
+		el1.add("Olli");
+		model.put("array", el1);
+
+		final Engine engine = newInlineErrorEngine();
+		String output = engine.transform("_start_${array[NIX}_end_", model);
+		assertEquals("_start_[!!invalid-array-syntax|'array[NIX' is not a valid array syntax|${array[NIX}!!]_end_", output);
+	}
+
+	@Test
+	public void invalidArraySyntaxNoOpen() {
+		final Map<String, Object> model = new HashMap<String, Object>();
+		final List<String> el1 = new ArrayList<>();
+		el1.add("Olli");
+		model.put("array", el1);
+
+		final Engine engine = newInlineErrorEngine();
+		String output = engine.transform("_start_${arrayNIX]}_end_", model);
+		assertEquals("_start_[!!invalid-array-syntax|'arrayNIX]' is not a valid array syntax|${arrayNIX]}!!]_end_", output);
+	}
+
+	@Test
     public void noStaticErrorInvalidIndex() {
         List<ErrorEntry>  staticErrors = new Engine().getStaticErrors("_start_${array[NIX]}_end_");
         assertEquals(0, staticErrors.size());

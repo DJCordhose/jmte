@@ -10,8 +10,8 @@ public enum ErrorMessage {
     MISSING_END("missing-end"),
     UNMATCHED_END("unmatched-end"),
     ELSE_OUT_OF_SCOPE("else-out-of-scope"),
-    INVALID_EXPRESSION("invalid-expression")
-    ;
+    INVALID_EXPRESSION("invalid-expression"),
+    INVALID_ARRAY_SYNTAX("invalid-array-syntax");
 
     public final String key;
     public final boolean isStatic;

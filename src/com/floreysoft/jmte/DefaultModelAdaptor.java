@@ -149,6 +149,11 @@ public class DefaultModelAdaptor implements ModelAdaptor {
 
         final String rawAttributeName;
         final boolean arrayAccess = Util.isArrayAccess(attributeName);
+        if (arrayAccess && !Util.isValidArrayAccess(attributeName)) {
+                errorHandler.error(INVALID_ARRAY_SYNTAX, token,
+                        new ModelBuilder("arrayExpression", attributeName).build());
+            return ERROR_STRING;
+        }
         if (!arrayAccess) {
             rawAttributeName = attributeName;
         } else {

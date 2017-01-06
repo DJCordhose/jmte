@@ -15,9 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.floreysoft.jmte.message.JournalingErrorHandler;
-import com.floreysoft.jmte.template.ErrorReportingOutputAppender;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.floreysoft.jmte.renderer.OptionRenderFormatInfo;

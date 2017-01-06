@@ -275,7 +275,13 @@ public class Util {
 	}
 
 	public static boolean isArrayAccess(String objectName) {
-		return objectName.contains("[");
+		return objectName.contains("[") || objectName.contains("]");
+	}
+
+	public static boolean isValidArrayAccess(String objectName) {
+		final int arrayOpenIndex = objectName.indexOf("[");
+		final int arrayCloseIndex = objectName.indexOf("]");
+		return arrayOpenIndex != -1 && arrayCloseIndex != -1 && arrayOpenIndex < arrayCloseIndex;
 	}
 
 	/**
