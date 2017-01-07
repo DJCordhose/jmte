@@ -175,7 +175,8 @@ Tag: 4.0.0
 * New Feature: Added journaling error handler (JournalingErrorHandler) and OutputAppender abstraction to embed error messages directly in output using ErrorReportingOutputAppender (see ErrorReportingTest)
 * New Feature: When iterating over maps you can now choose between values, keys, and entries (map._values, map._keys, map.entries) 
 * New Feature: Engine#getStaticErrors exposing ErrorEntry refactored from JournalingErrorHandler.Entry
-* New Feature (in progress): Allow renderers to be applied before comparing in if statements (see BooleanIfRendererTest)
+* New Feature: Allow renderers to be applied before comparing in if statements (see BooleanIfRendererTest)
+* New Feature: Added AbstractParameterRenderer to ease processing of parameters for Renderers
 
 
 Future Major Release 5.0.0

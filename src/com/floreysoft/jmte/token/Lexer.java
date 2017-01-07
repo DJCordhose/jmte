@@ -84,12 +84,25 @@ public class Lexer {
                     if (operand.startsWith("'") || operand.startsWith("\"")) {
                         operand = operand.substring(1, operand.length() - 1);
                     }
-                    // if there is a semicolon before an eq, this must be a renderer applied to the variable
-                    if (posFirstSemi != -1 && posFirstEq != -1 && posFirstSemi < posFirstEq) {
+					final String complexVariable = completeIfExpression.substring(0, posLastEq);
 
+                    // if there is a semicolon before an eq, this must be a renderer applied to the variable
+                    // like:
+                    // name;string(fromAfterFirst= ;toBeforeLast=$mychar)
+                    if (posFirstSemi != -1 && posFirstEq != -1 && posFirstSemi < posFirstEq) {
+                        // name
+                        final String variable = complexVariable.substring(0, posFirstSemi);
+                        // string(fromAfterFirst= ;toBeforeLast=$mychar)
+                        final String renderer = completeIfExpression.substring(posFirstSemi + 1);
+                        final List<String> scannedFormat = Util.MINI_PARSER.greedyScan(renderer ,
+                                "(", ")");
+                        // string
+                        String rendererName = access(scannedFormat, 0);
+                        // fromAfterFirst= ;toBeforeLast=$mychar
+                        String parameters = access(scannedFormat, 1);
+                        return new IfCmpRendererToken(variable, operand, negated, rendererName, parameters);
                     } else {
-                        final String variable = completeIfExpression.substring(0, posLastEq);
-                        return new IfCmpToken(variable, operand, negated);
+                        return new IfCmpToken(complexVariable, operand, negated);
                     }
 				}
 			}
