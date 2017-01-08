@@ -69,7 +69,7 @@ public class Lexer {
 					negated = false;
 					ifExpression = objectExpression;
 				}
-				if (!ifExpression.contains("=")) {
+				if (!ifExpression.contains("=") && !ifExpression.contains(";")) {
 					return new IfToken(ifExpression, negated);
 				} else {
                     // HACK: if the value we compare to contains a space, it is cut off
@@ -79,17 +79,32 @@ public class Lexer {
                     final int posFirstSemi = completeIfExpression.indexOf(';');
                     final int posFirstEq = completeIfExpression.indexOf('=');
                     final int posLastEq = completeIfExpression.lastIndexOf('=');
-                    String operand = completeIfExpression.substring(posLastEq + 1);
-                    // remove optional quotations
-                    if (operand.startsWith("'") || operand.startsWith("\"")) {
-                        operand = operand.substring(1, operand.length() - 1);
+                    final int posLastRightBracket = completeIfExpression.lastIndexOf(')');
+                    // if there is no right bracket next to last eq than this is no real comparision
+                    final boolean hasCmp = posLastEq > posLastRightBracket;
+                    final String complexVariable;
+                    String operand = null;
+                    if (hasCmp) {
+                        operand = completeIfExpression.substring(posLastEq + 1);
+                        // remove optional quotations
+                        if (operand.startsWith("'") || operand.startsWith("\"")) {
+                            operand = operand.substring(1, operand.length() - 1);
+                        }
+                        complexVariable = completeIfExpression.substring(0, posLastEq);
+                    } else {
+                        complexVariable = completeIfExpression;
                     }
-					final String complexVariable = completeIfExpression.substring(0, posLastEq);
-
                     // if there is a semicolon before an eq, this must be a renderer applied to the variable
                     // like:
                     // name;string(fromAfterFirst= ;toBeforeLast=$mychar)
-                    if (posFirstSemi != -1 && posFirstEq != -1 && posFirstSemi < posFirstEq) {
+                    //
+                    // or there is no eq, but a semicolon
+                    // like
+                    // var;gtFive()
+                    // or
+                    // var;gtFive
+                    if ((posFirstSemi != -1 && posFirstEq != -1 && posFirstSemi < posFirstEq) ||
+                        (posFirstSemi != -1 && posFirstEq == -1)) {
                         // name
                         final String variable = complexVariable.substring(0, posFirstSemi);
                         // string(fromAfterFirst= ;toBeforeLast=$mychar)

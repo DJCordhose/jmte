@@ -19,7 +19,7 @@ public class IfCmpToken extends IfToken {
 	}
 
 	public String getOperand() {
-		return operand;
+		return operand == null ? "true" : operand;
 	}
 
 	@Override
