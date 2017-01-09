@@ -29,9 +29,9 @@ public class IfCmpRendererToken extends IfCmpToken {
         if (rendererForName != null) {
             string = rendererForName.render(value, this.parameters, context.locale, context.model);
         } else {
-            string = value.toString();
+            string = value == null ? null : value.toString();
         }
-        final boolean condition = value != null && getOperand().equals(string);
+        final boolean condition = getOperand().equals(string);
         final Object evaluated = negated ? !condition : condition;
         return evaluated;
     }

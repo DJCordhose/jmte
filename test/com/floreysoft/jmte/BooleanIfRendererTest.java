@@ -153,6 +153,28 @@ public class BooleanIfRendererTest {
         assertEquals("greater than 5", output);
     }
 
+    @Test
+    public void booleanIfRendererNullValue() {
+        final Map<String, Object> model = new HashMap<String, Object>();
+        model.put("var", null);
+
+        final Engine engine = newEngine();
+        final String template = "${if var;gtFive()}greater than 5${else}not greater than 5${end}";
+        String output = engine.transform(template, model);
+        assertEquals("not greater than 5", output);
+    }
+
+    @Test
+    public void booleanIfRendererNullValueRendererNotFound() {
+        final Map<String, Object> model = new HashMap<String, Object>();
+        model.put("var", null);
+
+        final Engine engine = newEngine();
+        final String template = "${if var;doesNotExist()}greater than 5${else}not greater than 5${end}";
+        String output = engine.transform(template, model);
+        assertEquals("not greater than 5", output);
+    }
+
 }
 
 
