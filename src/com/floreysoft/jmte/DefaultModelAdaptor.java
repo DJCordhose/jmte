@@ -1,16 +1,30 @@
 package com.floreysoft.jmte;
 
-import java.lang.reflect.*;
-import java.util.*;
+import static com.floreysoft.jmte.message.ErrorMessage.INDEX_OUT_OF_BOUNDS;
+import static com.floreysoft.jmte.message.ErrorMessage.INVALID_ARRAY_SYNTAX;
+import static com.floreysoft.jmte.message.ErrorMessage.INVALID_INDEX;
+import static com.floreysoft.jmte.message.ErrorMessage.NOT_ARRAY;
+import static com.floreysoft.jmte.message.ErrorMessage.NO_CALL_ON_STRING;
+import static com.floreysoft.jmte.message.ErrorMessage.PROPERTY_ACCESS;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Member;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 import com.floreysoft.jmte.message.NoLogErrorHandler;
 import com.floreysoft.jmte.token.InvalidToken;
 import com.floreysoft.jmte.token.Token;
 import com.floreysoft.jmte.util.Util;
-
-import static com.floreysoft.jmte.message.ErrorMessage.*;
 
 /**
  * Default implementation of the model adapter.
@@ -210,6 +224,22 @@ public class DefaultModelAdaptor implements ModelAdaptor {
                             }
                             return ERROR_STRING;
                         }
+                    }
+                    else if (arrayIndex.contains(",")) {
+                        // try to get an interval
+                        String[] interval = arrayIndex.split(",");
+                        int start = Integer.parseInt(interval[0]);
+                        int end;
+                        if(interval.length == 1){
+                            end = arrayAsList.size();
+                        } else {
+                            end = start + Integer.parseInt(interval[1]) + 1;
+                        }
+                        List<Object> returnArray = new ArrayList<Object>();
+                        for (int i = start; i < end && i < arrayAsList.size(); i++) {
+                            returnArray.add(arrayAsList.get(i));
+                        }
+                        return returnArray;
                     } else {
                         index = Integer.parseInt(arrayIndex);
                         return arrayAsList.get(index);
@@ -222,6 +252,24 @@ public class DefaultModelAdaptor implements ModelAdaptor {
                     return ERROR_STRING;
                 }
             } else {
+                if (array instanceof String && array != ERROR_STRING) {
+                    if (arrayIndex.contains(",")) {
+                        // try to get an interval
+                        String[] interval = arrayIndex.split(",");
+                        int start = Integer.parseInt(interval[0]);
+                        int end;
+                        if(interval.length == 1){
+                            end = array.toString().length();
+                        } else {
+                            end = start + Integer.parseInt(interval[1]);
+                        }
+                        return array.toString().substring(start, end);
+                    }
+                    else {
+                        int index = Integer.parseInt(arrayIndex);
+                        return array.toString().substring(index, index + 1);
+                    }
+                }
                 if (array != ERROR_STRING) {
                     errorHandler.error(NOT_ARRAY, token,
                             new ModelBuilder("array", array.toString()).build());
