@@ -440,6 +440,22 @@ public abstract class AbstractEngineTest {
 	}
 
 	@Test
+	public void indexedArrayRangedAccess() throws Exception {
+		final Map<String, Object> model = createIndexArrayMock();
+
+		String output = newEngine().transform("${array2[0,1]}", model);
+		assertEquals("[{name=first}, {name=second}]", output);
+	}
+
+	@Test
+	public void indexedArrayRangedEndAccess() throws Exception {
+		final Map<String, Object> model = createIndexArrayMock();
+
+		String output = newEngine().transform("${array2[0,]}", model);
+		assertEquals("[{name=first}, {name=second}, {name=third}]", output);
+	}
+
+	@Test
 	public void indexedArrayAccessOfIndexedArray() throws Exception {
 		final Map<String, Object> model = createIndexArrayMock();
 
@@ -523,7 +539,37 @@ public abstract class AbstractEngineTest {
 		array2.add(el2_0);
 		model.put("array1", array1);
 
+		final List<Map<String, Object>> list2 = new ArrayList<Map<String, Object>>();
+		final Map<String, Object> el1_1 = new HashMap<String, Object>();
+		final Map<String, Object> el2_1 = new HashMap<String, Object>();
+		final Map<String, Object> el3_1 = new HashMap<String, Object>();
+		el1_1.put("name", "first");
+		list2.add(el1_1);
+		el2_1.put("name", "second");
+		list2.add(el2_1);
+		el3_1.put("name", "third");
+		list2.add(el3_1);
+		model.put("array2", list2);
+
 		return model;
+	}
+
+	@Test
+	public void stringIndexAccess(){
+		String output = newEngine().transform("${address[0]}", DEFAULT_MODEL);
+		assertEquals("F", output);
+	}
+
+	@Test
+	public void stringIndexRangeAccess(){
+		String output = newEngine().transform("${address[0,3]}", DEFAULT_MODEL);
+		assertEquals("Fil", output);
+	}
+
+	@Test
+	public void stringIndexRangeEndAccess(){
+		String output = newEngine().transform("${address[2,]}", DEFAULT_MODEL);
+		assertEquals("lbert", output);
 	}
 
 	@Test
