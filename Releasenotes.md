@@ -163,7 +163,7 @@ Feature Release 3.3.0
 Major Release 4.0.0
 ===================
 
-Date: so far only snapshot
+Date: 05.03.2017
 Tag: 4.0.0
 
 * Breaking Change: Token can now contain annotations
@@ -177,7 +177,7 @@ Tag: 4.0.0
 * New Feature: Engine#getStaticErrors exposing ErrorEntry refactored from JournalingErrorHandler.Entry
 * New Feature: Allow renderers to be applied before comparing in if statements (see BooleanIfRendererTest)
 * New Feature: Added AbstractParameterRenderer to ease processing of parameters for Renderers
-
+* New Feature: Slices of an Array can be accessed (https://github.com/DJCordhose/jmte/pull/7)
 
 Future Major Release 5.0.0
 ==========================
