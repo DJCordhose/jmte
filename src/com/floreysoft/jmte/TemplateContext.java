@@ -10,9 +10,9 @@ import com.floreysoft.jmte.token.Token;
 
 /**
  * Holds the combined current state of a template during evaluation.
- * 
+ *
  * @author olli
- * 
+ *
  */
 public class TemplateContext {
 
@@ -28,6 +28,7 @@ public class TemplateContext {
 	public final Locale locale;
 	public final ErrorHandler errorHandler;
 	final ProcessListener processListener;
+	public final StringBuilder output;
 
 	public TemplateContext(String template, Locale locale, String sourceName, ScopedMap model,
 			ModelAdaptor modelAdaptor, Engine engine, ErrorHandler errorHandler, ProcessListener processListener) {
@@ -40,6 +41,7 @@ public class TemplateContext {
 		this.modelAdaptor = modelAdaptor;
 		this.errorHandler = errorHandler;
 		this.processListener = processListener;
+		this.output = new StringBuilder((int) ((template != null ? template.length() : 0) * engine.getExpansionSizeFactor()));
 	}
 
 	/**
@@ -89,7 +91,7 @@ public class TemplateContext {
 
 	/**
 	 * Allows you to send additional notifications of executed processing steps.
-	 * 
+	 *
 	 * @param token
 	 *            the token that is handled
 	 * @param action
@@ -112,7 +114,7 @@ public class TemplateContext {
 	public NamedRenderer resolveNamedRenderer(String rendererName) {
 		return engine.resolveNamedRenderer(rendererName);
 	}
-	
+
 	public Encoder getEncoder() {
 		return engine.getEncoder();
 	}

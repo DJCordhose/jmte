@@ -179,6 +179,11 @@ Tag: 4.0.0
 * New Feature: Added AbstractParameterRenderer to ease processing of parameters for Renderers
 * New Feature: Slices of an Array can be accessed (https://github.com/DJCordhose/jmte/pull/7)
 
+Feature Release 4.1.0
+=====================
+* New Feature: TemplateContext now provides access to underlying StringBuilder creating the output
+
+
 Future Major Release 5.0.0
 ==========================
 
