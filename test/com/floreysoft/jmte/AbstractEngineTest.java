@@ -1710,6 +1710,62 @@ public abstract class AbstractEngineTest {
 	}
 
 	@Test
+	public void ifEqSample() throws Exception {
+		String input = "${if address='Filbert'}${address}${else}NIX${end}";
+		String output = newEngine().transform(input, DEFAULT_MODEL);
+		assertEquals("Filbert", output);
+	}
+
+	@Test
+	public void ifEqRendererSample() throws Exception {
+		String input = "${if address;string='Filbert'}${address}${else}NIX${end}";
+		String output = newEngine().transform(input, DEFAULT_MODEL);
+		assertEquals("Filbert", output);
+	}
+
+	@Test
+	public void ifEqRendererBracketsSample() throws Exception {
+		String input = "${if address;string()='Filbert'}${address}${else}NIX${end}";
+		String output = newEngine().transform(input, DEFAULT_MODEL);
+		assertEquals("Filbert", output);
+	}
+
+	@Test
+	public void ifEqSpacesSample() throws Exception {
+		String input = "${if address = 'Filbert'}${address}${else}NIX${end}";
+		String output = newEngine().transform(input, DEFAULT_MODEL);
+		assertEquals("Filbert", output);
+	}
+
+	@Test
+	public void ifEqSpacesRendererSample() throws Exception {
+		String input = "${if address;string = 'Filbert'}${address}${else}NIX${end}";
+		String output = newEngine().transform(input, DEFAULT_MODEL);
+		assertEquals("Filbert", output);
+	}
+
+	@Test
+	public void ifEqSpacesBracketsRendererSample() throws Exception {
+		String input = "${if address;string() = 'Filbert'}${address}${else}NIX${end}";
+		String output = newEngine().transform(input, DEFAULT_MODEL);
+		assertEquals("Filbert", output);
+	}
+
+	@Test
+	public void ifEqSpaceBeforeSample() throws Exception {
+		String input = "${if address ='Filbert'}${address}${else}NIX${end}";
+		String output = newEngine().transform(input, DEFAULT_MODEL);
+		assertEquals("Filbert", output);
+	}
+
+	@Test
+	public void ifEqSpaceAfterSample() throws Exception {
+		String input = "${if address= 'Filbert'}${address}${else}NIX${end}";
+		String output = newEngine().transform(input, DEFAULT_MODEL);
+		assertEquals("Filbert", output);
+	}
+
+	@Test
 	public void gracefulErrorSpaces() throws Exception {
 		final Map<String, Object> model = new HashMap<String, Object>();
 		model.put("n a m e", "Olli");

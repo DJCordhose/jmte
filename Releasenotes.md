@@ -168,7 +168,7 @@ Tag: 4.0.0
 
 * Breaking Change: Token can now contain annotations
 * Breaking Change: ErrorHandler now takes newly introduced ErrorMessage enum  (instead of just a string)
-* Deprecation: Cached and Compiled Templates are deprecated and are no longer actively maintained - will be removed compeletely in next major version
+* Deprecation: Cached and Compiled Templates are deprecated and are no longer actively maintained - will be removed completely in next major version
 * Deprecation: Engine#getUsedVariables
 * Breaking Change / Deprecation: Disabled enabledInterpretedTemplateCache and deprecated all uses in Engine
 * New Feature: Arrays now accept indices and have a computed length property
