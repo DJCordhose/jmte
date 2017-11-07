@@ -69,7 +69,7 @@ public class Lexer {
 					negated = false;
 					ifExpression = objectExpression;
 				}
-				if (!ifExpression.contains("=") && !ifExpression.contains(";")) {
+				if (!input.contains("=") && !input.contains(";")) {
 					return new IfToken(ifExpression, negated);
 				} else {
                     // HACK: if the value we compare to contains a space, it is cut off
@@ -86,11 +86,16 @@ public class Lexer {
                     String operand = null;
                     if (hasCmp) {
                         operand = completeIfExpression.substring(posLastEq + 1);
+                        // heuristic: when there is leading or trailing space and after that a quote begins,
+						// it must be ignorable white space
+						if (isQuoted(operand.trim())) {
+							operand = operand.trim();
+						}
                         // remove optional quotations
-                        if (operand.startsWith("'") || operand.startsWith("\"")) {
+                        if (isQuoted(operand)) {
                             operand = operand.substring(1, operand.length() - 1);
                         }
-                        complexVariable = completeIfExpression.substring(0, posLastEq);
+                        complexVariable = completeIfExpression.substring(0, posLastEq).trim();
                     } else {
                         complexVariable = completeIfExpression;
                     }
@@ -229,6 +234,10 @@ public class Lexer {
 				parameters);
 		return stringToken;
 
+	}
+
+	private static boolean isQuoted(String operand) {
+		return operand.startsWith("'") || operand.startsWith("\"");
 	}
 
 }

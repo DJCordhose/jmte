@@ -191,3 +191,5 @@ Major Release 5.0.0
 * Breaking Change: Switch to Java 8 language level
 * Bug fix / Enhancement: if statement more robust (https://github.com/DJCordhose/jmte/issues/8)
 * Refactoring / Cleanup: Removed all caliper tests and real life test
+* Deprecation: Configurable expression syntax, will be fixed to ${...}
+* Enhancement: transform using a *null* template will yield *null*

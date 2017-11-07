@@ -270,6 +270,13 @@ public class EngineTest {
 	}
 
 	@Test
+	public void transformRobustToNull() {
+		String output = newEngine()
+				.transform(null, new HashMap<>());
+		assertNull(output);
+	}
+
+	@Test
 	public void variableName() throws Exception {
 		Map<String, Object> simpleModel = new HashMap<String, Object>();
 		simpleModel
@@ -1729,6 +1736,13 @@ public class EngineTest {
 		String input = "${if address = 'Filbert'}${address}${else}NIX${end}";
 		String output = newEngine().transform(input, DEFAULT_MODEL);
 		assertEquals("Filbert", output);
+	}
+
+	@Test
+	public void ifEqSpacesElseSample() throws Exception {
+		String input = "${if address = 'Filbert2'}${address}${else}NIX${end}";
+		String output = newEngine().transform(input, DEFAULT_MODEL);
+		assertEquals("NIX", output);
 	}
 
 	@Test
