@@ -14,9 +14,7 @@
 	<property name="final.name" value="${name}-${version}" />
 	<property name="nocompiler.name" value="${final.name}" />
 	<property name="dist.name" value="${name}-${version}-full.zip" />
-	<property name="jar.name" value="${final.name}-bundled.jar" />
 	<property name="nocompiler.jar.name" value="${nocompiler.name}.jar" />
-	<property name="asm" value="lib/asm-3.3.1.jar" />
 
 	<tstamp>
 		<format property="TODAY.DATE" pattern="yyyy-MM-dd" locale="us" />
@@ -94,10 +92,10 @@
 		</copy>
 	</target>
 
-	<!-- 
+	<!--
   ===================================================================
-  Archive the code           
-  =================================================================== 
+  Archive the code
+  ===================================================================
   -->
 	<target name="archive-jars" depends="build" description="Builds the exectutable jar-archives">
 		<jar destfile="${dist.dir}/${nocompiler.jar.name}" filesetmanifest="skip">
@@ -108,23 +106,7 @@
 				<attribute name="Build-Date" value="${today}" />
 			</manifest>
 			<fileset dir="${build.dir}" excludes="**/*Test*.class,**/*Tests*.class,**/sample/**,tmp/**" />
-		</jar>	
-
-		<taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="lib/jarjar-1.0.jar" />
-
-		<jarjar jarfile="${dist.dir}/${jar.name}">
-			<manifest>
-				<attribute name="Built-By" value="${creator}" />
-				<attribute name="Main-Class" value="${main-class}" />
-				<attribute name="Version" value="${version}" />
-				<attribute name="Build-Date" value="${today}" />
-			</manifest>
-			<zipfileset src="${dist.dir}/${nocompiler.jar.name}" />
-			<zipfileset src="${asm}" />
-			<rule pattern="org.objectweb.asm.**" result="com.floreysoft.jmte.internal.asm.@1" />
-			<keep pattern="com.floreysoft.jmte.**" />
-		</jarjar>
-
+		</jar>
 	</target>
 
 	<!--
@@ -150,8 +132,8 @@
 			<zipfileset dir="${src.dir}" prefix="${final.name}/src" />
 			<zipfileset dir="${doc.dir}" prefix="${final.name}/doc" />
 			<zipfileset dir="${lib.dir}" prefix="${final.name}/lib" />
-			<zipfileset dir="${dist.dir}" includes="${jar.name}, ${nocompiler.jar.name}" prefix="${final.name}" />
-			<zipfileset dir="${basedir}" includes="build.xml, Caliper*, common.properties, COPYING, local.properties.sample, Releasenotes.txt" prefix="${final.name}" />
+			<zipfileset dir="${dist.dir}" includes="${nocompiler.jar.name}" prefix="${final.name}" />
+			<zipfileset dir="${basedir}" includes="build.xml, common.properties, COPYING, local.properties.sample, Releasenotes.md" prefix="${final.name}" />
 		</zip>
 	</target>
 

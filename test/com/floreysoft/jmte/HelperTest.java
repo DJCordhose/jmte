@@ -1,15 +1,15 @@
 package com.floreysoft.jmte;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
+import java.io.File;
 import java.util.List;
 import java.util.Set;
 
 import com.floreysoft.jmte.template.VariableDescription;
+import com.floreysoft.jmte.util.Util;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 
 public final class HelperTest {
@@ -69,6 +69,14 @@ public final class HelperTest {
 				new VariableDescription("int", VariableDescription.Context.IF),
 				new VariableDescription("date", "number", "whatever=Huhn", VariableDescription.Context.TEXT)
 		}, output.toArray());
+	}
+
+	@Test
+	public void file2String() throws Exception {
+		String charsetName = "ISO-8859-15";
+		File file = new File("example/basic.mte");
+		String fileToString = Util.fileToString(file, charsetName);
+		assertEquals("${if address}${address}${else}NIX${end}", fileToString);
 	}
 
 }

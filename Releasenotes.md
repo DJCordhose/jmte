@@ -186,6 +186,9 @@ Feature Release 4.1.0
 Major Release 5.0.0
 ===================
 
+Date: 07.11.2017
+Tag: 5.0.0
+
 * Breaking Change: Completely removed Abstraction over Template types, only interpreted survives
 * Breaking Change: Removed all API deprecated in version 4
 * Breaking Change: Switch to Java 8 language level

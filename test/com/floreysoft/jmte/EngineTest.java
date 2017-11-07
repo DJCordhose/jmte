@@ -22,13 +22,6 @@ import com.floreysoft.jmte.encoder.XMLEncoder;
 import com.floreysoft.jmte.renderer.RawRenderer;
 import com.floreysoft.jmte.sample.NamedDateRenderer;
 import com.floreysoft.jmte.sample.NamedStringRenderer;
-import com.floreysoft.jmte.sample.SampleCompiledSequenceTemplate;
-import com.floreysoft.jmte.sample.SampleComplexExpressionCompiledTemplate;
-import com.floreysoft.jmte.sample.SampleIfCmpCompiledTemplate;
-import com.floreysoft.jmte.sample.SampleIfEmptyFalseExpressionCompiledTemplate;
-import com.floreysoft.jmte.sample.SampleNestedExpressionCompiledTemplate;
-import com.floreysoft.jmte.sample.SampleNewlineForeachSeparatorCompiledTemplate;
-import com.floreysoft.jmte.sample.SampleSimpleExpressionCompiledTemplate;
 import com.floreysoft.jmte.token.AnnotationToken;
 import com.floreysoft.jmte.token.ForEachToken;
 import com.floreysoft.jmte.token.Token;
@@ -1349,75 +1342,6 @@ public class EngineTest {
 	}
 
 	@Test
-	public void compiledSimpleSample() throws Exception {
-		String input = "${address}";
-		String interpretedOutput = newEngine().transform(input, DEFAULT_MODEL);
-		String compiledOutput = new SampleSimpleExpressionCompiledTemplate(
-				newEngine()).transform(DEFAULT_MODEL, DEFAULT_LOCALE,
-				MODEL_ADAPTOR, null);
-		assertEquals(interpretedOutput, compiledOutput);
-	}
-
-	@Test
-	public void compiledComplexSample() throws Exception {
-		String input = "${<h1>,address(NIX),</h1>;long(full)}";
-		String interpretedOutput = ENGINE_WITH_CUSTOM_RENDERERS.transform(
-                input, DEFAULT_MODEL);
-		String compiledOutput = new SampleComplexExpressionCompiledTemplate(
-				ENGINE_WITH_CUSTOM_RENDERERS).transform(DEFAULT_MODEL,
-				DEFAULT_LOCALE, MODEL_ADAPTOR, null);
-		assertEquals(interpretedOutput, compiledOutput);
-	}
-
-	@Test
-	public void compiledIfSample() throws Exception {
-		String input = "${if !bean.trueCond}${address}${else}NIX${end}";
-		String interpretedOutput = newEngine().transform(input, DEFAULT_MODEL);
-		String compiledOutput = new SampleIfEmptyFalseExpressionCompiledTemplate(
-				newEngine()).transform(DEFAULT_MODEL, DEFAULT_LOCALE,
-				MODEL_ADAPTOR, null);
-		assertEquals(interpretedOutput, compiledOutput);
-	}
-
-	@Test
-	public void compiledForeachSample() throws Exception {
-		String input = "${ foreach list item \n}${item.property1}${end}";
-		String interpretedOutput = newEngine().transform(input, DEFAULT_MODEL);
-		String compiledOutput = new SampleNewlineForeachSeparatorCompiledTemplate(
-				newEngine()).transform(DEFAULT_MODEL, DEFAULT_LOCALE,
-                MODEL_ADAPTOR, null);
-		assertEquals(interpretedOutput, compiledOutput);
-	}
-
-	@Test
-	public void compiledSequenceSample() throws Exception {
-		String input = "PREFIX${<h1>,address(NIX),</h1>;long(full)}SUFFIX";
-		String interpretedOutput = newEngine().transform(input, DEFAULT_MODEL);
-		String compiledOutput = new SampleCompiledSequenceTemplate(newEngine())
-				.transform(DEFAULT_MODEL, DEFAULT_LOCALE, MODEL_ADAPTOR, null);
-		assertEquals(interpretedOutput, compiledOutput);
-	}
-
-	@Test
-	public void compiledNestedSample() throws Exception {
-		String input = "${foreach list item}${foreach item.list item2}OUTER_PRFIX${if item}${item2.property1}INNER_SUFFIX${end}${end}\n${end}";
-		String interpretedOutput = newEngine().transform(input, DEFAULT_MODEL);
-		String compiledOutput = new SampleNestedExpressionCompiledTemplate(
-				newEngine()).transform(DEFAULT_MODEL, DEFAULT_LOCALE,
-                MODEL_ADAPTOR, null);
-		assertEquals(interpretedOutput, compiledOutput);
-	}
-
-	@Test
-	public void compiledIfEqSample() throws Exception {
-		String input = "${if address='Filbert'}${address}${else}NIX${end}";
-		String interpretedOutput = newEngine().transform(input, DEFAULT_MODEL);
-		String compiledOutput = new SampleIfCmpCompiledTemplate(newEngine())
-				.transform(DEFAULT_MODEL, DEFAULT_LOCALE, MODEL_ADAPTOR, null);
-		assertEquals(interpretedOutput, compiledOutput);
-	}
-
-	@Test
 	public void longList() throws Exception {
 		String output = newEngine()
 				.transform(
@@ -1867,14 +1791,6 @@ public class EngineTest {
 		StringReader stringReader = new StringReader(input);
 		String readerToString = Util.readerToString(stringReader);
 		assertEquals(input, readerToString);
-	}
-
-	@Test
-	public void file2String() throws Exception {
-		String charsetName = "ISO-8859-15";
-		File file = new File("example/basic.mte");
-		String fileToString = Util.fileToString(file, charsetName);
-		assertEquals("${if address}${address}${else}NIX${end}", fileToString);
 	}
 
 	@Test

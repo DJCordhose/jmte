@@ -87,15 +87,9 @@ public final class Engine implements RendererRegistry {
 	private String exprEndToken = "}";
 	private double expansionSizeFactor = 2;
 	private ErrorHandler errorHandler = new DefaultErrorHandler();
-	private boolean useCompilation = false;
 	private ModelAdaptor modelAdaptor = new DefaultModelAdaptor();
 	private Encoder encoder = null;
 	private OutputAppender outputAppender = new DefaultOutputAppender();
-
-	private TemplateCompiler compiler;
-
-	// compiled templates cache lives as long as this engine
-	private final Map<String, Template> compiledTemplates = new HashMap<String, Template>();
 
 	private final Map<Class<?>, Renderer<?>> renderers = new HashMap<Class<?>, Renderer<?>>();
 	private final Map<Class<?>, Renderer<?>> resolvedRendererCache = new HashMap<Class<?>, Renderer<?>>();
@@ -415,14 +409,6 @@ public final class Engine implements RendererRegistry {
 		return expansionSizeFactor;
 	}
 
-	public synchronized boolean isUseCompilation() {
-		return useCompilation;
-	}
-
-	public synchronized void setUseCompilation(boolean useCompilation) {
-		this.useCompilation = useCompilation;
-	}
-
 	public synchronized void setModelAdaptor(ModelAdaptor modelAdaptor) {
 		this.modelAdaptor = modelAdaptor;
 	}
@@ -452,29 +438,7 @@ public final class Engine implements RendererRegistry {
 	 * @return the prepared template
 	 */
 	public Template getTemplate(String template, String sourceName) {
-		Template templateImpl;
-		if (useCompilation) {
-			templateImpl = compiledTemplates.get(template);
-			if (templateImpl == null) {
-				if (compiler == null) {
-					compiler = new DynamicBytecodeCompiler();
-				}
-				templateImpl = compiler.compile(template, sourceName, this);
-				compiledTemplates.put(template, templateImpl);
-			}
-			return templateImpl;
-		} else {
-			templateImpl = new InterpretedTemplate(template, sourceName, this);
-		}
-		return templateImpl;
-	}
-
-	public void setCompiler(TemplateCompiler compiler) {
-		this.compiler = compiler;
-	}
-
-	public TemplateCompiler getCompiler() {
-		return compiler;
+		return new InterpretedTemplate(template, sourceName, this);
 	}
 
 	public OutputAppender getOutputAppender() {
