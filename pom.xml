@@ -8,12 +8,12 @@
   <groupId>com.floreysoft</groupId>
   <artifactId>jmte</artifactId>
   <packaging>jar</packaging>
-  <version>4.1.0</version>
+  <version>5.0.0</version>
   <name>Java Minimal Template Engine</name>
   <description>
    To build and locally install jar, javadoc and sources, please use:
       mvn clean javadoc:jar source:jar install -Dmaven.test.skip=true
-   Tested on Maven 2.0.9, JDK 1.7
+   Tested on Maven 2.0.9, JDK 1.8
   </description>
   <url>http://code.google.com/p/jmte/</url>
   <licenses>
@@ -82,8 +82,8 @@
         <plugin>
             <artifactId>maven-compiler-plugin</artifactId>
             <configuration>
-                <source>1.7</source>
-                <target>1.7</target>
+                <source>1.8</source>
+                <target>1.8</target>
                 <encoding>UTF-8</encoding>
                 <debug>true</debug>
                 <testExcludes>

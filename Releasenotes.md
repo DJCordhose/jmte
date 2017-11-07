@@ -183,9 +183,11 @@ Feature Release 4.1.0
 =====================
 * New Feature: TemplateContext now provides access to underlying StringBuilder creating the output
 
+Major Release 5.0.0
+===================
 
-Future Major Release 5.0.0
-==========================
-
-* Breaking Change: Completely removed Abstraktion over Template types, only interpreted survive
+* Breaking Change: Completely removed Abstraction over Template types, only interpreted survives
 * Breaking Change: Removed all API deprecated in version 4
+* Breaking Change: Switch to Java 8 language level
+* Bug fix / Enhancement: if statement more robust (https://github.com/DJCordhose/jmte/issues/8)
+* Refactoring / Cleanup: Removed all caliper tests and real life test

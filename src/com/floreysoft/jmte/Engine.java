@@ -78,33 +78,6 @@ public final class Engine implements RendererRegistry {
 
 	public final static String VERSION = "@version@";
 
-	@Deprecated
-	public static Engine createCachingEngine() {
-		Engine engine = new Engine();
-		engine.setEnabledInterpretedTemplateCache(true);
-		return engine;
-	}
-
-	@Deprecated
-	public static Engine createNonCachingEngine() {
-		Engine engine = new Engine();
-		engine.setEnabledInterpretedTemplateCache(false);
-		return engine;
-	}
-
-	@Deprecated
-	public static Engine createCompilingEngine() {
-		Engine engine = new Engine();
-		engine.setUseCompilation(true);
-		return engine;
-	}
-
-	@Deprecated
-	public static Engine createDefaultEngine() {
-		Engine engine = new Engine();
-		return engine;
-	}
-
 	public static Engine createEngine() {
 		Engine engine = new Engine();
 		return engine;
@@ -115,7 +88,6 @@ public final class Engine implements RendererRegistry {
 	private double expansionSizeFactor = 2;
 	private ErrorHandler errorHandler = new DefaultErrorHandler();
 	private boolean useCompilation = false;
-	private boolean enabledInterpretedTemplateCache = false;
 	private ModelAdaptor modelAdaptor = new DefaultModelAdaptor();
 	private Encoder encoder = null;
 	private OutputAppender outputAppender = new DefaultOutputAppender();
@@ -124,9 +96,6 @@ public final class Engine implements RendererRegistry {
 
 	// compiled templates cache lives as long as this engine
 	private final Map<String, Template> compiledTemplates = new HashMap<String, Template>();
-
-	// interpreted templates cache lives as long as this engine
-	private final Map<String, Template> interpretedTemplates = new HashMap<String, Template>();
 
 	private final Map<Class<?>, Renderer<?>> renderers = new HashMap<Class<?>, Renderer<?>>();
 	private final Map<Class<?>, Renderer<?>> resolvedRendererCache = new HashMap<Class<?>, Renderer<?>>();
@@ -459,16 +428,6 @@ public final class Engine implements RendererRegistry {
 		return modelAdaptor;
 	}
 
-	@Deprecated
-	public synchronized boolean isEnabledInterpretedTemplateCache() {
-		return enabledInterpretedTemplateCache;
-	}
-
-	@Deprecated
-	public synchronized void setEnabledInterpretedTemplateCache(boolean enabledInterpretedTemplateCache) {
-		this.enabledInterpretedTemplateCache = enabledInterpretedTemplateCache;
-	}
-
 	/**
 	 * Gets a template for a certain source.
 	 * 
@@ -502,15 +461,7 @@ public final class Engine implements RendererRegistry {
 			}
 			return templateImpl;
 		} else {
-			if (enabledInterpretedTemplateCache) {
-				templateImpl = interpretedTemplates.get(template);
-				if (templateImpl == null) {
-					templateImpl = new InterpretedTemplate(template, sourceName, this);
-					interpretedTemplates.put(template, templateImpl);
-				}
-			} else {
-				templateImpl = new InterpretedTemplate(template, sourceName, this);
-			}
+			templateImpl = new InterpretedTemplate(template, sourceName, this);
 		}
 		return templateImpl;
 	}

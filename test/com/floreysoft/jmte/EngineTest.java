@@ -2,26 +2,23 @@ package com.floreysoft.jmte;
 
 import static org.junit.Assert.*;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.StringReader;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Callable;
 
 import com.floreysoft.jmte.message.*;
 import com.floreysoft.jmte.renderer.NullRenderer;
+import com.floreysoft.jmte.renderer.OptionRenderFormatInfo;
 import com.floreysoft.jmte.renderer.SimpleNamedRenderer;
 import com.floreysoft.jmte.template.ErrorReportingOutputAppender;
+import com.floreysoft.jmte.util.StartEndPair;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import com.floreysoft.jmte.encoder.XMLEncoder;
-import com.floreysoft.jmte.realLife.RealLiveTest;
 import com.floreysoft.jmte.renderer.RawRenderer;
 import com.floreysoft.jmte.sample.NamedDateRenderer;
 import com.floreysoft.jmte.sample.NamedStringRenderer;
@@ -38,7 +35,7 @@ import com.floreysoft.jmte.token.Token;
 import com.floreysoft.jmte.util.Util;
 
 @SuppressWarnings("rawtypes")
-public abstract class AbstractEngineTest {
+public class EngineTest {
 
 	static final DefaultModelAdaptor MODEL_ADAPTOR = new DefaultModelAdaptor();
 	public static final String LONG_TEMPLATE_MANY_ITERATIONS = "${foreach longList item}"
@@ -67,7 +64,10 @@ public abstract class AbstractEngineTest {
 			+ "${foreach list item}${foreach item.list item2}${if item}${item2.property1}${end}${end}\n${end}";
 	private static final int SIZE_LONG_LIST = 1000;
 
-	protected abstract Engine newEngine();
+	protected Engine newEngine() {
+		Engine engine = Engine.createEngine();
+		return engine;
+	}
 
 	// used to suppress error messages on stderr
 	protected ErrorHandler getTestErrorHandler() {
@@ -164,6 +164,7 @@ public abstract class AbstractEngineTest {
 		public Object property2 = "propertyValue2";
 		public boolean falseCond = false;
 		public Boolean falseCondObj = new Boolean(false);
+		public MyBean[] array = ARRAY;
 
 		public MyBean(Object property1, Object property2) {
 			this.property1 = property1;
@@ -1457,13 +1458,6 @@ public abstract class AbstractEngineTest {
 	}
 
 	@Test
-	// need to call it from here to have it executed in all three engine
-	// versions
-	public void realLife() throws Exception {
-		new RealLiveTest().shopTest(newEngine());
-	}
-
-	@Test
 	public void comment() throws Exception {
 		String input = "${-- comment}${address}";
 		String output = newEngine().transform(input, DEFAULT_MODEL);
@@ -1766,6 +1760,30 @@ public abstract class AbstractEngineTest {
 	}
 
 	@Test
+	public void ifEqSegment() throws Exception {
+		Map<String, String> headerEntry1 = new HashMap<>();
+		Map<String, String> headerEntry2 = new HashMap<>();
+		headerEntry1.put("name", "Subject");
+		headerEntry1.put("value", "Hiho");
+		headerEntry2.put("name", "From");
+		headerEntry2.put("value", "Olli");
+
+		ArrayList headers = new ArrayList();
+		headers.add(headerEntry1);
+		headers.add(headerEntry2);
+
+		Map payload = new HashMap();
+		payload.put("headers", headers);
+
+		Map model = new HashMap();
+		model.put("payload", payload);
+
+		String input = "${foreach payload.headers header}${if header.name='Subject'}${header.value}${end}${end}";
+		String output = newEngine().transform(input, model);
+		assertEquals("Hiho", output);
+	}
+
+	@Test
 	public void gracefulErrorSpaces() throws Exception {
 		final Map<String, Object> model = new HashMap<String, Object>();
 		model.put("n a m e", "Olli");
@@ -1773,6 +1791,132 @@ public abstract class AbstractEngineTest {
 		final Engine engine = newEngine();
 		engine.setErrorHandler(new JournalingErrorHandler());
 		String output = engine.transform("${n a m e}", model);
+	}
+
+	@Test
+	public void unterminatedScan() throws Exception {
+		String line = "${no end";
+		List<StartEndPair> scan = Util.scan(line, newEngine()
+				.getExprStartToken(), newEngine().getExprEndToken(), true);
+		assertEquals(0, scan.size());
+	}
+
+	@Test
+	public void extract() throws Exception {
+		String line = "${if adresse}Sie wohnen an ${adresse}";
+		List<StartEndPair> scan = Util.scan(line, newEngine()
+				.getExprStartToken(), newEngine().getExprEndToken(), true);
+		assertEquals(2, scan.size());
+
+		assertEquals(2, scan.get(0).start);
+		assertEquals(12, scan.get(0).end);
+
+		assertEquals(29, scan.get(1).start);
+		assertEquals(36, scan.get(1).end);
+
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void mergedForeach() throws Exception {
+		List amount = Arrays.asList(1, 2, 3);
+		List price = Arrays.asList(3.6, 2, 3.0);
+		List total = Arrays.asList("3.6", "4", "9");
+
+		List<Map<String, Object>> mergedLists = ModelBuilder.mergeLists(
+				new String[] { "amount", "price", "total" }, amount, price,
+				total);
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put("mergedLists", mergedLists);
+		String output = newEngine()
+				.transform(
+						"${foreach mergedLists item}${item.amount} x ${item.price} = ${item.total}\n${end}",
+						model);
+		assertEquals("1 x 3.6 = 3.6\n" + "2 x 2 = 4\n" + "3 x 3.0 = 9\n",
+				output);
+	}
+
+	@Test
+	public void stream2String() throws Exception {
+		String charsetName = "ISO-8859-15";
+		String input = "stream content";
+		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(
+				input.getBytes(charsetName));
+		String streamToString = Util.streamToString(byteArrayInputStream,
+				charsetName);
+		assertEquals(input, streamToString);
+	}
+
+	@Test
+	public void reader2String() throws Exception {
+		String input = "reader content";
+		StringReader stringReader = new StringReader(input);
+		String readerToString = Util.readerToString(stringReader);
+		assertEquals(input, readerToString);
+	}
+
+	@Test
+	public void file2String() throws Exception {
+		String charsetName = "ISO-8859-15";
+		File file = new File("example/basic.mte");
+		String fileToString = Util.fileToString(file, charsetName);
+		assertEquals("${if address}${address}${else}NIX${end}", fileToString);
+	}
+
+	@Test
+	public void namedRendererRegistry() throws Exception {
+		NamedRenderer stringRenderer = ENGINE_WITH_NAMED_RENDERERS
+				.resolveNamedRenderer("string");
+		assertNotNull(stringRenderer);
+		RenderFormatInfo formatInfo = stringRenderer.getFormatInfo();
+		assertTrue(formatInfo instanceof OptionRenderFormatInfo);
+		OptionRenderFormatInfo optionRenderInfo = (OptionRenderFormatInfo) formatInfo;
+		assertArrayEquals(new String[] { "uppercase", "" }, optionRenderInfo
+				.getOptions());
+
+		NamedRenderer dateRenderer = ENGINE_WITH_NAMED_RENDERERS
+				.resolveNamedRenderer("date");
+		assertNotNull(dateRenderer);
+
+		Collection<NamedRenderer> allNamedRenderers = ENGINE_WITH_NAMED_RENDERERS
+				.getAllNamedRenderers();
+		assertEquals(2, allNamedRenderers.size());
+
+		Collection<NamedRenderer> compatibleRenderers2 = ENGINE_WITH_NAMED_RENDERERS
+				.getCompatibleRenderers(Long.class);
+		assertEquals(1, compatibleRenderers2.size());
+
+		Collection<NamedRenderer> compatibleRenderers1 = ENGINE_WITH_NAMED_RENDERERS
+				.getCompatibleRenderers(Number.class);
+		assertEquals(2, compatibleRenderers1.size());
+
+		Collection<NamedRenderer> compatibleRenderers3 = ENGINE_WITH_NAMED_RENDERERS
+				.getCompatibleRenderers(Boolean.class);
+		assertEquals(0, compatibleRenderers3.size());
+
+	}
+
+	@Test
+	public void processListener() throws Exception {
+		String input = "${if empty}EMPTY${else}NOT_EMPTY${end}${foreach not_there var}${var}${end}";
+		Engine engine = newEngine();
+		final List<ProcessListener.Action> actions = new ArrayList<ProcessListener.Action>();
+		final ProcessListener processListener = new ProcessListener() {
+
+			@Override
+			public void log(TemplateContext context, Token token, Action action) {
+				actions.add(action);
+			}
+
+		};
+		engine.transform(input, DEFAULT_MODEL, processListener);
+		assertArrayEquals(new ProcessListener.Action[] {
+						ProcessListener.Action.EVAL, ProcessListener.Action.SKIP,
+						ProcessListener.Action.EVAL, ProcessListener.Action.EVAL,
+						ProcessListener.Action.END, ProcessListener.Action.EVAL,
+						ProcessListener.Action.SKIP, ProcessListener.Action.END },
+				actions.toArray());
+
 	}
 
 }

@@ -20,31 +20,31 @@ public final class HelperTest {
 
 	@Test
 	public void variablesAvailable() throws Exception {
-		boolean variablesAvailable = newEngine().variablesAvailable(AbstractEngineTest.DEFAULT_MODEL, "something", "bean.property1");
+		boolean variablesAvailable = newEngine().variablesAvailable(EngineTest.DEFAULT_MODEL, "something", "bean.property1");
 		assertTrue(variablesAvailable);
 	}
 	
 	@Test
 	public void noVariablesAvailable() throws Exception {
-		boolean variablesAvailable = newEngine().variablesAvailable(AbstractEngineTest.DEFAULT_MODEL);
+		boolean variablesAvailable = newEngine().variablesAvailable(EngineTest.DEFAULT_MODEL);
 		assertTrue(variablesAvailable);
 	}
 	
 	@Test
 	public void variablesNotAvailable() throws Exception {
-		boolean variablesAvailable = newEngine().variablesAvailable(AbstractEngineTest.DEFAULT_MODEL, "something", "bean.property1", "bean.propertyNotThere");
+		boolean variablesAvailable = newEngine().variablesAvailable(EngineTest.DEFAULT_MODEL, "something", "bean.property1", "bean.propertyNotThere");
 		assertFalse(variablesAvailable);
 	}
 	
 	@Test
 	public void variablesAvailableBooleanTrue() throws Exception {
-		boolean variablesAvailable = newEngine().variablesAvailable(AbstractEngineTest.DEFAULT_MODEL, "bean.trueCond");
+		boolean variablesAvailable = newEngine().variablesAvailable(EngineTest.DEFAULT_MODEL, "bean.trueCond");
 		assertTrue(variablesAvailable);
 	}
 	
 	@Test
 	public void variablesAvailableBooleanFalse() throws Exception {
-		boolean variablesAvailable = newEngine().variablesAvailable(AbstractEngineTest.DEFAULT_MODEL, "bean.falseCond");
+		boolean variablesAvailable = newEngine().variablesAvailable(EngineTest.DEFAULT_MODEL, "bean.falseCond");
 		assertFalse(variablesAvailable);
 	}
 	
