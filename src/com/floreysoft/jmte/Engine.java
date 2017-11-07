@@ -193,6 +193,9 @@ public final class Engine implements RendererRegistry {
 
 	String transformInternal(String template, Locale locale, String sourceName, Map<String, Object> model,
 			ModelAdaptor modelAdaptor, ProcessListener processListener) {
+		if (template == null) {
+			return null;
+		}
 		Template templateImpl = getTemplate(template, sourceName);
 		String output = templateImpl.transform(model, locale, modelAdaptor, processListener);
 		return output;
