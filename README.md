@@ -9,6 +9,13 @@ It is complete but minimal in a sense that you can express everything you need i
 
 It supports separation of model and view, runs without external dependencies, can be extended and configured in many ways and runs in almost all environments including Google App Engine.
 
-Code has moved from Google Code
-------------------------------
-This project has recently been moved from https://code.google.com/p/jmte/. Code will live here, but documentation is still there until I find the time to move it.
+Documentation
+-------------
+
+This project has been moved from https://code.google.com/p/jmte/, and there is some documentation still in their wiki pages: https://code.google.com/archive/p/jmte/wikis. On github there just is basic documentation [here](https://cdn.rawgit.com/DJCordhose/jmte/master/doc/index.html). For more details see the tests that cover all variations of the scripting language and extensions to the engine: https://github.com/DJCordhose/jmte/tree/master/test/com/floreysoft/jmte
+
+Where is JMTE used
+------------------
+
+- Document and JavaScript Templating in Ultradox: https://help.ultradox.com/en/guides/templates/templatingessentials.html
+- Email Notifications in Graylog: http://docs.graylog.org/en/2.3/pages/streams/alerts.html#email-alert-notification
