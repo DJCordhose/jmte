@@ -760,6 +760,30 @@ public class EngineTest {
 	}
 
 	@Test
+	public void objectEqObject() throws Exception {
+		String output = newEngine().transform(
+						"${if bean.property2=bean.property2}${bean.property2}${else}NIX${end}",
+						DEFAULT_MODEL);
+		assertEquals(BEAN.property2.toString(), output);
+	}
+
+	@Test
+	public void objectEqObject2() throws Exception {
+		String output = newEngine().transform(
+						"${if bean.property2=bean.property1}${bean.property2}${else}NIX${end}",
+						DEFAULT_MODEL);
+		assertEquals("NIX", output);
+	}
+
+	@Test
+	public void objectNeqObject() throws Exception {
+		String output = newEngine().transform(
+						"${if !bean.property2=bean.property1}${bean.property2}${else}NIX${end}",
+						DEFAULT_MODEL);
+		assertEquals(BEAN.property2.toString(), output);
+	}
+
+	@Test
 	public void stringEqNotElse() throws Exception {
 		String output = newEngine().transform(
                 "${if !address='Filbert'}${address}${else}NIX${end}",
