@@ -17,5 +17,5 @@ This project has been moved from https://code.google.com/p/jmte/, and there is s
 Where is JMTE used
 ------------------
 
-- Document and JavaScript Templating in Ultradox: https://help.ultradox.com/en/guides/templates/templatingessentials.html
-- Email Notifications in Graylog: http://docs.graylog.org/en/2.3/pages/streams/alerts.html#email-alert-notification
+- Document and JavaScript Templating in Ultradox: https://help.ultradox.com/en/guides/templates/overview.html
+- Email Notifications in Graylog: http://docs.graylog.org/en/3.1/pages/streams/alerts.html#email-alert-notification
