@@ -7,7 +7,7 @@ public class IfCmpRendererToken extends IfCmpToken {
 	private final String rendererName;
 	private final String parameters;
 
-	public IfCmpRendererToken(String expression, String operand, boolean negated, String rendererName, String parameters) {
+	public IfCmpRendererToken(String expression, AbstractToken operand, boolean negated, String rendererName, String parameters) {
 		super(expression, operand, negated);
 		this.rendererName = rendererName;
 		this.parameters = parameters;
@@ -31,7 +31,7 @@ public class IfCmpRendererToken extends IfCmpToken {
         } else {
             string = value == null ? null : value.toString();
         }
-        final boolean condition = getOperand().equals(string);
+        final boolean condition = getOperand(context).equals(string);
         final Object evaluated = negated ? !condition : condition;
         return evaluated;
     }

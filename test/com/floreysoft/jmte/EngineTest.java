@@ -240,6 +240,7 @@ public class EngineTest {
 	final static Map<String, Object> DEFAULT_MODEL = new HashMap<String, Object>();
 	static {
 		DEFAULT_MODEL.put("something", "something");
+		DEFAULT_MODEL.put("something2", "something");
 		DEFAULT_MODEL.put("address", "Filbert");
 		DEFAULT_MODEL.put("addressWithSpace", "Filbert Street");
 		DEFAULT_MODEL.put("map", MAP);
@@ -710,12 +711,12 @@ public class EngineTest {
 		assertEquals(DEFAULT_MODEL.get("addressWithSpace"), output);
 	}
 
-    @Test
+    @Test(expected = ParseException.class)
     public void stringEqWithSpace() throws Exception {
-        String output = newEngine().transform(
-                "${if addressWithSpace=Filbert Street}${addressWithSpace}${else}NIX${end}",
-                DEFAULT_MODEL);
-        assertEquals(DEFAULT_MODEL.get("addressWithSpace"), output);
+        Engine newEngine = newEngine();
+        newEngine.setErrorHandler(getTestErrorHandler());
+        newEngine.transform(
+        				"${if addressWithSpace=Filbert Street}${addressWithSpace}${else}NIX${end}", DEFAULT_MODEL);
     }
 
     @Test
@@ -724,6 +725,14 @@ public class EngineTest {
 				"${if address='Filbert'}${address}${else}NIX${end}",
 				DEFAULT_MODEL);
 		assertEquals(DEFAULT_MODEL.get("address"), output);
+	}
+
+	@Test
+	public void stringEqObject() throws Exception {
+		String output = newEngine().transform(
+						"${if something=something2}${something}${else}NIX${end}",
+						DEFAULT_MODEL);
+		assertEquals(DEFAULT_MODEL.get("something"), output);
 	}
 
     @Test
@@ -737,7 +746,7 @@ public class EngineTest {
 	@Test
 	public void objectNeq() throws Exception {
 		String output = newEngine().transform(
-				"${if !bigDecimal0=0}${bigDecimal0}${else}NIX${end}",
+				"${if !bigDecimal0='0'}${bigDecimal0}${else}NIX${end}",
 				DEFAULT_MODEL);
 		assertEquals("NIX", output);
 	}
@@ -748,6 +757,30 @@ public class EngineTest {
 				"${if bigDecimal1='1.0'}${bigDecimal1}${else}NIX${end}",
 				DEFAULT_MODEL);
 		assertEquals(DEFAULT_MODEL.get("bigDecimal1").toString(), output);
+	}
+
+	@Test
+	public void objectEqObject() throws Exception {
+		String output = newEngine().transform(
+						"${if bean.property2=bean.property2}${bean.property2}${else}NIX${end}",
+						DEFAULT_MODEL);
+		assertEquals(BEAN.property2.toString(), output);
+	}
+
+	@Test
+	public void objectEqObject2() throws Exception {
+		String output = newEngine().transform(
+						"${if bean.property2=bean.property1}${bean.property2}${else}NIX${end}",
+						DEFAULT_MODEL);
+		assertEquals("NIX", output);
+	}
+
+	@Test
+	public void objectNeqObject() throws Exception {
+		String output = newEngine().transform(
+						"${if !bean.property2=bean.property1}${bean.property2}${else}NIX${end}",
+						DEFAULT_MODEL);
+		assertEquals(BEAN.property2.toString(), output);
 	}
 
 	@Test
@@ -1112,7 +1145,7 @@ public class EngineTest {
 	public void elseInForeach() throws Exception {
 		String output = newEngine()
 				.transform(
-                        "${foreach strings string , }${if string=String1}nada${else}nüscht${end}${end}",
+                        "${foreach strings string , }${if string='String1'}nada${else}nüscht${end}${end}",
                         DEFAULT_MODEL);
 		assertEquals("nada, nüscht, nüscht", output);
 	}
@@ -1653,6 +1686,38 @@ public class EngineTest {
 		String input = "${if address;string()='Filbert'}${address}${else}NIX${end}";
 		String output = newEngine().transform(input, DEFAULT_MODEL);
 		assertEquals("Filbert", output);
+	}
+
+	@Test
+	public void ifEqObjectRendererSample() throws Exception {
+		String output = newEngine().transform(
+						"${if something;string=something2;string}${something}${else}NIX${end}",
+						DEFAULT_MODEL);
+		assertEquals(DEFAULT_MODEL.get("something"), output);
+	}
+
+	@Test
+	public void ifEqObjectRendererBracketsSample1() throws Exception {
+		String output = newEngine().transform(
+						"${if something;string()=something2;string}${something}${else}NIX${end}",
+						DEFAULT_MODEL);
+		assertEquals(DEFAULT_MODEL.get("something"), output);
+	}
+
+	@Test
+	public void ifEqObjectRendererBracketsSample2() throws Exception {
+		String output = newEngine().transform(
+						"${if something;string=something2;string()}${something}${else}NIX${end}",
+						DEFAULT_MODEL);
+		assertEquals(DEFAULT_MODEL.get("something"), output);
+	}
+
+	@Test
+	public void ifEqObjectRendererBracketsSample3() throws Exception {
+		String output = newEngine().transform(
+						"${if something;string()=something2;string()}${something}${else}NIX${end}",
+						DEFAULT_MODEL);
+		assertEquals(DEFAULT_MODEL.get("something"), output);
 	}
 
 	@Test
