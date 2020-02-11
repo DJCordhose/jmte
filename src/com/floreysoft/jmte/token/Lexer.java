@@ -3,10 +3,13 @@ package com.floreysoft.jmte.token;
 import static com.floreysoft.jmte.util.NestedParser.*;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.floreysoft.jmte.util.Util;
 
 public class Lexer {
+	private static final Pattern EQ_PATTERN = Pattern.compile("=(?![^(]*\\))");
 
 	public AbstractToken nextToken(final char[] template, final int start,
 			final int end) {
@@ -72,20 +75,30 @@ public class Lexer {
 				if (!input.contains("=") && !input.contains(";")) {
 					return new IfToken(ifExpression, negated);
 				} else {
+										final AbstractToken innerToken;
                     // HACK: if the value we compare to contains a space, it is cut off
                     // add the part that is cut off here
                     final String completeIfExpression =
                             ifExpression + input.substring(input.indexOf(ifExpression) + ifExpression.length());
                     final int posFirstSemi = completeIfExpression.indexOf(';');
-                    final int posFirstEq = completeIfExpression.indexOf('=');
-                    final int posLastEq = completeIfExpression.lastIndexOf('=');
-                    final int posLastRightBracket = completeIfExpression.lastIndexOf(')');
-                    // if there is no right bracket next to last eq than this is no real comparision
-                    final boolean hasCmp = posLastEq > posLastRightBracket;
+
+                    // check if there is a = which is not between two brackets
+										final boolean hasCmp;
+										final int posEq;
+
+										Matcher matcher = EQ_PATTERN.matcher(completeIfExpression);
+
+										if(matcher.find()){
+											hasCmp = true;
+											posEq = matcher.start(0);
+										} else {
+											hasCmp = false;
+											posEq = -1;
+										}
                     final String complexVariable;
-                    String operand = null;
+
                     if (hasCmp) {
-                        operand = completeIfExpression.substring(posLastEq + 1);
+                        String operand = completeIfExpression.substring(posEq + 1);
                         // heuristic: when there is leading or trailing space and after that a quote begins,
 						// it must be ignorable white space
 						if (isQuoted(operand.trim())) {
@@ -93,11 +106,15 @@ public class Lexer {
 						}
                         // remove optional quotations
                         if (isQuoted(operand)) {
-                            operand = operand.substring(1, operand.length() - 1);
-                        }
-                        complexVariable = completeIfExpression.substring(0, posLastEq).trim();
+                        	innerToken = new PlainTextToken(operand.substring(1, operand.length() - 1));
+                        } else {
+													// no string operand since there are no quotes -> resolve this to be a resolved expression
+													innerToken = innerNextToken(operand);
+												}
+                        complexVariable = completeIfExpression.substring(0, posEq).trim();
                     } else {
                         complexVariable = completeIfExpression;
+												innerToken = null;
                     }
                     // if there is a semicolon before an eq, this must be a renderer applied to the variable
                     // like:
@@ -108,8 +125,8 @@ public class Lexer {
                     // var;gtFive()
                     // or
                     // var;gtFive
-                    if ((posFirstSemi != -1 && posFirstEq != -1 && posFirstSemi < posFirstEq) ||
-                        (posFirstSemi != -1 && posFirstEq == -1)) {
+                    if ((posFirstSemi != -1 && posEq != -1 && posFirstSemi < posEq) ||
+                        (posFirstSemi != -1 && posEq == -1)) {
                         // name
                         final String variable = complexVariable.substring(0, posFirstSemi);
                         // string(fromAfterFirst= ;toBeforeLast=$mychar)
@@ -120,9 +137,9 @@ public class Lexer {
                         String rendererName = access(scannedFormat, 0);
                         // fromAfterFirst= ;toBeforeLast=$mychar
                         String parameters = access(scannedFormat, 1);
-                        return new IfCmpRendererToken(variable, operand, negated, rendererName, parameters);
+                        return new IfCmpRendererToken(variable, innerToken, negated, rendererName, parameters);
                     } else {
-                        return new IfCmpToken(complexVariable, operand, negated);
+                        return new IfCmpToken(complexVariable, innerToken, negated);
                     }
 				}
 			}
