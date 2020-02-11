@@ -196,3 +196,11 @@ Tag: 5.0.0
 * Refactoring / Cleanup: Removed all caliper tests and real life test
 * Deprecation: Configurable expression syntax, will be fixed to ${...}
 * Enhancement: transform using a *null* template will yield *null*
+
+Major Release 6.0.0
+===================
+
+Date: 11.02.2020
+Tag: 6.0.0
+
+* Breaking Change: if can now compare a variable against another (https://github.com/DJCordhose/jmte/pull/12) 
