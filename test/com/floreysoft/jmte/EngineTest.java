@@ -1914,4 +1914,18 @@ public class EngineTest {
 
 	}
 
+	/**
+	 * Within 10000 invocations and 10 threads we normally see it fail consistently if there is threading issue.
+	 */
+	@org.testng.annotations.Test(threadPoolSize = 10, invocationCount = 10000, timeOut = 10000)
+	public void testConcurrentAccessToJmteEngine() {
+		String template = "/blah/\\\\.html";
+		String expected = "/blah/\\.html";
+		Engine engine = new Engine();
+		String result =  engine.transform(template, new HashMap<>());
+		assertEquals(expected, result);
+	}
+
+
+
 }
