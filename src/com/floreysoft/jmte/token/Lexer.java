@@ -28,7 +28,7 @@ public class Lexer {
 	private String unescapeAccess(List<? extends Object> arr,int index){
 		String val = access(arr,index);
 		if (val!=null && val.trim().length()>0){
-			val = Util.createNoQuoteMiniParser().unescape(val);
+			val = Util.NO_QUOTE_MINI_PARSER.unescape(val);
 		}
 		return val;
 	}
@@ -176,7 +176,7 @@ public class Lexer {
 
 				String separator = input.substring(separatorBegin);
 				if (separator !=null){
-					separator = Util.createNoQuoteMiniParser().unescape(separator);
+					separator = Util.NO_QUOTE_MINI_PARSER.unescape(separator);
 				}
                 final ForEachToken forEachToken = new ForEachToken(objectExpression, varName, separator
                         .length() != 0 ? separator : null);

@@ -36,7 +36,7 @@ public class TokenStream {
 			int plainTextLengthBeforeNextToken = startEndPair.start
 					- splitStart.length() - offset;
 			if (plainTextLengthBeforeNextToken != 0) {
-				AbstractToken token = new PlainTextToken(Util.createNoQuoteMiniParser().unescape(new String(inputChars,
+				AbstractToken token = new PlainTextToken(Util.NO_QUOTE_MINI_PARSER.unescape(new String(inputChars,
 						offset, plainTextLengthBeforeNextToken)));
 				token.setTokenIndex(index++);
 				tokens.add(token);
@@ -59,7 +59,7 @@ public class TokenStream {
 		// chunk indeed)
 		int remainingChars = input.length() - offset;
 		if (remainingChars != 0) {
-			AbstractToken token = new PlainTextToken(Util.createNoQuoteMiniParser().unescape(new String(inputChars,
+			AbstractToken token = new PlainTextToken(Util.NO_QUOTE_MINI_PARSER.unescape(new String(inputChars,
 					offset, remainingChars)));
 			token.setTokenIndex(index++);
 			tokens.add(token);
