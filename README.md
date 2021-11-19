@@ -9,6 +9,8 @@ It is complete but minimal in a sense that you can express everything you need i
 
 It supports separation of model and view, runs without external dependencies, can be extended and configured in many ways and runs in almost all environments including Google App Engine.
 
+**Caution**: JMTE is is in low maintenance mode: critical bugs will be fixed, but do not expect new features
+
 Documentation
 -------------
 

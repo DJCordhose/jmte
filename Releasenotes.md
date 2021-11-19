@@ -204,3 +204,11 @@ Date: 11.02.2020
 Tag: 6.0.0
 
 * Breaking Change: if can now compare a variable against another (https://github.com/DJCordhose/jmte/pull/12) 
+
+Major Release 7.0.0
+===================
+
+Date: not yet published
+
+* Breaking Change: brute force approach to make MiniParser thread safe (all methods are now synchronized)
+* JMTE is is in low maintenance mode: critical bugs will be fixed, but no new features
