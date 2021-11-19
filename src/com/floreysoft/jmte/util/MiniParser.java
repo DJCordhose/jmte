@@ -5,7 +5,7 @@ import java.util.List;
 
 /**
  * Parser for embedded mini languages.
- * 
+ *
  * <p>
  * <ul>
  * <li>Solves Demarcation: Where does an embedded language begin and where does
@@ -26,11 +26,11 @@ import java.util.List;
  * </li>
  * </ul>
  * </p>
- * 
+ *
  * Thread safe.
- * 
+ *
  * @author olli
- * 
+ *
  */
 public final class MiniParser {
 
@@ -61,14 +61,20 @@ public final class MiniParser {
 				false, true);
 	}
 
+	private static class ParsingContext {
+		boolean escaped = false;
+		boolean quoted = false;
+
+		boolean isEscaped() {
+			return escaped || quoted;
+		}
+	}
+
 	private final char escapeChar;
 	private final char quoteChar;
 	private final boolean ignoreCase;
 	private final boolean trim;
 	private final boolean rawOutput;
-
-	private transient boolean escaped = false;
-	private transient boolean quoted = false;
 
 	public MiniParser(final char escapeChar, final char quoteChar,
 			final boolean ignoreCase, final boolean trim,
@@ -80,8 +86,10 @@ public final class MiniParser {
 		this.rawOutput = rawOutput;
 	}
 
-	public synchronized String replace(final String input, final String oldString,
+	public String replace(final String input, final String oldString,
 			final String newString) {
+		ParsingContext context = new ParsingContext();
+
 		try {
 			if (oldString == null || oldString.equals("")) {
 				return input;
@@ -94,41 +102,41 @@ public final class MiniParser {
 					index += oldString.length() - 1;
 				} else {
 					char c = input.charAt(index);
-					append(buffer, c);
+					append(buffer, c, context);
 				}
 			}
 
 			return buffer.toString();
 		} finally {
-			escaped = false;
-			quoted = false;
+			context.escaped = false;
+			context.quoted = false;
 		}
 	}
 
-	public synchronized List<String> split(final String input, final char separator) {
+	public List<String> split(final String input, final char separator) {
 		return split(input, separator, Integer.MAX_VALUE);
 	}
 
-	public synchronized List<String> split(final String input, final char separator,
+	public List<String> split(final String input, final char separator,
 			final int maxSegments) {
 		return splitInternal(input, false, separator, null, maxSegments);
 	}
 
-	public synchronized List<String> split(final String input, final String separatorSet) {
+	public List<String> split(final String input, final String separatorSet) {
 		return split(input, separatorSet, Integer.MAX_VALUE);
 	}
 
-	public synchronized List<String> split(final String input, final String separatorSet,
+	public List<String> split(final String input, final String separatorSet,
 			final int maxSegments) {
 		return splitInternal(input, false, (char) -1, separatorSet, maxSegments);
 	}
 
-	public synchronized List<String> splitOnWhitespace(final String input,
+	public List<String> splitOnWhitespace(final String input,
 			final int maxSegments) {
 		return splitInternal(input, true, (char) -1, null, maxSegments);
 	}
 
-	public synchronized List<String> splitOnWhitespace(final String input) {
+	public List<String> splitOnWhitespace(final String input) {
 		return splitOnWhitespace(input, Integer.MAX_VALUE);
 	}
 
@@ -136,12 +144,13 @@ public final class MiniParser {
 	// Has the benefit of shared code and caliper mini benchmarks showed no
 	// measurable performance penalty for additional check which separator to
 	// use
-	private synchronized List<String> splitInternal(final String input,
+	private List<String> splitInternal(final String input,
 			final boolean splitOnWhitespace, final char separator,
 			final String separatorSet, final int maxSegments) {
 		if (input == null) {
 			return null;
 		}
+		ParsingContext context = new ParsingContext();
 		try {
 			final List<String> segments = new ArrayList<String>();
 			StringBuilder buffer = new StringBuilder();
@@ -166,11 +175,11 @@ public final class MiniParser {
 				// an
 				// unsecaped, unquoted separator, this segment is now done
 				if (segments.size() != maxSegments - 1 && separates
-						&& !isEscaped()) {
+						&& !context.isEscaped()) {
 					finish(segments, buffer);
 					buffer = new StringBuilder();
 				} else {
-					append(buffer, c);
+					append(buffer, c, context);
 				}
 			}
 			if (!splitOnWhitespace || buffer.length() != 0) {
@@ -178,31 +187,32 @@ public final class MiniParser {
 			}
 			return segments;
 		} finally {
-			escaped = false;
-			quoted = false;
+			context.escaped = false;
+			context.quoted = false;
 		}
 	}
 
-	private synchronized void finish(final List<String> segments, StringBuilder buffer) {
+	private void finish(final List<String> segments, StringBuilder buffer) {
 		String string = buffer.toString();
 		segments.add(trim ? string.trim() : string);
 	}
 
-	public synchronized int lastIndexOf(final String input, final String substring) {
+	public int lastIndexOf(final String input, final String substring) {
 		return indexOfInternal(input, substring, true);
 	}
 
-	public synchronized int indexOf(final String input, final String substring) {
+	public int indexOf(final String input, final String substring) {
 		return indexOfInternal(input, substring, false);
 	}
 
-	private synchronized int indexOfInternal(final String input, final String substring,
+	private int indexOfInternal(final String input, final String substring,
 			boolean last) {
 		int resultIndex = -1;
+		ParsingContext context = new ParsingContext();
 		for (int index = 0; index < input.length(); index++) {
 			if (input.regionMatches(ignoreCase, index, substring, 0, substring
 					.length())
-					&& !isEscaped()) {
+					&& !context.isEscaped()) {
 				resultIndex = index;
 				if (!last) {
 					break;
@@ -213,21 +223,23 @@ public final class MiniParser {
 
 	}
 
-	public synchronized List<String> scan(final String input, final String splitStart,
+	public List<String> scan(final String input, final String splitStart,
 			final String splitEnd) {
 		return scan(input, splitStart, splitEnd, false);
 	}
 
-	public synchronized List<String> greedyScan(final String input, final String splitStart,
+	public List<String> greedyScan(final String input, final String splitStart,
 			final String splitEnd) {
 		return scan(input, splitStart, splitEnd, true);
 	}
 
-	public synchronized List<String> scan(final String input, final String splitStart,
+	public List<String> scan(final String input, final String splitStart,
 			final String splitEnd, boolean greedy) {
 		if (input == null) {
 			return null;
 		}
+		ParsingContext context = new ParsingContext();
+
 		try {
 			final List<String> segments = new ArrayList<String>();
 			StringBuilder buffer = new StringBuilder();
@@ -243,13 +255,13 @@ public final class MiniParser {
 				final String separator = started ? splitEnd : splitStart;
 				if (input.regionMatches(ignoreCase, index, separator, 0,
 						separator.length())
-						&& !isEscaped() && greedyCond) {
+						&& !context.isEscaped() && greedyCond) {
 					finish(segments, buffer);
 					buffer = new StringBuilder();
 					started = !started;
 					index += separator.length();
 				} else {
-					append(buffer, c);
+					append(buffer, c, context);
 					index++;
 				}
 			}
@@ -259,22 +271,23 @@ public final class MiniParser {
 			}
 			return segments;
 		} finally {
-			escaped = false;
-			quoted = false;
+			context.escaped = false;
+			context.quoted = false;
 		}
 	}
 
-	public synchronized String unescape(final String input) {
+	public String unescape(final String input) {
+		ParsingContext context = new ParsingContext();
 		final StringBuilder unescaped = new StringBuilder();
 		for (int i = 0; i < input.length(); i++) {
 			final char c = input.charAt(i);
-			append(unescaped, c);
+			append(unescaped, c, context);
 		}
 		return unescaped.toString();
 	}
 
 	// the heart of it all
-	private synchronized void append(StringBuilder buffer, char c) {
+	private void append(StringBuilder buffer, char c, ParsingContext context) {
 
 		// version manually simplified
 		// final boolean shouldAppend = rawOutput || escaped
@@ -306,27 +319,23 @@ public final class MiniParser {
 		// tests
 		// showed a slow down of more than 100%
 		if (c == escapeChar) {
-			if (escaped || rawOutput) {
+			if (context.escaped || rawOutput) {
 				buffer.append(c);
 			}
-			escaped = !escaped;
+			context.escaped = !context.escaped;
 		} else if (c == quoteChar) {
-			if (escaped) {
+			if (context.escaped) {
 				buffer.append(c);
-				escaped = false;
+				context.escaped = false;
 			} else {
-				quoted = !quoted;
+				context.quoted = !context.quoted;
 				if (rawOutput) {
 					buffer.append(c);
 				}
 			}
 		} else {
 			buffer.append(c);
-			escaped = false;
+			context.escaped = false;
 		}
-	}
-
-	private synchronized boolean isEscaped() {
-		return escaped || quoted;
 	}
 }
