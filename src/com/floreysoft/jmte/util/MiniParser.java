@@ -27,7 +27,7 @@ import java.util.List;
  * </ul>
  * </p>
  * 
- * Not thread safe.
+ * Thread safe.
  * 
  * @author olli
  * 
@@ -37,26 +37,26 @@ public final class MiniParser {
 	public final static char DEFAULT_ESCAPE_CHAR = '\\';
 	public final static char DEFAULT_QUOTE_CHAR = '"';
 
-	public static MiniParser defaultInstance() {
+	public synchronized static MiniParser defaultInstance() {
 		return new MiniParser(DEFAULT_ESCAPE_CHAR, DEFAULT_QUOTE_CHAR, false,
 				false, false);
 	}
 
-	public static MiniParser trimmedInstance() {
+	public synchronized static MiniParser trimmedInstance() {
 		return new MiniParser(DEFAULT_ESCAPE_CHAR, DEFAULT_QUOTE_CHAR, false,
 				true, false);
 	}
 
-	public static MiniParser ignoreCaseInstance() {
+	public synchronized static MiniParser ignoreCaseInstance() {
 		return new MiniParser(DEFAULT_ESCAPE_CHAR, DEFAULT_QUOTE_CHAR, true,
 				false, false);
 	}
 
-	public static MiniParser fullRawInstance() {
+	public synchronized static MiniParser fullRawInstance() {
 		return new MiniParser((char) -1, (char) -1, false, false, true);
 	}
 
-	public static MiniParser rawOutputInstance() {
+	public synchronized static MiniParser rawOutputInstance() {
 		return new MiniParser(DEFAULT_ESCAPE_CHAR, DEFAULT_QUOTE_CHAR, false,
 				false, true);
 	}
@@ -80,7 +80,7 @@ public final class MiniParser {
 		this.rawOutput = rawOutput;
 	}
 
-	public String replace(final String input, final String oldString,
+	public synchronized String replace(final String input, final String oldString,
 			final String newString) {
 		try {
 			if (oldString == null || oldString.equals("")) {
@@ -105,30 +105,30 @@ public final class MiniParser {
 		}
 	}
 
-	public List<String> split(final String input, final char separator) {
+	public synchronized List<String> split(final String input, final char separator) {
 		return split(input, separator, Integer.MAX_VALUE);
 	}
 
-	public List<String> split(final String input, final char separator,
+	public synchronized List<String> split(final String input, final char separator,
 			final int maxSegments) {
 		return splitInternal(input, false, separator, null, maxSegments);
 	}
 
-	public List<String> split(final String input, final String separatorSet) {
+	public synchronized List<String> split(final String input, final String separatorSet) {
 		return split(input, separatorSet, Integer.MAX_VALUE);
 	}
 
-	public List<String> split(final String input, final String separatorSet,
+	public synchronized List<String> split(final String input, final String separatorSet,
 			final int maxSegments) {
 		return splitInternal(input, false, (char) -1, separatorSet, maxSegments);
 	}
 
-	public List<String> splitOnWhitespace(final String input,
+	public synchronized List<String> splitOnWhitespace(final String input,
 			final int maxSegments) {
 		return splitInternal(input, true, (char) -1, null, maxSegments);
 	}
 
-	public List<String> splitOnWhitespace(final String input) {
+	public synchronized List<String> splitOnWhitespace(final String input) {
 		return splitOnWhitespace(input, Integer.MAX_VALUE);
 	}
 
@@ -136,7 +136,7 @@ public final class MiniParser {
 	// Has the benefit of shared code and caliper mini benchmarks showed no
 	// measurable performance penalty for additional check which separator to
 	// use
-	private List<String> splitInternal(final String input,
+	private synchronized List<String> splitInternal(final String input,
 			final boolean splitOnWhitespace, final char separator,
 			final String separatorSet, final int maxSegments) {
 		if (input == null) {
@@ -183,20 +183,20 @@ public final class MiniParser {
 		}
 	}
 
-	private void finish(final List<String> segments, StringBuilder buffer) {
+	private synchronized void finish(final List<String> segments, StringBuilder buffer) {
 		String string = buffer.toString();
 		segments.add(trim ? string.trim() : string);
 	}
 
-	public int lastIndexOf(final String input, final String substring) {
+	public synchronized int lastIndexOf(final String input, final String substring) {
 		return indexOfInternal(input, substring, true);
 	}
 
-	public int indexOf(final String input, final String substring) {
+	public synchronized int indexOf(final String input, final String substring) {
 		return indexOfInternal(input, substring, false);
 	}
 
-	private int indexOfInternal(final String input, final String substring,
+	private synchronized int indexOfInternal(final String input, final String substring,
 			boolean last) {
 		int resultIndex = -1;
 		for (int index = 0; index < input.length(); index++) {
@@ -213,17 +213,17 @@ public final class MiniParser {
 
 	}
 
-	public List<String> scan(final String input, final String splitStart,
+	public synchronized List<String> scan(final String input, final String splitStart,
 			final String splitEnd) {
 		return scan(input, splitStart, splitEnd, false);
 	}
 
-	public List<String> greedyScan(final String input, final String splitStart,
+	public synchronized List<String> greedyScan(final String input, final String splitStart,
 			final String splitEnd) {
 		return scan(input, splitStart, splitEnd, true);
 	}
 
-	public List<String> scan(final String input, final String splitStart,
+	public synchronized List<String> scan(final String input, final String splitStart,
 			final String splitEnd, boolean greedy) {
 		if (input == null) {
 			return null;
@@ -264,7 +264,7 @@ public final class MiniParser {
 		}
 	}
 
-	public String unescape(final String input) {
+	public synchronized String unescape(final String input) {
 		final StringBuilder unescaped = new StringBuilder();
 		for (int i = 0; i < input.length(); i++) {
 			final char c = input.charAt(i);
@@ -274,7 +274,7 @@ public final class MiniParser {
 	}
 
 	// the heart of it all
-	private void append(StringBuilder buffer, char c) {
+	private synchronized void append(StringBuilder buffer, char c) {
 
 		// version manually simplified
 		// final boolean shouldAppend = rawOutput || escaped
@@ -326,7 +326,7 @@ public final class MiniParser {
 		}
 	}
 
-	private boolean isEscaped() {
+	private synchronized boolean isEscaped() {
 		return escaped || quoted;
 	}
 }
