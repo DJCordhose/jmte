@@ -40,6 +40,16 @@ public class Util {
 			.fullRawInstance();
 	public final static MiniParser NO_QUOTE_MINI_PARSER = new MiniParser(
 			MiniParser.DEFAULT_ESCAPE_CHAR, (char) -1, false, false, false);
+
+	public static MiniParser createNoQuoteMiniParser() {
+		return NO_QUOTE_MINI_PARSER;
+		/*
+		 * If we return a new instance here, then EngineTest.testConcurrentAccessToJmteEngine passes.
+ 		 */
+//		return new MiniParser(
+//				MiniParser.DEFAULT_ESCAPE_CHAR, (char) -1, false, false, false);
+	}
+
 	public final static MiniParser RAW_OUTPUT_MINI_PARSER = MiniParser
 			.rawOutputInstance();
 
