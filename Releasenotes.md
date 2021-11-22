@@ -208,7 +208,7 @@ Tag: 6.0.0
 Major Release 7.0.0
 ===================
 
-Date: not yet published
+Date: 22.11.2021
 
 * Breaking Change: brute force approach to make MiniParser thread safe (all methods are now synchronized)
 * JMTE is is in low maintenance mode: critical bugs will be fixed, but no new features
