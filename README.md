@@ -21,3 +21,10 @@ Where is JMTE used
 
 - Document and JavaScript Templating in Ultradox: https://help.ultradox.com/en/guides/templates/overview.html
 - Email Notifications in Graylog: http://docs.graylog.org/en/3.1/pages/streams/alerts.html#email-alert-notification
+
+Releasing
+---------
+- https://andresalmiray.com/publishing-to-maven-central-using-apache-maven/
+- JDK 17 has issues: https://issues.sonatype.org/browse/OSSRH-66257
+  * export MAVEN_OPTS="--add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.text=ALL-UNNAMED --add-opens=java.desktop/java.awt.font=ALL-UNNAMED"
+- GPG might have problems with your terminal: https://github.com/keybase/keybase-issues/issues/2798  

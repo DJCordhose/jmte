@@ -212,3 +212,9 @@ Date: 22.11.2021
 
 * Breaking Change: brute force approach to make MiniParser thread safe (all methods are now synchronized)
 * JMTE is is in low maintenance mode: critical bugs will be fixed, but no new features
+
+Current Head
+===================
+
+Date: WIP
+

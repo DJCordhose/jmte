@@ -1,9 +1,4 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <parent>
-    <groupId>org.sonatype.oss</groupId>
-    <artifactId>oss-parent</artifactId>
-    <version>7</version>
-  </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.floreysoft</groupId>
   <artifactId>jmte</artifactId>
@@ -11,9 +6,7 @@
   <version>7.0.0</version>
   <name>Java Minimal Template Engine</name>
   <description>
-   To build and locally install jar, javadoc and sources, please use:
-      mvn clean javadoc:jar source:jar install -Dmaven.test.skip=true
-   Tested on Maven 2.0.9, JDK 1.8
+    A small Library without runtime dependencies
   </description>
   <url>http://code.google.com/p/jmte/</url>
   <licenses>
@@ -26,6 +19,7 @@
   <scm>
     <connection>scm:git:https://github.com/DJCordhose/jmte.git</connection>
     <developerConnection>scm:git:git@github.com:DJCordhose/jmte.git</developerConnection>
+    <url>https://github.com/DJCordhose/jmte</url>
   </scm>
   <developers>
     <developer>
@@ -34,9 +28,9 @@
       <email>oliver.zeiger....@gmail.com</email>
     </developer>
     <developer>
-     <id>jmte-hpaluch</id>
-     <name>Henryk Paluch</name>
-     <email>hpal...@seznam.cz</email>
+      <id>jmte-hpaluch</id>
+      <name>Henryk Paluch</name>
+      <email>hpal...@seznam.cz</email>
     </developer>
   </developers>
   <dependencies>
@@ -52,17 +46,6 @@
       <version>7.4.0</version>
       <scope>test</scope>
     </dependency>
-	<dependency>
-		<groupId>org.ow2.asm</groupId>
-		<artifactId>asm</artifactId>
-		<version>5.0.3</version>
-	</dependency>
-      <dependency>
-          <groupId>com.google.caliper</groupId>
-          <artifactId>caliper</artifactId>
-          <version>0.5-rc1</version>
-          <scope>test</scope>
-      </dependency>
   </dependencies>
   <!-- compatible with Ant structure -->
   <build>
@@ -71,121 +54,143 @@
     <resources>
       <resource>
         <directory>${project.basedir}/src</directory>
-	<excludes>
-		 <exclude>**/*.java</exclude>
-	</excludes>
+        <excludes>
+          <exclude>**/*.java</exclude>
+        </excludes>
       </resource>
     </resources>
     <testResources>
       <testResource>
         <directory>${project.basedir}/test</directory>
-	<excludes>
-		 <exclude>**/*.java</exclude>
-	</excludes>
+        <excludes>
+          <exclude>**/*.java</exclude>
+        </excludes>
       </testResource>
     </testResources>
     <plugins>
-        <plugin>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <configuration>
-                <source>1.8</source>
-                <target>1.8</target>
-                <encoding>UTF-8</encoding>
-                <debug>true</debug>
-                <testExcludes>
-                 <exclude>**/*CaliperTest.java</exclude>
-                </testExcludes>
-            </configuration>
-        </plugin>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-resources-plugin</artifactId>
-            <configuration>
-                <encoding>UTF-8</encoding>
-            </configuration>
-        </plugin>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-               <excludes>
-                 <exclude>**/*CaliperTest.java</exclude>
-               </excludes>
-           </configuration>
-       </plugin>
-       <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <configuration>
-              <additionalparam>-Xdoclint:none</additionalparam>
-              <failOnError>false</failOnError>
-              <show>public</show>
-	      <links>
-		      <link>http://docs.oracle.com/javase/8/docs/api/</link>
-	      </links>
-	      <windowtitle>${project.name} - Public API</windowtitle>
-            </configuration>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+          <encoding>UTF-8</encoding>
+          <debug>true</debug>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <configuration>
+          <encoding>UTF-8</encoding>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <additionalparam>-Xdoclint:none</additionalparam>
+          <failOnError>false</failOnError>
+          <show>public</show>
+          <links>
+            <link>http://docs.oracle.com/javase/8/docs/api/</link>
+          </links>
+          <windowtitle>${project.name} - Public API</windowtitle>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
         <configuration>
-           <mavenExecutorId>forked-path</mavenExecutorId>
+          <mavenExecutorId>forked-path</mavenExecutorId>
         </configuration>
       </plugin>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-source-plugin</artifactId>
-            <executions>
-                <execution>
-                    <id>attach-sources</id>
-                    <goals>
-                        <goal>jar</goal>
-                    </goals>
-                </execution>
-            </executions>
-        </plugin>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <executions>
-                <execution>
-                    <id>attach-javadocs</id>
-                    <goals>
-                        <goal>jar</goal>
-                    </goals>
-                </execution>
-            </executions>
-        </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+            <configuration>
+              <attach>true</attach>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+            <configuration>
+              <attach>true</attach>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-staging-maven-plugin</artifactId>
+        <version>1.6.6</version>
+        <extensions>true</extensions>
+        <configuration>
+          <serverId>nexus</serverId>
+          <nexusUrl>https://oss.sonatype.org</nexusUrl>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <version>3.0.1</version>
+        <executions>
+          <execution>
+            <id>sign-artifacts</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>sign</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
   <profiles>
-	  <profile>
-	    <id>release-sign-artifacts</id>
-	    <activation>
-	      <property>
-	        <name>performRelease</name>
-	        <value>true</value>
-	      </property>
-	    </activation>
-	    <build>
-	      <plugins>
-	        <plugin>
-	          <groupId>org.apache.maven.plugins</groupId>
-	          <artifactId>maven-gpg-plugin</artifactId>
-	          <version>1.5</version>
-	          <executions>
-	            <execution>
-	              <id>sign-artifacts</id>
-	              <phase>verify</phase>
-	              <goals>
-	                <goal>sign</goal>
-	              </goals>
-	            </execution>
-	          </executions>
-	        </plugin>
-	      </plugins>
-	    </build>
-	  </profile>
-   </profiles>
+    <profile>
+      <id>release-sign-artifacts</id>
+      <activation>
+        <property>
+          <name>performRelease</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>3.0.1</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
