@@ -11,6 +11,21 @@ It supports separation of model and view, runs without external dependencies, ca
 
 **Caution**: JMTE is is in low maintenance mode: critical bugs will be fixed, but do not expect new features
 
+
+Include using Maven
+-------------------
+
+https://repo1.maven.org/maven2/com/floreysoft/jmte/
+
+```
+   <dependency>
+      <groupId>com.floreysoft</groupId>
+      <artifactId>jmte</artifactId>
+      <version>7.0.0</version>
+      <scope>build</scope>
+    </dependency>
+```    
+
 Documentation
 -------------
 
@@ -22,9 +37,11 @@ Where is JMTE used
 - Document and JavaScript Templating in Ultradox: https://help.ultradox.com/en/guides/templates/overview.html
 - Email Notifications in Graylog: http://docs.graylog.org/en/3.1/pages/streams/alerts.html#email-alert-notification
 
+
+
 Releasing
 ---------
 - https://andresalmiray.com/publishing-to-maven-central-using-apache-maven/
 - JDK 17 has issues: https://issues.sonatype.org/browse/OSSRH-66257
   * export MAVEN_OPTS="--add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.text=ALL-UNNAMED --add-opens=java.desktop/java.awt.font=ALL-UNNAMED"
-- GPG might have problems with your terminal: https://github.com/keybase/keybase-issues/issues/2798  
+- GPG might have problems with your terminal: https://github.com/keybase/keybase-issues/issues/2798
