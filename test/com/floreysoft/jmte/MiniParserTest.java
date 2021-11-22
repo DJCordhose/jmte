@@ -1,25 +1,15 @@
 package com.floreysoft.jmte;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-
-import org.junit.Ignore;
-import org.junit.Test;
 
 import com.floreysoft.jmte.util.MiniParser;
 import com.floreysoft.jmte.util.NestedParser;
+
+import org.junit.Test;
 
 
 public final class MiniParserTest {
