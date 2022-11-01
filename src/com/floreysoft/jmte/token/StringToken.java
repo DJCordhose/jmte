@@ -128,7 +128,7 @@ public class StringToken extends ExpressionToken {
 	}
 
 	private Object resolveDefault(Object value) {
-		if (value == null || value.equals("")) {
+		if (value == null || value.toString().equals("")) {
 			if (this.defaultValue != null) {
 				value = defaultValue;
 			}
