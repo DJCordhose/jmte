@@ -21,7 +21,7 @@ https://repo1.maven.org/maven2/com/floreysoft/jmte/
    <dependency>
       <groupId>com.floreysoft</groupId>
       <artifactId>jmte</artifactId>
-      <version>7.0.0</version>
+      <version>7.0.1</version>
       <scope>build</scope>
     </dependency>
 ```    
@@ -42,6 +42,7 @@ Where is JMTE used
 Releasing
 ---------
 - https://andresalmiray.com/publishing-to-maven-central-using-apache-maven/
+  * `mvn -B --file pom.xml release:prepare release:perform`
 - JDK 17 has issues: https://issues.sonatype.org/browse/OSSRH-66257
-  * export MAVEN_OPTS="--add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.text=ALL-UNNAMED --add-opens=java.desktop/java.awt.font=ALL-UNNAMED"
+  * `export MAVEN_OPTS="--add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.text=ALL-UNNAMED --add-opens=java.desktop/java.awt.font=ALL-UNNAMED"`
 - GPG might have problems with your terminal: https://github.com/keybase/keybase-issues/issues/2798
