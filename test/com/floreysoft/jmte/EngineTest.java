@@ -9,6 +9,9 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.Callable;
 
+import com.floreysoft.jmte.extended.ChainedNamedRenderer;
+import com.floreysoft.jmte.extended.LowerCaseNamedRenderer;
+import com.floreysoft.jmte.extended.UpperCaseNamedRenderer;
 import com.floreysoft.jmte.message.*;
 import com.floreysoft.jmte.renderer.NullRenderer;
 import com.floreysoft.jmte.renderer.OptionRenderFormatInfo;
@@ -93,7 +96,9 @@ public class EngineTest {
 	});
 	final Engine ENGINE_WITH_NAMED_RENDERERS = ENGINE_WITH_CUSTOM_RENDERERS
 			.registerNamedRenderer(new NamedDateRenderer())
-			.registerNamedRenderer(new NamedStringRenderer());
+			.registerNamedRenderer(new NamedStringRenderer())
+			.registerNamedRenderer(new UpperCaseNamedRenderer())
+			.registerNamedRenderer(new LowerCaseNamedRenderer());
 
 	private static final MyBean MyBean1 = new MyBean("1.1", "1.2");
 	private static final MyBean MyBean2 = new MyBean("2.1", "2.2");
@@ -1240,6 +1245,32 @@ public class EngineTest {
 	}
 
 	@Test
+	public void namedUpperCaseRenderer() throws Exception {
+		String output = ENGINE_WITH_NAMED_RENDERERS
+				.transform( "${address;uppercase}", DEFAULT_MODEL);
+		assertEquals("FILBERT", output);
+	}
+
+	@Test
+	public void namedLowerCaseRenderer() throws Exception {
+		String output = ENGINE_WITH_NAMED_RENDERERS
+				.transform( "${address;lowercase}", DEFAULT_MODEL);
+		assertEquals("filbert", output);
+	}
+
+	@Test
+	public void namedChainedRenderer() throws Exception {
+		Engine engine = new Engine();
+		engine.registerNamedRenderer(new UpperCaseNamedRenderer());
+		engine.registerNamedRenderer(new NamedStringRenderer());
+		engine.registerNamedRenderer(new ChainedNamedRenderer(engine.getAllNamedRenderers()));
+
+		String output = engine
+				.transform( "${address;chain(string(foo);uppercase)}", DEFAULT_MODEL);
+		assertEquals("STRING=FILBERT(FOO)", output);
+	}
+
+	@Test
 	public void namedRendererHasPrecedence() throws Exception {
 		final Engine engine = newEngine();
 		engine.registerRenderer(String.class, new Renderer<String>() {
@@ -1316,7 +1347,7 @@ public class EngineTest {
 	private String clearTimezone(String timeString) {
 		return timeString.replace("MEZ", "").replace("CET", "");
 	}
-	
+
 	@Test
 	public void callable() throws Exception {
 		Callable<Date> date = new Callable<Date>() {
@@ -1463,15 +1494,15 @@ public class EngineTest {
 				model);
 		assertEquals("back\\slash for all: Hello \\ world!", output);
 	}
-	
+
 	@Test
 	public void forachIterator() throws Exception {
 		String actual = newEngine().transform("${foreach list i}${_it.property1}${end}", DEFAULT_MODEL);
 		String output = newEngine().transform("${foreach list i}${i.property1}${end}", DEFAULT_MODEL);
 		assertEquals(output, actual);
 	}
-	
-	@Test		
+
+	@Test
 	public void forachIteratorNested() throws Exception {
 		String actual = newEngine()
 				.transform(
@@ -1483,7 +1514,7 @@ public class EngineTest {
 						DEFAULT_MODEL);
 		assertEquals(output, actual);
 	}
-	
+
 	@Test
 	public void forachIndex() throws Exception {
 		Map<String, Object> model = new HashMap<String, Object>();
@@ -1494,7 +1525,7 @@ public class EngineTest {
 		String expected = "1. item A\n" + "2. item B\n" + "3. item C";
 		assertEquals(expected, actual);
 	}
-	
+
 	@Test
 	public void nestedForachIndex() throws Exception {
 		Map<String, Object> model = new HashMap<String, Object>();
@@ -1509,7 +1540,7 @@ public class EngineTest {
 
 
 	private static NamedRenderer indexRenderer = new NamedRenderer() {
-		
+
 		@Override
 		public String render(Object o, String format, Locale locale, Map<String,Object> model) {
 			if (format != null && format.length() > 0 && Character.isLetter(format.charAt(0))) {
@@ -1524,20 +1555,20 @@ public class EngineTest {
 					// do nothing, simply fall back to default formatting
 				}
 			}
-			// suppose we have a number a index, use it with a bit of formatting 
+			// suppose we have a number a index, use it with a bit of formatting
 			return "(" + o.toString() + ")";
 		}
-		
+
 		@Override
 		public Class<?>[] getSupportedClasses() {
 			return new Class[]{String.class};
 		}
-		
+
 		@Override
 		public String getName() {
 			return "index";
 		}
-		
+
 		@Override
 		public RenderFormatInfo getFormatInfo() {
 			return null;
@@ -1553,7 +1584,7 @@ public class EngineTest {
 		// sample renderer that can do number and letter bullet points
 		// can easily be extended to any other format
 		engine.registerNamedRenderer(indexRenderer);
-		
+
 		String actual = engine.transform("${foreach array item \n}${index_item;index} ${item}${end}", model);
 		String expected = "(1) item A\n" + "(2) item B\n" + "(3) item C";
 		assertEquals(expected, actual);
@@ -1569,7 +1600,7 @@ public class EngineTest {
 		// sample renderer that can do number and letter bullet points
 		// can easily be extended to any other format
 		engine.registerNamedRenderer(indexRenderer);
-		
+
 		String actual = engine.transform("${foreach array item \n}${index_item;index} ${item}\n${foreach array2 inner \n}${index_inner;index(a)} ${inner}${end}${end}", model);
 		String expected = "(1) outer#1\n" + "a. inner#1\n" +"b. inner#2\n" + "(2) outer#2\n"+ "a. inner#1\n" +"b. inner#2";
 		assertEquals(expected, actual);
@@ -1591,7 +1622,7 @@ public class EngineTest {
 		String expected = "<input type='text' name='title' value=whatever/>";
 		assertEquals(expected, actual);
 	}
-	
+
 	@Test
 	public void xmlEncoder() throws Exception {
 		Engine engine = newEngine();
