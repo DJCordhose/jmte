@@ -1195,6 +1195,12 @@ public class EngineTest {
                         DEFAULT_MODEL);
 		assertEquals("1.1${\n },2.1\n\\", output);
 	}
+	
+	@Test
+	public void escapeShortcut() throws Exception {
+		String output = newEngine().transform("${xx\\{,address,\\}xx}", DEFAULT_MODEL);
+		assertEquals("xx{Filbert}xx", output);
+	}
 
 	@Test
 	public void quotes() throws Exception {
