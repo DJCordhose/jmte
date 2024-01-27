@@ -312,22 +312,15 @@ public class Util {
 		List<StartEndPair> result = new ArrayList<StartEndPair>();
 		int fromIndex = 0;
 		while (true) {
-			int exprStart = input.indexOf(splitStart, fromIndex);
+			int exprStart = nextIndex(input, splitStart, fromIndex, useEscaping);
 			if (exprStart == -1) {
 				break;
 			}
-			if (useEscaping && Util.isEscaped(input, exprStart)) {
-				fromIndex = exprStart + splitStart.length();
-				continue;
-			}
 
 			exprStart += splitStart.length();
-			int exprEnd = input.indexOf(splitEnd, exprStart);
+			int exprEnd = nextIndex(input, splitEnd, exprStart, useEscaping);
 			if (exprEnd == -1) {
 				break;
-			}
-			while (useEscaping && Util.isEscaped(input, exprEnd)) {
-				exprEnd = input.indexOf(splitEnd, exprEnd + splitEnd.length());
 			}
 
 			fromIndex = exprEnd + splitEnd.length();
@@ -336,6 +329,23 @@ public class Util {
 			result.add(startEndPair);
 		}
 		return result;
+	}
+
+	private static int nextIndex(String input, String str, int fromIndex, boolean useEscaping) {
+		if (useEscaping) {
+			return nextUnescapedIndex(input, str, fromIndex);
+		}
+		return input.indexOf(str, fromIndex);
+	}
+
+	private static int nextUnescapedIndex(String input, String str, int fromIndex) {
+		while (true) {
+			int index = input.indexOf(str, fromIndex);
+			if (index == -1 || !Util.isEscaped(input, index)) {
+				return index;
+			}
+			fromIndex = index + str.length();
+		}
 	}
 
 	/**
