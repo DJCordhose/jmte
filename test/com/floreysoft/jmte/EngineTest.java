@@ -1842,6 +1842,14 @@ public class EngineTest {
 	}
 
 	@Test
+	public void unterminatedScanWithEscapedEnd() throws Exception {
+		String line = "${no end\\}";
+		List<StartEndPair> scan = Util.scan(line, newEngine()
+				.getExprStartToken(), newEngine().getExprEndToken(), true);
+		assertEquals(0, scan.size());
+	}
+
+	@Test
 	public void extract() throws Exception {
 		String line = "${if adresse}Sie wohnen an ${adresse}";
 		List<StartEndPair> scan = Util.scan(line, newEngine()
