@@ -242,7 +242,7 @@ public class Lexer {
 		parameters = access(scannedFormat, 1);
 
 		// this is not a well formed variable name
-		if (variableName.contains(" ")) {
+		if (variableName == null || variableName.contains(" ")) {
 			return new InvalidToken();
 		}
 
