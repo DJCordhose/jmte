@@ -17,6 +17,8 @@ import com.floreysoft.jmte.renderer.NullRenderer;
 import com.floreysoft.jmte.renderer.OptionRenderFormatInfo;
 import com.floreysoft.jmte.renderer.SimpleNamedRenderer;
 import com.floreysoft.jmte.template.ErrorReportingOutputAppender;
+import com.floreysoft.jmte.token.InvalidToken;
+import com.floreysoft.jmte.token.Lexer;
 import com.floreysoft.jmte.util.StartEndPair;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -1849,6 +1851,14 @@ public class EngineTest {
 		List<StartEndPair> scan = Util.scan(line, newEngine()
 				.getExprStartToken(), newEngine().getExprEndToken(), true);
 		assertEquals(0, scan.size());
+	}
+
+	@Test
+	public void escapedSpace() throws Exception {
+		String line = "${\\ }";
+		Lexer lexer = new Lexer();
+		Token token = lexer.nextToken(line.toCharArray(), 2, 4);
+		assertTrue(token instanceof InvalidToken);
 	}
 
 	@Test
