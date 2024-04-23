@@ -10,6 +10,7 @@ import com.floreysoft.jmte.ScopedMap;
 import com.floreysoft.jmte.TemplateContext;
 import com.floreysoft.jmte.message.ErrorEntry;
 import com.floreysoft.jmte.message.JournalingErrorHandler;
+import com.floreysoft.jmte.token.AnnotationToken;
 import com.floreysoft.jmte.token.ElseToken;
 import com.floreysoft.jmte.token.EndToken;
 import com.floreysoft.jmte.token.ExpressionToken;
@@ -275,7 +276,7 @@ public class InterpretedTemplate extends AbstractTemplate {
 			if (!skip) {
 				this.context.engine.getOutputAppender().append(this.getOutput(), token.getText(), token);
 			}
-		} else if (token instanceof StringToken) {
+		} else if (token instanceof StringToken || token instanceof AnnotationToken) {
 			tokenStream.consume();
 			if (!skip) {
 				String expanded = (String) token.evaluate(context);

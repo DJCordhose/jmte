@@ -1497,6 +1497,26 @@ public class EngineTest {
 	}
 
 	@Test
+	public void annotationProcessorWithCondition() throws Exception {
+		String input = "${if address='Filbert'}${address}${else}${@sample argument}${end}";
+		Engine engine = newEngine();
+		engine.registerAnnotationProcessor(new AnnotationProcessor<String>() {
+
+			@Override
+			public String eval(AnnotationToken token, TemplateContext context) {
+				return token.getArguments();
+			}
+
+			@Override
+			public String getType() {
+				return "sample";
+			}
+		});
+		String output = engine.transform(input, DEFAULT_MODEL);
+		assertEquals("Filbert", output);
+	}
+
+	@Test
 	public void backslashInData() throws Exception {
 		Map<String, Object> model = new HashMap<String, Object>();
 		model.put("str", "Hello \\ world!");
