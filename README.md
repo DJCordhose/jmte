@@ -21,7 +21,7 @@ https://repo1.maven.org/maven2/com/floreysoft/jmte/
    <dependency>
       <groupId>com.floreysoft</groupId>
       <artifactId>jmte</artifactId>
-      <version>7.0.1</version>
+      <version>7.0.3</version>
       <scope>build</scope>
     </dependency>
 ```    
