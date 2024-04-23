@@ -3,7 +3,7 @@
   <groupId>com.floreysoft</groupId>
   <artifactId>jmte</artifactId>
   <packaging>jar</packaging>
-  <version>7.0.4-SNAPSHOT</version>
+  <version>7.0.3-SNAPSHOT</version>
   <name>Java Minimal Template Engine</name>
   <description>
     A small Library without runtime dependencies
