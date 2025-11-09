@@ -98,23 +98,11 @@ public class Lexer {
                     final String complexVariable;
 
                     if (hasCmp) {
-                        String operand = completeIfExpression.substring(posEq + 1);
-                        // heuristic: when there is leading or trailing space and after that a quote begins,
-						// it must be ignorable white space
-						if (isQuoted(operand.trim())) {
-							operand = operand.trim();
-						}
-                        // remove optional quotations
-                        if (isQuoted(operand)) {
-                        	innerToken = new PlainTextToken(operand.substring(1, operand.length() - 1));
-                        } else {
-													// no string operand since there are no quotes -> resolve this to be a resolved expression
-													innerToken = innerNextToken(operand);
-												}
                         complexVariable = completeIfExpression.substring(0, posEq).trim();
+                        innerToken = ifCmpOperand(untrimmedInput, completeIfExpression.substring(posEq + 1));
                     } else {
                         complexVariable = completeIfExpression;
-												innerToken = null;
+                        innerToken = null;
                     }
                     // if there is a semicolon before an eq, this must be a renderer applied to the variable
                     // like:
@@ -253,8 +241,37 @@ public class Lexer {
 
 	}
 
-	private static boolean isQuoted(String operand) {
-		return operand.startsWith("'") || operand.startsWith("\"");
+    private AbstractToken ifCmpOperand(String untrimmedInput, String untrimmedOperand) {
+        String operand = trimQuotedOperand(untrimmedOperand);
+        if (isQuoted(operand)) {
+            return new PlainTextToken(operand.substring(1, operand.length() - 1));
+        }
+
+        // no string operand since there are no quotes -> resolve this to be a resolved expression
+        final AbstractToken innerToken = innerNextToken(operand);
+        char[] buffer = untrimmedInput.toCharArray();
+        int index = untrimmedInput.length() - operand.length();
+        innerToken.setText(operand);
+        innerToken.setLine(buffer, index, untrimmedInput.length());
+        innerToken.setColumn(buffer, index, untrimmedInput.length());
+
+        return innerToken;
+    }
+
+    private String trimQuotedOperand(String untrimmedOperand) {
+        // heuristic: when there is leading or trailing space and after that a quote begins,
+        // it must be ignorable white space
+        String trimmedOperand = untrimmedOperand.trim();
+        if (isQuoted(trimmedOperand)) {
+            return trimmedOperand;
+        }
+        return untrimmedOperand;
+    }
+
+    private static boolean isQuoted(String operand) {
+        return operand.length() >= 2
+                && (operand.startsWith("'") || operand.startsWith("\""))
+                && operand.endsWith(operand.substring(0, 1));
 	}
 
 }

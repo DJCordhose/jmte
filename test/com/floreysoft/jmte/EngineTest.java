@@ -3,7 +3,6 @@ package com.floreysoft.jmte;
 import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.StringReader;
 import java.math.BigDecimal;
 import java.util.*;
@@ -16,7 +15,6 @@ import com.floreysoft.jmte.message.*;
 import com.floreysoft.jmte.renderer.NullRenderer;
 import com.floreysoft.jmte.renderer.OptionRenderFormatInfo;
 import com.floreysoft.jmte.renderer.SimpleNamedRenderer;
-import com.floreysoft.jmte.template.ErrorReportingOutputAppender;
 import com.floreysoft.jmte.token.InvalidToken;
 import com.floreysoft.jmte.token.Lexer;
 import com.floreysoft.jmte.util.StartEndPair;
@@ -1880,6 +1878,19 @@ public class EngineTest {
 		Token token = lexer.nextToken(line.toCharArray(), 2, 4);
 		assertTrue(token instanceof InvalidToken);
 	}
+
+    @Test
+    public void unclosedIfConditionStringIsInvalid() throws Exception {
+        String line = "test\ntest${ if something = \" }";
+        final Engine engine = newEngine();
+        JournalingErrorHandler errorHandler = new JournalingErrorHandler();
+        engine.setErrorHandler(errorHandler);
+
+        engine.transform(line, DEFAULT_MODEL);
+
+        ErrorEntry errorEntry = errorHandler.entries.get(0);
+        assertEquals("Error while parsing ' \" ' at location (2:22): Invalid expression!", errorEntry.formattedMessage.format());
+    }
 
 	@Test
 	public void extract() throws Exception {

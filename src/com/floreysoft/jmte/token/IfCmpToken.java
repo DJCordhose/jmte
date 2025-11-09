@@ -39,4 +39,18 @@ public class IfCmpToken extends IfToken {
 		return evaluated;
 	}
 
+    @Override public void setColumn(char[] buffer, int start, int end) {
+        super.setColumn(buffer, start, end);
+        if (operand != null) {
+            operand.setColumn(buffer, start + operand.getColumn() - 1, end);
+        }
+    }
+
+    @Override public void setLine(char[] buffer, int start, int end) {
+        super.setLine(buffer, start, end);
+        if (operand != null) {
+            operand.setLine(buffer, start + operand.getLine() - 1, end);
+        }
+    }
+
 }
